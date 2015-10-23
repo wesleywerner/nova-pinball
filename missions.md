@@ -32,7 +32,7 @@ Collapse the star
 + Complete the "NOVA" word bonus
 Fade in the black hole (the hole lock is now in effect)
 
-Feed matter into the gravity well
+Wormhole
 + Lock the ball in the black hole x3
 Open a worm-hole that swallows the black hole.
 The hole disappears, the planet is returned.

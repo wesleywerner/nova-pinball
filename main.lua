@@ -20,7 +20,10 @@ local states = require ("modules.states")
 local pinball = require ("nova-pinball-engine")
 local targetManager = require("modules.letter-targets")
 local bumperManager = require("modules.bumpers")
+local mission = require("modules.mission")
 local sprites = { }
+
+local missionText = ""
 
 function loadFromFile ( )
     local binser = require("modules.binser")
@@ -46,7 +49,7 @@ function love.load()
 
     -- Set graphics
     love.graphics.setBackgroundColor(0, 0, 0)
-    local font = love.graphics.newFont (40)
+    local font = love.graphics.newFont (20)
     love.graphics.setFont (font)
 
     -- Set initial game state
@@ -56,7 +59,7 @@ function love.load()
     loadFromFile()
 
     -- The black hole position where the light rays and spiral revolve around.
-    local x, y = pinball:getObjectXY("hole")
+    local x, y = pinball:getObjectXY("black hole")
     sprites.blackhole.x = x
     sprites.blackhole.y = y
 
@@ -78,19 +81,31 @@ function love.load()
     local x, y = pinball:getObjectXY("a")
     novaTarget:add("a", x, y, "images/spot-off.png", "images/a-on.png")
 
-    -- Set up the dot targets
-    dotTarget = targetManager:new()
-    dotTarget.onComplete = onDotTargetComplete
-    dotTarget.onSwitch = onDotTargetSwitch
-    dotTarget:add("dot1", 85, 245, "images/dot-off.png", "images/dot-on.png")
-    dotTarget:add("dot2", 85, 295, "images/dot-off.png", "images/dot-on.png")
-    dotTarget:add("dot3", 85, 345, "images/dot-off.png", "images/dot-on.png")
+    -- Set up the left targets
+    leftTargets = targetManager:new()
+    leftTargets.onComplete = onLeftTargetsComplete
+    leftTargets.onSwitch = onLeftTargetSwitch
+    leftTargets:add("dot1", 85, 245, "images/dot-off.png", "images/dot-on.png")
+    leftTargets:add("dot2", 85, 295, "images/dot-off.png", "images/dot-on.png")
+    leftTargets:add("dot3", 85, 345, "images/dot-off.png", "images/dot-on.png")
 
-    omegaTargets = targetManager:new()
-    --omegaTargets.onComplete = onOmegaTargetsComplete
-    --omegaTargets.onSwitch = onOmegaTargetsSwitch
-    omegaTargets:add("dot4", 545, 315, "images/dot-off.png", "images/dot-on.png")
-    omegaTargets:add("dot5", 545, 390, "images/dot-off.png", "images/dot-on.png")
+    -- Set up the right targets
+    rightTargets = targetManager:new()
+    rightTargets.onComplete = onrightTargetsComplete
+    rightTargets.onSwitch = onrightTargetsSwitch
+    rightTargets:add("dot4", 545, 315, "images/dot-off.png", "images/dot-on.png")
+    rightTargets:add("dot5", 545, 390, "images/dot-off.png", "images/dot-on.png")
+
+    -- Define the mission goals
+    mission:define("red giant"):on("nova word")
+    mission:define("hydrogen release"):on("left ramp"):on("right ramp")
+    mission:define("fusion stage 1"):on("left targets"):on("left ramp")
+    mission:define("fusion stage 2"):on("right targets"):on("right ramp")
+    mission:define("fusion burn"):wait(10)      -- triggered via a timed delay
+    mission:define("fusion unstable"):wait(10)  -- ditto
+    mission:define("collapse star"):on("left ramp"):on("right ramp"):on("nova word")
+    mission:define("wormhole"):on("black hole"):on("black hole"):on("black hole") -- FIX allow multiple entries
+    mission:start()
 
 end
 
@@ -98,6 +113,7 @@ function love.update (dt)
 
     states:update(dt)
     bumperManager:update(dt)
+    mission:update(dt)
 
     if (states.current == states.play or states.current == states.drained) then
         pinball:update(dt)
@@ -140,8 +156,8 @@ function love.draw ( )
 
     -- Draw the dot targets
     novaTarget:draw()
-    dotTarget:draw()
-    omegaTargets:draw()
+    leftTargets:draw()
+    rightTargets:draw()
 
     -- Draw the Nova wheel
     love.graphics.draw(sprites.wheel.image,
@@ -168,6 +184,9 @@ function love.draw ( )
     -- Draw the status box
     love.graphics.setColor(0, 0, 0, 200)
     love.graphics.rectangle("fill", 0, scrHeight - 60, scrWidth, scrHeight - 60)
+    love.graphics.setColor(255, 255, 255, 255)
+    love.graphics.printf("shoot for " .. mission:nextTarget(), 0, scrHeight - 60, 600, "center")
+    love.graphics.printf("completed " .. missionText, 0, scrHeight - 40, 600, "center")
 
     -- Simple text overlays
     if (states.current == states.launch) then
@@ -278,7 +297,7 @@ function pinball.tagContact (tag, id)
 
     if (tag == "renew") then
         pinball:newBall()
-    elseif (tag == "hole") then
+    elseif (tag == "black hole") then
         local sign1 = math.random(-1, 1) < 0 and -1 or 1
         local sign2 = math.random(-10, 1) < 0 and -1 or 1   -- More chance to shoot up
         local v1 = (300 + math.random() * 600) * sign1
@@ -287,10 +306,10 @@ function pinball.tagContact (tag, id)
     end
 
     novaTarget:switchOn(tag)
-    dotTarget:switchOn(tag)
-    omegaTargets:switchOn(tag)
-
+    leftTargets:switchOn(tag)
+    rightTargets:switchOn(tag)
     bumperManager:hit(tag)
+    mission:check(tag)
     
 end
 
@@ -310,19 +329,45 @@ function loadSprite (path)
 end
 
 function onNovaTargetSwitch(letter)
-    print("switched " .. letter)
+    --print("switched " .. letter)
 end
 
 function onNovaTargetComplete()
     print("NOVA word completed")
+    mission:check("nova word")
 end
 
-function onDotTargetSwitch(letter)
-    print("switched " .. letter)
+function onLeftTargetSwitch(letter)
+    --print("switched " .. letter)
 end
 
-function onDotTargetComplete()
+function onLeftTargetsComplete()
     print("DOT target completed")
+    mission:check("left targets")
+end
+
+function onrightTargetsSwitch(letter)
+    --print("switched " .. letter)
+end
+
+function onrightTargetsComplete()
+    mission:check("right targets")
+end
+
+function mission.onMissionAdvanced(title)
+    print("mission goal complete: " .. title)
+    missionText = title
+
+    if (title == "red giant") then
+    elseif (title == "hydrogen release") then
+    elseif (title == "fusion stage 1") then
+    elseif (title == "fusion stage 2") then
+    elseif (title == "fusion burn") then
+    elseif (title == "fusion unstable") then
+    elseif (title == "collapse star") then
+    elseif (title == "wormhole") then
+    end
+    
 end
 
 -- When a ball is locked with pinball:lockBall()
