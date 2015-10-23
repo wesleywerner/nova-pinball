@@ -1,0 +1,3 @@
+[submodule "nova-pinball-engine"]
+	path = nova-pinball-engine
+	url = git@github.com:wesleywerner/nova-pinball-engine.git
