@@ -129,6 +129,7 @@ function love.load()
     mission:define("fusion unstable"):wait(10)  -- ditto
     mission:define("collapse star"):on("left ramp"):on("right ramp"):on("nova word")
     mission:define("wormhole"):on("black hole"):on("black hole"):on("black hole") -- FIX allow multiple entries
+    mission:define("reset"):wait(10)
     mission:start()
 
 end
@@ -160,6 +161,11 @@ function love.keypressed (key, isrepeat)
     end
     if (key == "lshift") then pinball:moveLeftFlippers() end
     if (key == "rshift") then pinball:moveRightFlippers() end
+    -- advance the mission goal
+    if (key == "f2") then
+        mission:skipWait()
+        mission:check(mission:nextTarget())
+    end
 end
 
 function love.keyreleased(key)
@@ -397,6 +403,9 @@ function mission.onMissionAdvanced(title)
     elseif (title == "collapse star") then
         spriteStates:item("black hole"):setVisible(true):scale(0.001)
     elseif (title == "wormhole") then
+        pinball:setGravity(-0.2)
+    elseif (title == "reset") then
+        pinball:restoreGravity()
     end
     
 end

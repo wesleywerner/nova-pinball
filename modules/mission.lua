@@ -105,11 +105,15 @@ function mission:nextTarget()
     local idx = #self:current().has+1
     local max = #self:current().needs
     if (idx > max) then
-        print("max dependency reached.")
+        --print("max dependency reached.")
         return "NONE"
     else
         return self:current().needs[idx]
     end
+end
+
+function mission:skipWait()
+    if (self:current().wait) then self:current().wait = 0.1 end
 end
 
 return mission
