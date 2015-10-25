@@ -21,6 +21,7 @@ local pinball = require ("nova-pinball-engine")
 local targetManager = require("modules.letter-targets")
 local bumperManager = require("modules.bumpers")
 local mission = require("modules.mission")
+local spriteStates = require("modules.sprite-state-manager")
 local sprites = { }
 
 local missionText = ""
@@ -64,7 +65,7 @@ function love.load()
     sprites.background.ox = 0   -- Position relative to top-left corner
     sprites.background.oy = 0   -- and not the center of the image
 
-    -- The black hole position where the light rays and spiral revolve around.
+    -- Set the black hole, light rays and spiral positions
     local x, y = pinball:getObjectXY("black hole")
     sprites.blackhole.x = x
     sprites.blackhole.y = y
@@ -75,6 +76,12 @@ function love.load()
     sprites.wheel2.x = x
     sprites.wheel2.y = y
     sprites.wheel2.scale = -1
+
+    -- Set up the sprite state manager
+    spriteStates:add("wheel 1", sprites.wheel1):setRotation(0.0004):setScale(0):setVisible(false)
+    spriteStates:add("wheel 2", sprites.wheel2):setRotation(0.0006):setScale(0):setVisible(false)
+    spriteStates:add("rays", sprites.rays):setRotation(-0.002):setScale(0):setVisible(false)
+    spriteStates:add("black hole", sprites.blackhole):setScale(0):setVisible(false)
 
     -- Set up the bumper manager
     bumperManager:add("bumper1", "images/bumper.png")
@@ -133,9 +140,11 @@ function love.update (dt)
     end
 
     -- Rotate the nova wheel
-    sprites.wheel1.angle = sprites.wheel1.angle + 0.0004
-    sprites.wheel2.angle = sprites.wheel2.angle + 0.0006
-    sprites.rays.angle = sprites.rays.angle + 0.0004
+    spriteStates:update(dt)
+    --sprites.wheel1.angle = sprites.wheel1.angle + 0.0004
+    --sprites.wheel2.angle = sprites.wheel2.angle + 0.0006
+    --sprites.rays.angle = sprites.rays.angle + 0.0004
+
 
 end
 
@@ -174,15 +183,17 @@ function love.draw ( )
     leftTargets:draw()
     rightTargets:draw()
 
+    spriteStates:draw()
+
     -- Draw the Nova wheel
-    sprites.wheel1:draw()
-    sprites.wheel2:draw()
+    --sprites.wheel1:draw()
+    --sprites.wheel2:draw()
 
     -- Draw the Nova rays
-    sprites.rays:draw()
+    --sprites.rays:draw()
 
     -- Draw the Black hole
-    sprites.blackhole:draw()
+    --sprites.blackhole:draw()
 
     -- Draw the pinball components
     love.graphics.origin()  -- Reset the coordinate system
