@@ -42,7 +42,8 @@ function love.load()
     sprites.ball = loadSprite ("images/ball.png")
     sprites.leftflipper = loadSprite ("images/leftflip.png")
     sprites.blackhole = loadSprite("images/black-hole.png")
-    sprites.wheel = loadSprite("images/nova-wheel.png")
+    sprites.wheel1 = loadSprite("images/nova-wheel.png")
+    sprites.wheel2 = loadSprite("images/nova-wheel.png")
     sprites.rays = loadSprite("images/nova-rays.png")
 
     -- Set graphics
@@ -56,10 +57,24 @@ function love.load()
     -- Load the table layout into the pinball engine
     loadFromFile()
 
+    -- Position the background image
+    local border = 20
+    sprites.background.x = pinball.table.size.x1-border
+    sprites.background.y = pinball.table.size.y1-border
+    sprites.background.ox = 0   -- Position relative to top-left corner
+    sprites.background.oy = 0   -- and not the center of the image
+
     -- The black hole position where the light rays and spiral revolve around.
     local x, y = pinball:getObjectXY("black hole")
     sprites.blackhole.x = x
     sprites.blackhole.y = y
+    sprites.rays.x = x
+    sprites.rays.y = y
+    sprites.wheel1.x = x
+    sprites.wheel1.y = y
+    sprites.wheel2.x = x
+    sprites.wheel2.y = y
+    sprites.wheel2.scale = -1
 
     -- Set up the bumper manager
     bumperManager:add("bumper1", "images/bumper.png")
@@ -117,7 +132,9 @@ function love.update (dt)
         pinball:update(dt)
     end
 
-    sprites.wheel.angle = sprites.wheel.angle + 0.0004
+    -- Rotate the nova wheel
+    sprites.wheel1.angle = sprites.wheel1.angle + 0.0004
+    sprites.wheel2.angle = sprites.wheel2.angle + 0.0006
     sprites.rays.angle = sprites.rays.angle + 0.0004
 
 end
@@ -148,9 +165,9 @@ function love.draw ( )
 
     -- Draw the background image. It has a 20px border we account for.
     love.graphics.setColor(255, 255, 255, 255)
-    local border = 20
-    love.graphics.draw(sprites.background.image,
-        pinball.table.size.x1-border, pinball.table.size.y1-border)
+    sprites.background:draw()
+    --love.graphics.draw(sprites.background.image,
+        --pinball.table.size.x1-border, pinball.table.size.y1-border)
 
     -- Draw the dot targets
     novaTarget:draw()
@@ -158,22 +175,14 @@ function love.draw ( )
     rightTargets:draw()
 
     -- Draw the Nova wheel
-    love.graphics.draw(sprites.wheel.image,
-        sprites.blackhole.x, sprites.blackhole.y,
-        sprites.wheel.angle, 1, 1, sprites.wheel.ox, sprites.wheel.oy)
-    love.graphics.draw(sprites.wheel.image,
-        sprites.blackhole.x, sprites.blackhole.y,
-        -sprites.wheel.angle, -1, -1, sprites.wheel.ox, sprites.wheel.oy)
+    sprites.wheel1:draw()
+    sprites.wheel2:draw()
 
     -- Draw the Nova rays
-    love.graphics.draw(sprites.rays.image,
-        sprites.blackhole.x, sprites.blackhole.y,
-        sprites.rays.angle, 1, 1, sprites.rays.ox, sprites.rays.oy)
+    sprites.rays:draw()
 
     -- Draw the Black hole
-    love.graphics.draw(sprites.blackhole.image,
-        sprites.blackhole.x, sprites.blackhole.y,
-        0, 1, 1, sprites.blackhole.ox, sprites.blackhole.oy)
+    sprites.blackhole:draw()
 
     -- Draw the pinball components
     love.graphics.origin()  -- Reset the coordinate system
@@ -324,6 +333,10 @@ function loadSprite (path)
     sprite.ox = sprite.size[1] / 2
     sprite.oy = sprite.size[2] / 2
     sprite.angle = 0
+    sprite.scale = 1
+    function sprite:draw()
+        love.graphics.draw(self.image, self.x, self.y, self.angle, self.scale, self.scale, self.ox, self.oy)
+    end
     return sprite
 end
 
