@@ -43,9 +43,7 @@ function love.load()
     sprites.leftflipper = loadSprite ("images/leftflip.png")
     sprites.blackhole = loadSprite("images/black-hole.png")
     sprites.wheel = loadSprite("images/nova-wheel.png")
-    sprites.wheel.angle = 0
     sprites.rays = loadSprite("images/nova-rays.png")
-    sprites.rays.angle = 0
 
     -- Set graphics
     love.graphics.setBackgroundColor(0, 0, 0)
@@ -325,6 +323,7 @@ function loadSprite (path)
     sprite.size = { sprite.image:getDimensions () }
     sprite.ox = sprite.size[1] / 2
     sprite.oy = sprite.size[2] / 2
+    sprite.angle = 0
     return sprite
 end
 
