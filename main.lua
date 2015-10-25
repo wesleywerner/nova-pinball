@@ -136,12 +136,12 @@ end
 function love.update (dt)
 
     states:update(dt)
-    bumperManager:update(dt)
-    mission:update(dt)
 
     if (states.current == states.play or states.current == states.drained) then
         pinball:update(dt)
         spriteStates:update(dt)
+        mission:update(dt)
+        bumperManager:update(dt)
     end
 
 end
@@ -309,11 +309,7 @@ end
 
 function pinball.tagContact (tag, id)
 
-    --print("tag hit", tag, id)
-
-    if (tag == "renew") then
-        pinball:newBall()
-    elseif (tag == "black hole") then
+    if (tag == "black hole") then
         local blackHoleVisible = spriteStates:item("black hole").visible
         if blackHoleVisible then
             local sign1 = math.random(-1, 1) < 0 and -1 or 1
