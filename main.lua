@@ -384,10 +384,14 @@ function mission.onMissionAdvanced(title)
     if (title == "red giant") then
     elseif (title == "hydrogen release") then
     elseif (title == "fusion stage 1") then
+        spriteStates:item("wheel 1"):setVisible(true):scale(0.0003)
     elseif (title == "fusion stage 2") then
+        spriteStates:item("wheel 2"):setVisible(true):scale(0.0003)
     elseif (title == "fusion burn") then
     elseif (title == "fusion unstable") then
+        spriteStates:item("rays"):setVisible(true):scale(0.0005)
     elseif (title == "collapse star") then
+        spriteStates:item("black hole"):setVisible(true):scale(0.001)
     elseif (title == "wormhole") then
     end
     
