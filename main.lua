@@ -81,10 +81,10 @@ function love.load()
     sprites.wheel2.scale = -1
 
     -- Set up the sprite state manager
-    spriteStates:add("red star", sprites.redStar):setScale(0):setVisible(false)
     spriteStates:add("wheel 1", sprites.wheel1):setRotation(0.0004):setScale(0):setVisible(false)
     spriteStates:add("wheel 2", sprites.wheel2):setRotation(0.0006):setScale(0):setVisible(false)
     spriteStates:add("rays", sprites.rays):setRotation(-0.002):setScale(0):setVisible(false)
+    spriteStates:add("red star", sprites.redStar):setScale(0):setVisible(false)
     spriteStates:add("black hole", sprites.blackhole):setScale(0):setVisible(false)
 
     -- Set up the bumper manager
@@ -141,14 +141,8 @@ function love.update (dt)
 
     if (states.current == states.play or states.current == states.drained) then
         pinball:update(dt)
+        spriteStates:update(dt)
     end
-
-    -- Rotate the nova wheel
-    spriteStates:update(dt)
-    --sprites.wheel1.angle = sprites.wheel1.angle + 0.0004
-    --sprites.wheel2.angle = sprites.wheel2.angle + 0.0006
-    --sprites.rays.angle = sprites.rays.angle + 0.0004
-
 
 end
 
@@ -320,11 +314,14 @@ function pinball.tagContact (tag, id)
     if (tag == "renew") then
         pinball:newBall()
     elseif (tag == "black hole") then
-        local sign1 = math.random(-1, 1) < 0 and -1 or 1
-        local sign2 = math.random(-10, 1) < 0 and -1 or 1   -- More chance to shoot up
-        local v1 = (300 + math.random() * 600) * sign1
-        local v2 = (300 + math.random() * 600) * sign2
-        pinball:lockBall (id, sprites.blackhole.x, sprites.blackhole.y, 1, v1, v2)
+        local blackHoleVisible = spriteStates:item("black hole").visible
+        if blackHoleVisible then
+            local sign1 = math.random(-1, 1) < 0 and -1 or 1
+            local sign2 = math.random(-10, 1) < 0 and -1 or 1   -- More chance to shoot up
+            local v1 = (300 + math.random() * 600) * sign1
+            local v2 = (300 + math.random() * 600) * sign2
+            pinball:lockBall (id, sprites.blackhole.x, sprites.blackhole.y, 1, v1, v2)
+        end
     end
 
     novaTarget:switchOn(tag)
