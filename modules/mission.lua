@@ -47,15 +47,15 @@ function mission:start()
     self.currentIdx = 1
     for _, v in pairs(self.steps) do
         print("mission '" .. v.title .. "' needs: ")
-        for k, p in pairs(v.needs) do
-            print(k)
+        for _, p in pairs(v.needs) do
+            print(p)
         end
         if (v.wait) then print("wait delay of " .. v.wait) end
     end
 end
 
 function mission:on(signal)
-    self.build.needs[signal] = 1
+    table.insert(self.build.needs, signal)
     return self
 end
 
@@ -65,31 +65,34 @@ function mission:wait(delay)
 end
 
 function mission:check(signal)
-    --print("mission goal checking " .. signal)
-    if (self:current().needs[signal] and not self:current().has[signal]) then
-        print("got signal", signal)
-        self:current().has[signal] = 1
+    -- Validate dependencies in a specific order
+    local idx = #self:current().has+1
+    local max = #self:current().needs
+    if (idx > max) then
+        print("max dependency reached.")
+        return
+    end
+    if (self:current().needs[idx] == signal) then
+        table.insert(self:current().has, signal)
         self:testState()
-    --else
-        --print("signal not a goal")
-        --print("needs it?", self:current().needs[signal])
-        --print("has it?", self:current().has[signal])
     end
 end
 
 function mission:testState()
-    for dependency, _ in pairs(self:current().needs) do
-        -- This step is missing a dependency
-        if (not self:current().has[dependency]) then return end
-        -- This step still has a delay
-        if (self:current().wait) then return end
-    end
+    -- This step still has a delay
+    if (self:current().wait) then return end
+    -- This step has a remaining dependency
+    local need = #self:current().needs
+    local has = #self:current().has
+    if (has ~= need) then return end
     -- We have all we need to advance
     if (self.onMissionAdvanced) then self.onMissionAdvanced(self:current().title) end
+    -- Advance to the next step
     if (self.currentIdx < #self.steps) then
         self.currentIdx = self.currentIdx + 1
     else
-        -- Reset the missions
+        -- Reset the steps
+        self.currentIdx = 1
         for _, step in pairs(self.steps) do
             step.has = {}
         end
@@ -99,11 +102,14 @@ end
 function mission:nextTarget()
     -- This step still has a delay
     if (self:current().wait) then return "wait" end
-    for dependency, _ in pairs(self:current().needs) do
-        -- This step is missing a dependency
-        if (not self:current().has[dependency]) then return dependency end
+    local idx = #self:current().has+1
+    local max = #self:current().needs
+    if (idx > max) then
+        print("max dependency reached.")
+        return "NONE"
+    else
+        return self:current().needs[idx]
     end
-    return "NONE"
 end
 
 return mission
