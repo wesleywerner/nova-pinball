@@ -147,7 +147,6 @@ function love.update (dt)
 end
 
 function love.keypressed (key, isrepeat)
-
     if (key == "escape") then
         love.event.quit ( )
     elseif (key == " " and states.current == states.play) then
@@ -159,7 +158,13 @@ function love.keypressed (key, isrepeat)
             states:new(states.play)
         end
     end
+    if (key == "lshift") then pinball:moveLeftFlippers() end
+    if (key == "rshift") then pinball:moveRightFlippers() end
+end
 
+function love.keyreleased(key)
+    if (key == "lshift") then pinball:releaseLeftFlippers() end
+    if (key == "rshift") then pinball:releaseRightFlippers() end
 end
 
 function love.draw ( )
@@ -303,7 +308,8 @@ end
 -- The number of balls still in play are passed.
 function pinball.ballDrained (ballsInPlay)
     if (ballsInPlay == 0) then
-        states:new (states.drained)
+        --states:new (states.drained)
+        pinball:newBall()
     end
 end
 
