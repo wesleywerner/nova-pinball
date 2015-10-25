@@ -46,6 +46,7 @@ function love.load()
     sprites.wheel1 = loadSprite("images/nova-wheel.png")
     sprites.wheel2 = loadSprite("images/nova-wheel.png")
     sprites.rays = loadSprite("images/nova-rays.png")
+    sprites.redStar = loadSprite("images/red-star.png")
 
     -- Set graphics
     love.graphics.setBackgroundColor(0, 0, 0)
@@ -71,6 +72,8 @@ function love.load()
     sprites.blackhole.y = y
     sprites.rays.x = x
     sprites.rays.y = y
+    sprites.redStar.x = x
+    sprites.redStar.y = y
     sprites.wheel1.x = x
     sprites.wheel1.y = y
     sprites.wheel2.x = x
@@ -78,6 +81,7 @@ function love.load()
     sprites.wheel2.scale = -1
 
     -- Set up the sprite state manager
+    spriteStates:add("red star", sprites.redStar):setScale(0):setVisible(false)
     spriteStates:add("wheel 1", sprites.wheel1):setRotation(0.0004):setScale(0):setVisible(false)
     spriteStates:add("wheel 2", sprites.wheel2):setRotation(0.0006):setScale(0):setVisible(false)
     spriteStates:add("rays", sprites.rays):setRotation(-0.002):setScale(0):setVisible(false)
@@ -382,6 +386,7 @@ function mission.onMissionAdvanced(title)
     missionText = title
 
     if (title == "red giant") then
+        spriteStates:item("red star"):setVisible(true):scale(0.001)
     elseif (title == "hydrogen release") then
     elseif (title == "fusion stage 1") then
         spriteStates:item("wheel 1"):setVisible(true):scale(0.0003)
