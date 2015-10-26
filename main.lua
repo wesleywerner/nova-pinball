@@ -315,7 +315,10 @@ function pinball.drawBumper (tag, x, y, r)
     --love.graphics.setColor(255, 255, 255, 255)
     --love.graphics.draw(sprites.bumper.image, x, y, 0, 1, 1, sprites.bumper.ox, sprites.bumper.oy)
 
-    -- TODO This translate should happen in the main draw
+    -- TODO We translate here because for some reason
+    -- the x,y of CircleShapes are not in world coordinates.
+    -- I have tried finding the cause without luck.
+    -- Polygon shapes translate fine (drawKicker for example)
     if (states.current == states.previewTable) then
         love.graphics.origin()  -- Reset the coordinate system
         if (states.current == states.previewTable) then
