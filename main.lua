@@ -235,12 +235,7 @@ function love.draw ( )
     spriteStates:draw()
 
     -- Draw the pinball components
-    love.graphics.origin()  -- Reset the coordinate system
     pinball:draw()
-
-    if (states.current == states.previewTable) then
-        love.graphics.translate(0, previewPosition)
-    end
 
     -- Draw the status box
     --love.graphics.setColor(0, 0, 0, 200)
@@ -320,6 +315,14 @@ function pinball.drawBumper (tag, x, y, r)
     --love.graphics.setColor(255, 255, 255, 255)
     --love.graphics.draw(sprites.bumper.image, x, y, 0, 1, 1, sprites.bumper.ox, sprites.bumper.oy)
 
+    -- TODO This translate should happen in the main draw
+    if (states.current == states.previewTable) then
+        love.graphics.origin()  -- Reset the coordinate system
+        if (states.current == states.previewTable) then
+            love.graphics.translate(0, previewPosition)
+        end
+    end
+    
     bumperManager:draw(tag, x, y)
 end
 
