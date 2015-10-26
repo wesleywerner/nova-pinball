@@ -456,6 +456,11 @@ function onrightTargetsComplete()
     mission:check("right targets")
 end
 
+function mission.onMissionCheckPassed(signal)
+    -- Force to display the next goal
+    updateLedDisplayMessages(0)
+end
+
 function mission.onMissionAdvanced(title)
     print("mission goal complete: " .. title)
 

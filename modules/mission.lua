@@ -76,6 +76,7 @@ function mission:check(signal)
     if (self:current().needs[idx] == signal) then
         table.insert(self:current().has, signal)
         self:testState()
+        if (self.onMissionCheckPassed) then self.onMissionCheckPassed(signal) end
     end
 end
 
