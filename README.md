@@ -4,6 +4,17 @@ A pinball simulator written in LÖVE.
 
 Created by Wesley "keyboard monkey" Werner
 
+# CREDITS
+
+*LOVE*, a 2D game framework
+http://love2d.org/
+
+*Advanced LED Board-7 Font* by Sizenko Alexander
+http://www.styleseven.com
+http://www.fontspace.com/style-7/advanced-led-board-7
+
+*Pinball engine* code by Wesley Werner
+
 # LICENSE
 
 This program is free software: you can redistribute it and/or modify
