@@ -20,6 +20,12 @@ local states = { }
 
 states.current = nil
 
+states.previewTable = {
+    ["timeout"] = nil,
+    ["timer"] = nil,
+    ["next"] = nil
+    }
+
 states.play = {
     ["timeout"] = nil,
     ["timer"] = nil,

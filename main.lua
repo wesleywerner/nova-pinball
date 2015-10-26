@@ -24,6 +24,7 @@ local mission = require("modules.mission")
 local spriteStates = require("modules.sprite-state-manager")
 local led = require("modules.led-display")
 local sprites = { }
+local previewPosition = 0
 
 -- A set of encouraging words while the mission state is waiting
 local waitingWords = {
@@ -69,7 +70,8 @@ function love.load()
     love.graphics.setFont (font)
 
     -- Set initial game state
-    states:new (states.launch)
+    pinball:newBall()
+    states:new(states.previewTable)
 
     -- Load the table layout into the pinball engine
     loadFromFile()
@@ -171,34 +173,33 @@ function love.load()
 end
 
 function love.update (dt)
-
     states:update(dt)
-
-    if (states.current == states.play or states.current == states.drained) then
+    led:update(dt)
+    if (states.current == states.previewTable) then
+        if (previewPosition > -pinball.cfg.cameraOffset) then
+            previewPosition = previewPosition - (dt*50)
+        end
+    elseif (states.current == states.play or states.current == states.drained) then
         pinball:update(dt)
         bumperManager:update(dt)
         spriteStates:update(dt)
         mission:update(dt)
-        led:update(dt)
         updateMissionStatusReminder(dt)
     end
 
 end
 
 function love.keypressed (key, isrepeat)
-    if (key == "escape") then
-        love.event.quit ( )
-    elseif (key == " " and states.current == states.play) then
-        pinball:newBall()
-    elseif (key == "p") then
-        if (states.current == states.play) then
-            states:new(states.paused)
-        else
-            states:new(states.play)
-        end
+    if (states.current == states.previewTable) then
+        if (key == " ") then states:new(states.play) end
+    elseif (states.current == states.play) then
+        if (key == "p") then states:new(states.paused) end
+        if (key == "lshift") then pinball:moveLeftFlippers() end
+        if (key == "rshift") then pinball:moveRightFlippers() end
+    elseif (states.current == states.paused) then
+        if (key == "p") then states:new(states.play) end
     end
-    if (key == "lshift") then pinball:moveLeftFlippers() end
-    if (key == "rshift") then pinball:moveRightFlippers() end
+    if (key == "escape") then love.event.quit() end
     -- advance the mission goal
     if (key == "f2") then
         mission:skipWait()
@@ -219,32 +220,27 @@ function love.draw ( )
     -- Fix the coordinate system so that we draw relative to the table.
     pinball:setCamera()
 
+    if (states.current == states.previewTable) then
+        love.graphics.translate(0, previewPosition)
+    end
+    
     -- Draw the background image. It has a 20px border we account for.
     love.graphics.setColor(255, 255, 255, 255)
     sprites.background:draw()
-    --love.graphics.draw(sprites.background.image,
-        --pinball.table.size.x1-border, pinball.table.size.y1-border)
 
-    -- Draw the dot targets
+    -- Draw targets and sprites
     novaTarget:draw()
     leftTargets:draw()
     rightTargets:draw()
-
     spriteStates:draw()
-
-    -- Draw the Nova wheel
-    --sprites.wheel1:draw()
-    --sprites.wheel2:draw()
-
-    -- Draw the Nova rays
-    --sprites.rays:draw()
-
-    -- Draw the Black hole
-    --sprites.blackhole:draw()
 
     -- Draw the pinball components
     love.graphics.origin()  -- Reset the coordinate system
     pinball:draw()
+
+    if (states.current == states.previewTable) then
+        love.graphics.translate(0, previewPosition)
+    end
 
     -- Draw the status box
     --love.graphics.setColor(0, 0, 0, 200)
@@ -268,7 +264,7 @@ function love.draw ( )
         love.graphics.printf (text, 0, 200, 600, "center")
         
     elseif (states.current == states.paused) then
-        love.graphics.setColor(255, 128, 128, 64)
+        love.graphics.setColor(255, 128, 128, 200)
         love.graphics.printf ("PAUSED", 0, 200, 600, "center")
 
     elseif (states.current == states.drained) then
