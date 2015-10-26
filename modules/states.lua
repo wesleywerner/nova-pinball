@@ -20,6 +20,12 @@ local states = { }
 
 states.current = nil
 
+states.promptQuit = {
+    ["timeout"] = nil,
+    ["timer"] = nil,
+    ["next"] = nil
+    }
+
 states.previewTable = {
     ["timeout"] = nil,
     ["timer"] = nil,

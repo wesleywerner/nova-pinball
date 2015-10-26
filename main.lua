@@ -202,13 +202,20 @@ function love.keypressed (key, isrepeat)
             updateLedDisplayMessages(0)
         end
     elseif (states.current == states.play) then
-        if (key == "p") then states:new(states.paused) end
+        if (key == "escape") then states:new(states.paused) end
         if (key == "lshift") then pinball:moveLeftFlippers() end
         if (key == "rshift") then pinball:moveRightFlippers() end
     elseif (states.current == states.paused) then
-        if (key == "p") then states:new(states.play) end
+        if (key == " ") then states:new(states.play) end
+        if (key == "escape") then states:new(states.promptQuit) end
+    elseif (states.current == states.promptQuit) then
+        if (key == "y") then
+            love.event.quit()
+        else
+            states:new(states.paused)
+        end
     end
-    if (key == "escape") then love.event.quit() end
+    --if (key == "escape") then love.event.quit() end
     -- advance the mission goal
     if (key == "f2") then
         mission:skipWait()
@@ -253,31 +260,23 @@ function love.draw ( )
     led:draw()
 
     -- Simple text overlays
-    if (states.current == states.launch) then
-
-        local text = ""
-        if (states.current.timer > 1) then
-            text = "GO!"
-        elseif (states.current.timer > 0.5) then
-            text = "Set"
-        elseif (states.current.timer > 0) then
-            text = "Ready"
-        end
-        
-        love.graphics.setColor(255, 255, 255)
-        love.graphics.printf (text, 0, 200, 600, "center")
-        
-    elseif (states.current == states.paused) then
-        love.graphics.setColor(255, 128, 128, 200)
-        love.graphics.printf ("PAUSED", 0, 200, 600, "center")
-
+    if (states.current == states.paused) then
+        printShadowText("PAUSED", 200, {255, 128, 255, 200})
+    elseif (states.current == states.promptQuit) then
+        printShadowText("Leave? [Y/N]", 240, {255, 255, 128, 200})
     elseif (states.current == states.drained) then
-
         love.graphics.setColor(128, 0, 255)
         love.graphics.printf ("Drained", 0, 200, 600, "center")
-
     end
 
+end
+
+function printShadowText(text, y, color)
+    local w = love.graphics.getWidth()
+    love.graphics.setColor(0, 0, 0, 200)
+    love.graphics.printf (text, 1, y+1, w, "center")
+    love.graphics.setColor(unpack(color))
+    love.graphics.printf (text, 0, y, w, "center")
 end
 
 function love.resize (w, h)
