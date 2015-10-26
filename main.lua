@@ -164,10 +164,10 @@ function love.load()
     mission:define("hydrogen release"):on("left ramp"):on("right ramp")
     mission:define("fusion stage 1"):on("left targets"):on("left ramp")
     mission:define("fusion stage 2"):on("right targets"):on("right ramp")
-    mission:define("fusion burn"):wait(10)      -- triggered via a timed delay
-    mission:define("fusion unstable"):wait(10)  -- ditto
+    mission:define("fusion burn"):wait(60)      -- triggered via a timed delay
+    mission:define("fusion unstable"):wait(60)  -- ditto
     mission:define("collapse star"):on("left ramp"):on("right ramp"):on("nova word")
-    mission:define("wormhole"):on("black hole"):on("black hole"):on("black hole") -- FIX allow multiple entries
+    mission:define("wormhole"):on("black hole"):on("black hole"):on("black hole")
     mission:define("reset"):wait(15)
     mission:start()
 
