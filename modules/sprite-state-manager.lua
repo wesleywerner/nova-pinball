@@ -34,6 +34,7 @@ function manager:add(key, sprite)
     end
     function o:setScale(scale)
         self.sprite.scale = scale
+        self.visible = scale == 0
         return self
     end
     function o:scale(scale)
@@ -69,6 +70,8 @@ function manager:update(dt)
                 elseif (v.sprite.scale <= 0 and v.scaleIncrement < 0) then
                     v.sprite.scale = 0
                     v.scaleIncrement = nil
+                    -- Stop drawing sprites at zero scale
+                    v.visible = false
                 end
             end
             if (v.angleIncrement) then
