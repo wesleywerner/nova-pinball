@@ -300,7 +300,7 @@ function updateLedDisplayMessages(dt)
         if (states.current == states.previewTable) then
             -- Pre-game welcome
             led:add(0, "Welcome to Nova Pinball!")
-            led:add(0, "Hit space to play")
+            led:add(0, "Hit space to play", true)
         elseif (states.current == states.play) then
             -- Display a hint of the next goal
             local title = mission:nextTarget()
@@ -386,7 +386,8 @@ end
 -- The number of balls still in play are passed.
 function pinball.ballDrained (ballsInPlay)
     if (ballsInPlay == 0) then
-        led:add(20, "Ball drained!")
+        led:add(20, "Ball drained")
+        led:add(0, "Hit space to play", true)
     end
 end
 
@@ -400,6 +401,7 @@ function pinball.tagContact (tag, id)
             local v1 = (300 + math.random() * 600) * sign1
             local v2 = (300 + math.random() * 600) * sign2
             pinball:lockBall (id, sprites.blackhole.x, sprites.blackhole.y, 1, v1, v2)
+            led:add(0, "Gravity Lock Bonus")
         end
     end
 
@@ -436,7 +438,7 @@ function onNovaTargetSwitch(letter)
 end
 
 function onNovaTargetComplete()
-    print("NOVA word completed")
+    led:add(0, "Word Bonus!")
     mission:check("nova word")
 end
 
