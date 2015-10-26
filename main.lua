@@ -22,9 +22,8 @@ local targetManager = require("modules.letter-targets")
 local bumperManager = require("modules.bumpers")
 local mission = require("modules.mission")
 local spriteStates = require("modules.sprite-state-manager")
+local led = require("modules.led-display")
 local sprites = { }
-
-local missionText = ""
 
 function loadFromFile ( )
     local binser = require("modules.binser")
@@ -148,6 +147,10 @@ function love.load()
     mission:define("reset"):wait(15)
     mission:start()
 
+    led:add(0, "Welcome to Nova Pinball!")
+    led:add(0, "Hit space to play")
+    positionDrawingElements()
+
 end
 
 function love.update (dt)
@@ -157,9 +160,10 @@ function love.update (dt)
     if (states.current == states.play or states.current == states.drained) then
         pinball:update(dt)
         bumperManager:update(dt)
-    end
         spriteStates:update(dt)
         mission:update(dt)
+    end
+    led:update(dt)
 
 end
 
@@ -228,8 +232,7 @@ function love.draw ( )
     love.graphics.setColor(0, 0, 0, 200)
     love.graphics.rectangle("fill", 0, scrHeight - 60, scrWidth, scrHeight - 60)
     love.graphics.setColor(255, 255, 255, 255)
-    love.graphics.printf("shoot for " .. mission:nextTarget(), 0, scrHeight - 60, 600, "center")
-    love.graphics.printf("completed " .. missionText, 0, scrHeight - 40, 600, "center")
+    led:draw()
 
     -- Simple text overlays
     if (states.current == states.launch) then
@@ -261,6 +264,13 @@ end
 
 function love.resize (w, h)
     pinball:resize (w, h)
+end
+
+function positionDrawingElements()
+    w, h = love.window.getDimensions()
+    led.size.w = w
+    led.size.h = 60
+    led.position.y = h - led.size.h
 end
 
 function pinball.drawWall (points)
@@ -404,22 +414,30 @@ end
 
 function mission.onMissionAdvanced(title)
     print("mission goal complete: " .. title)
-    missionText = title
 
     if (title == "red giant") then
+        led:add(10, "Star evolved into a Red Giant")
         spriteStates:item("red star"):setVisible(true):scale(0.001)
     elseif (title == "hydrogen release") then
+        led:add(10, "Hydrogen released!")
     elseif (title == "fusion stage 1") then
+        led:add(10, "Fusion first stage complete!")
         spriteStates:item("wheel 1"):setVisible(true):scale(0.003) -- 0.0003    TODO use these final values
     elseif (title == "fusion stage 2") then
+        led:add(10, "Fusion second stage complete!")
         spriteStates:item("wheel 2"):setVisible(true):scale(0.003)
     elseif (title == "fusion burn") then
+        led:add(10, "Fusion burning... ")
     elseif (title == "fusion unstable") then
+        led:add(10, "Fusion unstable!")
         spriteStates:item("rays"):setVisible(true):scale(0.005) -- 0.0005   TODO use these final values
     elseif (title == "collapse star") then
+        led:add(10, "Star collapsing!")
+        led:add(10, "Black hole created!")
         spriteStates:item("black hole"):setVisible(true):scale(0.01)   -- 0.001
     elseif (title == "wormhole") then
         -- show the worm hole
+        led:add(10, "Wormhole Alert!")
         pinball:setGravity(-0.1)
         pinball:setBallDampening(1)
         spriteStates:item("worm hole rays"):setVisible(true):scale(0.001)
@@ -427,6 +445,7 @@ function mission.onMissionAdvanced(title)
         spriteStates:item("worm hole clouds"):setVisible(true):scale(0.002)
     elseif (title == "reset") then
         -- hide the nova rings and black hole
+        led:add(0, "")
         spriteStates:item("wheel 1"):scale(-0.1)
         spriteStates:item("wheel 2"):scale(-0.1)
         spriteStates:item("rays"):scale(-0.1)
