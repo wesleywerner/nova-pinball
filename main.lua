@@ -26,6 +26,11 @@ local led = require("modules.led-display")
 local sprites = { }
 local previewPosition = 0
 
+-- A lookup of mission targets and their human readable texts
+local missionDescriptions = {
+    ["nova word"]="Complete the NOVA word bonus",
+    }
+
 -- A set of encouraging words while the mission state is waiting
 local waitingWords = {
     "Keep it up!",
@@ -193,6 +198,8 @@ function love.keypressed (key, isrepeat)
         if (key == " ") then
             pinball.cfg.translateOffset.y = 0
             states:new(states.play)
+            led:add(0, "Make the star go Nova!")
+            updateLedDisplayMessages(0)
         end
     elseif (states.current == states.play) then
         if (key == "p") then states:new(states.paused) end
@@ -294,15 +301,18 @@ function updateLedDisplayMessages(dt)
             led:add(0, "Hit space to play")
         elseif (states.current == states.play) then
             -- Display a hint of the next goal
-            local targetName = mission:nextTarget()
+            local title = mission:nextTarget()
             -- Show encouraging words while waiting on a goal
-            if (targetName == "wait") then
-                local words = waitingWords[math.random(1, #waitingWords)]
-                led:add(10, words)
-                return
+            if (title == "wait") then
+                title = waitingWords[math.random(1, #waitingWords)]
+            elseif (missionDescriptions[title]) then
+                -- Display a hint of the next goal
+                title = missionDescriptions[title]
+            else
+                -- A generic message if no descriptive text is available for this goal
+                title = "Shoot for the " .. title
             end
-            -- Display a hing of the next goal
-            led:add(10, "Shoot for the " .. targetName)
+            led:add(10, title)
         end
     end
 end
