@@ -201,6 +201,7 @@ function love.keypressed (key, isrepeat)
             led:add(0, "Make the star go Nova!")
             updateLedDisplayMessages(0)
         end
+        if (key == "escape") then states:new(states.promptQuit) end
     elseif (states.current == states.play) then
         if (key == "escape") then states:new(states.paused) end
         if (key == "lshift") then pinball:moveLeftFlippers() end
