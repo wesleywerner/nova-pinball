@@ -281,7 +281,6 @@ function updateMissionStatusReminder(dt)
     missionStatusUpdateTime = missionStatusUpdateTime - dt
     if (missionStatusUpdateTime < 0) then
         missionStatusUpdateTime = 20
-        led:add(0, "Mission goal")
         led:add(0, "Shoot for " .. mission:nextTarget())
     end
 end
@@ -470,10 +469,12 @@ function mission.onMissionAdvanced(title)
         -- Slowly retract the rays
         spriteStates:item("worm hole rays"):scale(-0.015)
         -- Show a star flare after reset
-        spriteStates:item("star flare"):scale(0.001)
+        spriteStates:item("star flare"):scale(0.001):setVisible(true)
         pinball:restoreGravity()
         pinball:setBallDampening(0)
     end
+
+    led:add(0, "Shoot for " .. mission:nextTarget())
     
 end
 
