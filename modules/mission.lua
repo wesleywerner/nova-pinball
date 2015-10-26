@@ -60,6 +60,7 @@ function mission:on(signal)
 end
 
 function mission:wait(delay)
+    self.build.waitDefault = delay
     self.build.wait = delay
     return self
 end
@@ -95,6 +96,7 @@ function mission:testState()
         self.currentIdx = 1
         for _, step in pairs(self.steps) do
             step.has = {}
+            if (step.waitDefault) then step.wait = step.waitDefault end
         end
     end
 end
