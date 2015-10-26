@@ -36,7 +36,7 @@ local waitingWords = {
     }
 
 -- Tracks when to display the current mission goal on the LED display
-local missionStatusUpdateTime = 5
+local missionStatusUpdateTime = 0
 
 function loadFromFile ( )
     local binser = require("modules.binser")
@@ -166,8 +166,6 @@ function love.load()
     mission:define("reset"):wait(15)
     mission:start()
 
-    led:add(0, "Welcome to Nova Pinball!")
-    led:add(0, "Hit space to play")
     positionDrawingElements()
 
 end
@@ -175,6 +173,7 @@ end
 function love.update (dt)
     states:update(dt)
     led:update(dt)
+    updateLedDisplayMessages(dt)
     if (states.current == states.previewTable) then
         if (previewPosition > -pinball.cfg.cameraOffset) then
             previewPosition = previewPosition - (dt*50)
@@ -185,7 +184,6 @@ function love.update (dt)
         bumperManager:update(dt)
         spriteStates:update(dt)
         mission:update(dt)
-        updateMissionStatusReminder(dt)
     end
 
 end
@@ -286,19 +284,26 @@ function positionDrawingElements()
     led.position.y = h - led.size.h
 end
 
-function updateMissionStatusReminder(dt)
+function updateLedDisplayMessages(dt)
     missionStatusUpdateTime = missionStatusUpdateTime - dt
     if (missionStatusUpdateTime < 0 or dt == 0) then
         missionStatusUpdateTime = 20
-        local targetName = mission:nextTarget()
-        -- Show encouraging words while waiting on a goal
-        if (targetName == "wait") then
-            local words = waitingWords[math.random(1, #waitingWords)]
-            led:add(10, words)
-            return
+        if (states.current == states.previewTable) then
+            -- Pre-game welcome
+            led:add(0, "Welcome to Nova Pinball!")
+            led:add(0, "Hit space to play")
+        elseif (states.current == states.play) then
+            -- Display a hint of the next goal
+            local targetName = mission:nextTarget()
+            -- Show encouraging words while waiting on a goal
+            if (targetName == "wait") then
+                local words = waitingWords[math.random(1, #waitingWords)]
+                led:add(10, words)
+                return
+            end
+            -- Display a hing of the next goal
+            led:add(10, "Shoot for the " .. targetName)
         end
-        -- Display a hing of the next goal
-        led:add(10, "Shoot for the " .. targetName)
     end
 end
 
@@ -491,7 +496,7 @@ function mission.onMissionAdvanced(title)
         pinball:setBallDampening(0)
     end
 
-    updateMissionStatusReminder(0)
+    updateLedDisplayMessages(0)
     
 end
 
