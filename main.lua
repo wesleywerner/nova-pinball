@@ -25,6 +25,15 @@ local spriteStates = require("modules.sprite-state-manager")
 local led = require("modules.led-display")
 local sprites = { }
 
+-- A set of encouraging words while the mission state is waiting
+local waitingWords = {
+    "Keep it up!",
+    "Looking good!",
+    "Don't drop that ball!",
+    "Hope you're enjoying Nova Pinball!",
+    "You are in the Zone!"
+    }
+
 -- Tracks when to display the current mission goal on the LED display
 local missionStatusUpdateTime = 5
 
@@ -279,9 +288,17 @@ end
 
 function updateMissionStatusReminder(dt)
     missionStatusUpdateTime = missionStatusUpdateTime - dt
-    if (missionStatusUpdateTime < 0) then
+    if (missionStatusUpdateTime < 0 or dt == 0) then
         missionStatusUpdateTime = 20
-        led:add(0, "Shoot for " .. mission:nextTarget())
+        local targetName = mission:nextTarget()
+        -- Show encouraging words while waiting on a goal
+        if (targetName == "wait") then
+            local words = waitingWords[math.random(1, #waitingWords)]
+            led:add(10, words)
+            return
+        end
+        -- Display a hing of the next goal
+        led:add(10, "Shoot for the " .. targetName)
     end
 end
 
@@ -474,7 +491,7 @@ function mission.onMissionAdvanced(title)
         pinball:setBallDampening(0)
     end
 
-    led:add(0, "Shoot for " .. mission:nextTarget())
+    updateMissionStatusReminder(0)
     
 end
 
