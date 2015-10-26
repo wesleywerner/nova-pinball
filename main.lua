@@ -434,22 +434,22 @@ function mission.onMissionAdvanced(title)
         led:add(10, "Hydrogen released!")
     elseif (title == "fusion stage 1") then
         led:add(10, "Fusion first stage complete!")
-        spriteStates:item("wheel 1"):setVisible(true):scale(0.003) -- 0.0003    TODO use these final values
+        spriteStates:item("wheel 1"):setVisible(true):scale(0.0003)
     elseif (title == "fusion stage 2") then
         led:add(10, "Fusion second stage complete!")
-        spriteStates:item("wheel 2"):setVisible(true):scale(0.003)
+        spriteStates:item("wheel 2"):setVisible(true):scale(0.0003)
     elseif (title == "fusion burn") then
         led:add(10, "Fusion burning... ")
     elseif (title == "fusion unstable") then
         led:add(10, "Fusion unstable!")
-        spriteStates:item("rays"):setVisible(true):scale(0.005) -- 0.0005   TODO use these final values
+        spriteStates:item("rays"):setVisible(true):scale(0.0005)
     elseif (title == "collapse star") then
         led:add(10, "Star collapsing!")
         led:add(10, "Black hole created!")
-        spriteStates:item("black hole"):setVisible(true):scale(0.01)   -- 0.001
+        spriteStates:item("black hole"):setVisible(true):scale(0.001)
     elseif (title == "wormhole") then
         -- show the worm hole
-        led:add(10, "Wormhole Alert!")
+        led:add(10, "Wormhole Alert!", true)
         pinball:setGravity(-0.1)
         pinball:setBallDampening(1)
         spriteStates:item("worm hole rays"):setVisible(true):scale(0.001)
@@ -457,7 +457,7 @@ function mission.onMissionAdvanced(title)
         spriteStates:item("worm hole clouds"):setVisible(true):scale(0.002)
     elseif (title == "reset") then
         -- hide the nova rings and black hole
-        led:add(0, "")
+        led:add(11, "Super Bonus!")
         spriteStates:item("wheel 1"):scale(-0.1)
         spriteStates:item("wheel 2"):scale(-0.1)
         spriteStates:item("rays"):scale(-0.1)
