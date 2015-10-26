@@ -86,8 +86,8 @@ function mission:testState()
     local need = #self:current().needs
     local has = #self:current().has
     if (has ~= need) then return end
-    -- We have all we need to advance
-    if (self.onMissionAdvanced) then self.onMissionAdvanced(self:current().title) end
+    -- Store the step just completed
+    local completedTitle = self:current().title
     -- Advance to the next step
     if (self.currentIdx < #self.steps) then
         self.currentIdx = self.currentIdx + 1
@@ -99,6 +99,8 @@ function mission:testState()
             if (step.waitDefault) then step.wait = step.waitDefault end
         end
     end
+    -- Fire the callback
+    if (self.onMissionAdvanced) then self.onMissionAdvanced(completedTitle) end
 end
 
 function mission:nextTarget()
