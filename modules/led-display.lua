@@ -3,7 +3,7 @@ led.queue = {}
 led.position = {x=0, y=0}
 led.size = {w=400, h=200}
 led.current = nil
-led.WaitTime = 3.5
+led.WaitTime = 1.5
 
 -- Add a new message to display.
 -- Higher priorities get displayed first.
@@ -17,6 +17,8 @@ function led:add(priority, message, sticky)
         position={x=0, y=self.size.h},
         direction="up"
         }
+    -- Avoid duplicating current message
+    if (self.current and self.current.message == message) then return end
     -- Unsticky current
     if (self.current and self.current.sticky and self.current.priority < priority) then
         self.current.sticky = false
