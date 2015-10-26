@@ -47,6 +47,10 @@ function love.load()
     sprites.wheel2 = loadSprite("images/nova-wheel.png")
     sprites.rays = loadSprite("images/nova-rays.png")
     sprites.redStar = loadSprite("images/red-star.png")
+    sprites.wormholeRays = loadSprite("images/wormhole-rays.png")
+    sprites.wormhole = loadSprite("images/wormhole-background.png")
+    sprites.wormholeClouds = loadSprite("images/wormhole-clouds.png")
+    sprites.starFlare = loadSprite("images/star-flare.png")
 
     -- Set graphics
     love.graphics.setBackgroundColor(0, 0, 0)
@@ -66,12 +70,20 @@ function love.load()
     sprites.background.ox = 0   -- Position relative to top-left corner
     sprites.background.oy = 0   -- and not the center of the image
 
-    -- Set the black hole, light rays and spiral positions
+    -- Center all these sprites around the black hole's position
     local x, y = pinball:getObjectXY("black hole")
     sprites.blackhole.x = x
     sprites.blackhole.y = y
+    sprites.wormholeRays.x = x
+    sprites.wormholeRays.y = y
+    sprites.wormhole.x = x
+    sprites.wormhole.y = y
+    sprites.wormholeClouds.x = x
+    sprites.wormholeClouds.y = y
     sprites.rays.x = x
     sprites.rays.y = y
+    sprites.starFlare.x = x
+    sprites.starFlare.y = y
     sprites.redStar.x = x
     sprites.redStar.y = y
     sprites.wheel1.x = x
@@ -81,11 +93,15 @@ function love.load()
     sprites.wheel2.scale = -1
 
     -- Set up the sprite state manager
-    spriteStates:add("wheel 1", sprites.wheel1):setRotation(0.0004):setScale(0):setVisible(false)
-    spriteStates:add("wheel 2", sprites.wheel2):setRotation(0.0006):setScale(0):setVisible(false)
-    spriteStates:add("rays", sprites.rays):setRotation(-0.002):setScale(0):setVisible(false)
-    spriteStates:add("red star", sprites.redStar):setScale(0):setVisible(false)
-    spriteStates:add("black hole", sprites.blackhole):setScale(0):setVisible(false)
+    spriteStates:add("wheel 1", sprites.wheel1):setRotation(0.0004):setScale(0)
+    spriteStates:add("wheel 2", sprites.wheel2):setRotation(0.0006):setScale(0)
+    spriteStates:add("rays", sprites.rays):setRotation(-0.002):setScale(0)
+    spriteStates:add("red star", sprites.redStar):setScale(0)
+    spriteStates:add("star flare", sprites.starFlare):setScale(0)
+    spriteStates:add("worm hole rays", sprites.wormholeRays):setRotation(0.01):setScale(0)
+    spriteStates:add("worm hole", sprites.wormhole):setRotation(0.01):setScale(0)
+    spriteStates:add("worm hole clouds", sprites.wormholeClouds):setRotation(0.02):setScale(0):setBlendmode("additive")
+    spriteStates:add("black hole", sprites.blackhole):setScale(0)
 
     -- Set up the bumper manager
     bumperManager:add("bumper1", "images/bumper.png")
@@ -129,7 +145,7 @@ function love.load()
     mission:define("fusion unstable"):wait(10)  -- ditto
     mission:define("collapse star"):on("left ramp"):on("right ramp"):on("nova word")
     mission:define("wormhole"):on("black hole"):on("black hole"):on("black hole") -- FIX allow multiple entries
-    mission:define("reset"):wait(10)
+    mission:define("reset"):wait(15)
     mission:start()
 
 end
@@ -140,10 +156,10 @@ function love.update (dt)
 
     if (states.current == states.play or states.current == states.drained) then
         pinball:update(dt)
-        spriteStates:update(dt)
-        mission:update(dt)
         bumperManager:update(dt)
     end
+        spriteStates:update(dt)
+        mission:update(dt)
 
 end
 
@@ -394,17 +410,34 @@ function mission.onMissionAdvanced(title)
         spriteStates:item("red star"):setVisible(true):scale(0.001)
     elseif (title == "hydrogen release") then
     elseif (title == "fusion stage 1") then
-        spriteStates:item("wheel 1"):setVisible(true):scale(0.0003)
+        spriteStates:item("wheel 1"):setVisible(true):scale(0.003) -- 0.0003    TODO use these final values
     elseif (title == "fusion stage 2") then
-        spriteStates:item("wheel 2"):setVisible(true):scale(0.0003)
+        spriteStates:item("wheel 2"):setVisible(true):scale(0.003)
     elseif (title == "fusion burn") then
     elseif (title == "fusion unstable") then
-        spriteStates:item("rays"):setVisible(true):scale(0.0005)
+        spriteStates:item("rays"):setVisible(true):scale(0.005) -- 0.0005   TODO use these final values
     elseif (title == "collapse star") then
-        spriteStates:item("black hole"):setVisible(true):scale(0.001)
+        spriteStates:item("black hole"):setVisible(true):scale(0.01)   -- 0.001
     elseif (title == "wormhole") then
-        pinball:setGravity(-0.2)
+        -- show the worm hole
+        pinball:setGravity(-0.5)
+        spriteStates:item("worm hole rays"):setVisible(true):scale(0.001)
+        spriteStates:item("worm hole"):setVisible(true):scale(0.002)
+        spriteStates:item("worm hole clouds"):setVisible(true):scale(0.002)
     elseif (title == "reset") then
+        -- hide the nova rings and black hole
+        spriteStates:item("wheel 1"):scale(-0.1)
+        spriteStates:item("wheel 2"):scale(-0.1)
+        spriteStates:item("rays"):scale(-0.1)
+        spriteStates:item("red star"):scale(-0.1)
+        spriteStates:item("black hole"):scale(-0.1)
+        -- hide the wormhole and restore gravity
+        spriteStates:item("worm hole"):scale(-0.04)
+        spriteStates:item("worm hole clouds"):scale(-0.04)
+        -- Slowly retract the rays
+        spriteStates:item("worm hole rays"):scale(-0.015)
+        -- Show a star flare after reset
+        spriteStates:item("star flare"):scale(0.001)
         pinball:restoreGravity()
     end
     
