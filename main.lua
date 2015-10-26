@@ -184,7 +184,7 @@ function love.update (dt)
             previewPosition = previewPosition - (dt*50)
             pinball.cfg.translateOffset.y = previewPosition
         end
-    elseif (states.current == states.play or states.current == states.drained) then
+    elseif (states.current == states.play) then
         pinball:update(dt)
         bumperManager:update(dt)
         spriteStates:update(dt)
@@ -205,6 +205,11 @@ function love.keypressed (key, isrepeat)
         if (key == "escape") then states:new(states.paused) end
         if (key == "lshift") then pinball:moveLeftFlippers() end
         if (key == "rshift") then pinball:moveRightFlippers() end
+        if (key == " " and #pinball.bodies.balls == 0) then
+            pinball:newBall()
+            led:add(0, "Make the star go Nova!")
+            updateLedDisplayMessages(0)
+        end
     elseif (states.current == states.paused) then
         if (key == " ") then states:new(states.play) end
         if (key == "escape") then states:new(states.promptQuit) end
@@ -264,9 +269,6 @@ function love.draw ( )
         printShadowText("PAUSED", 200, {255, 128, 255, 200})
     elseif (states.current == states.promptQuit) then
         printShadowText("Leave? [Y/N]", 240, {255, 255, 128, 200})
-    elseif (states.current == states.drained) then
-        love.graphics.setColor(128, 0, 255)
-        love.graphics.printf ("Drained", 0, 200, 600, "center")
     end
 
 end
@@ -383,8 +385,7 @@ end
 -- The number of balls still in play are passed.
 function pinball.ballDrained (ballsInPlay)
     if (ballsInPlay == 0) then
-        --states:new (states.drained)
-        pinball:newBall()
+        led:add(20, "Ball drained!")
     end
 end
 

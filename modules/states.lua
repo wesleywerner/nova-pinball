@@ -38,17 +38,17 @@ states.play = {
     ["next"] = nil
     }
 
-states.launch = {
-    ["timeout"] = 0.5,
-    ["timer"] = 0,
-    ["next"] = states.play
-    }
+--states.launch = {
+    --["timeout"] = 0.5,
+    --["timer"] = 0,
+    --["next"] = states.play
+    --}
 
-states.drained = {
-    ["timeout"] = 0.5,
-    ["timer"] = 0,
-    ["next"] = states.launch
-    }
+--states.drained = {
+    --["timeout"] = nil,
+    --["timer"] = nil,
+    --["next"] = nil
+    --}
 
 states.paused = {
     ["timeout"] = nil,
