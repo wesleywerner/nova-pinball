@@ -143,21 +143,21 @@ function love.load()
     leftTargets = targetManager:new()
     leftTargets.onComplete = onLeftTargetsComplete
     leftTargets.onSwitch = onLeftTargetSwitch
-    local x, y = pinball:getObjectXY("dot1")
-    leftTargets:add("dot1", x, y, "images/dot-off.png", "images/dot-on.png")
-    local x, y = pinball:getObjectXY("dot2")
-    leftTargets:add("dot2", x, y, "images/dot-off.png", "images/dot-on.png")
-    local x, y = pinball:getObjectXY("dot3")
-    leftTargets:add("dot3", x, y, "images/dot-off.png", "images/dot-on.png")
+    local x, y = pinball:getObjectXY("dot4")
+    leftTargets:add("dot4", x, y, "images/dot-off.png", "images/dot-on.png")
+    local x, y = pinball:getObjectXY("dot5")
+    leftTargets:add("dot5", x, y, "images/dot-off.png", "images/dot-on.png")
 
     -- Set up the right targets
     rightTargets = targetManager:new()
     rightTargets.onComplete = onrightTargetsComplete
     rightTargets.onSwitch = onrightTargetsSwitch
-    local x, y = pinball:getObjectXY("dot4")
-    rightTargets:add("dot4", x, y, "images/dot-off.png", "images/dot-on.png")
-    local x, y = pinball:getObjectXY("dot5")
-    rightTargets:add("dot5", x, y, "images/dot-off.png", "images/dot-on.png")
+    local x, y = pinball:getObjectXY("dot1")
+    rightTargets:add("dot1", x, y, "images/dot-off.png", "images/dot-on.png")
+    local x, y = pinball:getObjectXY("dot2")
+    rightTargets:add("dot2", x, y, "images/dot-off.png", "images/dot-on.png")
+    local x, y = pinball:getObjectXY("dot3")
+    rightTargets:add("dot3", x, y, "images/dot-off.png", "images/dot-on.png")
 
     -- Define the mission goals
     mission:define("red giant"):on("nova word")
