@@ -420,7 +420,8 @@ function mission.onMissionAdvanced(title)
         spriteStates:item("black hole"):setVisible(true):scale(0.01)   -- 0.001
     elseif (title == "wormhole") then
         -- show the worm hole
-        pinball:setGravity(-0.5)
+        pinball:setGravity(-0.1)
+        pinball:setBallDampening(1)
         spriteStates:item("worm hole rays"):setVisible(true):scale(0.001)
         spriteStates:item("worm hole"):setVisible(true):scale(0.002)
         spriteStates:item("worm hole clouds"):setVisible(true):scale(0.002)
@@ -439,6 +440,7 @@ function mission.onMissionAdvanced(title)
         -- Show a star flare after reset
         spriteStates:item("star flare"):scale(0.001)
         pinball:restoreGravity()
+        pinball:setBallDampening(0)
     end
     
 end
