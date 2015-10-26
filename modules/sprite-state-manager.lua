@@ -28,6 +28,7 @@ function manager:add(key, sprite)
     o.scaleIncrement = nil
     o.angleIncrement = nil
     o.key = key
+    o.blendmode = "alpha"   -- Default blend mode
     function o:setRotation(angle)
         self.angleIncrement = angle
         return self
@@ -43,6 +44,10 @@ function manager:add(key, sprite)
     end
     function o:setVisible(visible)
         self.visible = visible
+        return self
+    end
+    function o:setBlendmode(mode)
+        self.blendmode = mode
         return self
     end
     table.insert(self.items, o)
@@ -85,7 +90,9 @@ function manager:draw()
     for k, v in pairs(self.items) do
         -- only draw visible
         if (v.visible) then
+            love.graphics.setBlendMode(v.blendmode)
             v.sprite:draw()
+            love.graphics.setBlendMode("alpha")
         end
     end
 end
