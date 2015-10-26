@@ -65,7 +65,7 @@ function love.load()
 
     -- Set graphics
     love.graphics.setBackgroundColor(0, 0, 0)
-    local font = love.graphics.newFont (20)
+    local font = love.graphics.newFont ("fonts/advanced_led_board-7.ttf", 37)
     love.graphics.setFont (font)
 
     -- Set initial game state
@@ -242,9 +242,9 @@ function love.draw ( )
     pinball:draw()
 
     -- Draw the status box
-    love.graphics.setColor(0, 0, 0, 200)
-    love.graphics.rectangle("fill", 0, scrHeight - 60, scrWidth, scrHeight - 60)
-    love.graphics.setColor(255, 255, 255, 255)
+    --love.graphics.setColor(0, 0, 0, 200)
+    --love.graphics.rectangle("fill", 0, scrHeight - 60, scrWidth, scrHeight - 60)
+    love.graphics.setColor(200, 200, 255, 255)
     led:draw()
 
     -- Simple text overlays
@@ -282,7 +282,7 @@ end
 function positionDrawingElements()
     w, h = love.window.getDimensions()
     led.size.w = w
-    led.size.h = 60
+    led.size.h = 40
     led.position.y = h - led.size.h
 end
 
