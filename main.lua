@@ -25,6 +25,9 @@ local spriteStates = require("modules.sprite-state-manager")
 local led = require("modules.led-display")
 local sprites = { }
 
+-- Tracks when to display the current mission goal on the LED display
+local missionStatusUpdateTime = 5
+
 function loadFromFile ( )
     local binser = require("modules.binser")
     local mydata, size = love.filesystem.read("nova.pinball", nil)
@@ -162,8 +165,9 @@ function love.update (dt)
         bumperManager:update(dt)
         spriteStates:update(dt)
         mission:update(dt)
+        led:update(dt)
+        updateMissionStatusReminder(dt)
     end
-    led:update(dt)
 
 end
 
@@ -271,6 +275,15 @@ function positionDrawingElements()
     led.size.w = w
     led.size.h = 60
     led.position.y = h - led.size.h
+end
+
+function updateMissionStatusReminder(dt)
+    missionStatusUpdateTime = missionStatusUpdateTime - dt
+    if (missionStatusUpdateTime < 0) then
+        missionStatusUpdateTime = 20
+        led:add(0, "Mission goal")
+        led:add(0, "Shoot for " .. mission:nextTarget())
+    end
 end
 
 function pinball.drawWall (points)
