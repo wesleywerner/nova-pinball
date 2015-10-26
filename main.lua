@@ -178,6 +178,7 @@ function love.update (dt)
     if (states.current == states.previewTable) then
         if (previewPosition > -pinball.cfg.cameraOffset) then
             previewPosition = previewPosition - (dt*50)
+            pinball.cfg.translateOffset.y = previewPosition
         end
     elseif (states.current == states.play or states.current == states.drained) then
         pinball:update(dt)
@@ -191,7 +192,10 @@ end
 
 function love.keypressed (key, isrepeat)
     if (states.current == states.previewTable) then
-        if (key == " ") then states:new(states.play) end
+        if (key == " ") then
+            pinball.cfg.translateOffset.y = 0
+            states:new(states.play)
+        end
     elseif (states.current == states.play) then
         if (key == "p") then states:new(states.paused) end
         if (key == "lshift") then pinball:moveLeftFlippers() end
@@ -220,9 +224,9 @@ function love.draw ( )
     -- Fix the coordinate system so that we draw relative to the table.
     pinball:setCamera()
 
-    if (states.current == states.previewTable) then
-        love.graphics.translate(0, previewPosition)
-    end
+    --if (states.current == states.previewTable) then
+        --love.graphics.translate(0, previewPosition)
+    --end
     
     -- Draw the background image. It has a 20px border we account for.
     love.graphics.setColor(255, 255, 255, 255)
@@ -314,17 +318,6 @@ function pinball.drawBumper (tag, x, y, r)
     ---- draw bumper image
     --love.graphics.setColor(255, 255, 255, 255)
     --love.graphics.draw(sprites.bumper.image, x, y, 0, 1, 1, sprites.bumper.ox, sprites.bumper.oy)
-
-    -- TODO We translate here because for some reason
-    -- the x,y of CircleShapes are not in world coordinates.
-    -- I have tried finding the cause without luck.
-    -- Polygon shapes translate fine (drawKicker for example)
-    if (states.current == states.previewTable) then
-        love.graphics.origin()  -- Reset the coordinate system
-        if (states.current == states.previewTable) then
-            love.graphics.translate(0, previewPosition)
-        end
-    end
     
     bumperManager:draw(tag, x, y)
 end
