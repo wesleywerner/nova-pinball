@@ -35,7 +35,7 @@ function manager:add(key, sprite)
     end
     function o:setScale(scale)
         self.sprite.scale = scale
-        self.visible = scale == 0
+        self.visible = scale > 0
         return self
     end
     function o:scale(scale)
