@@ -51,6 +51,10 @@ function loadFromFile ( )
     pinball:loadTable(tableDefinition)
 end
 
+function thisState:gameInProgress()
+    return states:on("play") or states:on("paused")
+end
+
 function thisState:load()
 
     -- Set up play states
