@@ -45,13 +45,6 @@ end
 
 function mission:start()
     self.currentIdx = 1
-    for _, v in pairs(self.steps) do
-        print("mission '" .. v.title .. "' needs: ")
-        for _, p in pairs(v.needs) do
-            print(p)
-        end
-        if (v.wait) then print("wait delay of " .. v.wait) end
-    end
 end
 
 function mission:on(signal)
@@ -63,6 +56,28 @@ function mission:wait(delay)
     self.build.waitDefault = delay
     self.build.wait = delay
     return self
+end
+
+-- Moves a step after the specified step
+function mission:moveAfter(title)
+    for i, m in ipairs(self.steps) do
+        if (m.title == title) then
+            table.remove(self.steps)
+            table.insert(self.steps, i+1, self.build)
+            return self
+        end
+    end
+    return self
+end
+
+-- Returns if a step exists
+function mission:has(title)
+    for _, m in ipairs(self.steps) do
+        if (m.title == title) then
+            return true
+        end
+    end
+    return false
 end
 
 function mission:check(signal)
