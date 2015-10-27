@@ -76,6 +76,7 @@ function thisState:load()
     sprites.wormhole = loadSprite("images/wormhole-background.png")
     sprites.wormholeClouds = loadSprite("images/wormhole-clouds.png")
     sprites.starFlare = loadSprite("images/star-flare.png")
+    sprites.star = loadSprite("images/stable-star.png")
 
     -- Set graphics
     love.graphics.setBackgroundColor(0, 0, 0)
@@ -106,6 +107,8 @@ function thisState:load()
     sprites.wormholeClouds.y = y
     sprites.rays.x = x
     sprites.rays.y = y
+    sprites.star.x = x
+    sprites.star.y = y
     sprites.starFlare.x = x
     sprites.starFlare.y = y
     sprites.redStar.x = x
@@ -117,6 +120,7 @@ function thisState:load()
     sprites.wheel2.scale = -1
 
     -- Set up the sprite state manager
+    spriteStates:add("star", sprites.star)
     spriteStates:add("wheel 1", sprites.wheel1):setRotation(0.0004):setScale(0)
     spriteStates:add("wheel 2", sprites.wheel2):setRotation(0.0006):setScale(0)
     spriteStates:add("rays", sprites.rays):setRotation(-0.002):setScale(0)
@@ -238,6 +242,7 @@ end
 function thisState:draw ( )
 
     -- Reset drawing color
+    love.graphics.setBackgroundColor(0, 0, 0)
     love.graphics.setColor (255, 255, 255, 255)
 
     -- Fix the coordinate system so that we draw relative to the table.
