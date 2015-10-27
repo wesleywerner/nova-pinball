@@ -18,6 +18,8 @@
 
 local thisState = {}
 local state = nil
+local menuOptions = {"Play", "About", "Leave"}
+local selectedItem = 1
 
 function thisState:load()
 
@@ -34,32 +36,61 @@ function thisState:update (dt)
 end
 
 function thisState:keypressed (key)
-print("on menu state", state.current)
     if state:on("main") then
-        if key == " " then
-            print("playing!")
-            mainstate:set("play")
-        elseif key == "escape" then
-            love.event.quit()
+        if key == "up" then
+            selectedItem = selectedItem - 1
+            if (selectedItem < 1) then selectedItem = #menuOptions end
+        elseif key == "down" then
+            selectedItem = selectedItem + 1
+            if (selectedItem > #menuOptions) then selectedItem = 1 end
+        elseif key == "return" or key == "enter" or key == " " then
+            self:menuAction()
         end
     elseif state:on("about") then
-
+        state:set("main")
     end
 end
 
 function thisState:keyreleased(key)
-
+    if (playstate:gameInProgress()) then
+        menuOptions[1] = "Continue"
+    else
+        menuOptions[1] = "Play"
+    end
 end
 
 function thisState:draw ( )
-    love.graphics.setColor(255, 255, 255, 255)
-    love.graphics.printf ("main menu", 0, 100, scrWidth, "center")
-    love.graphics.setColor(255, 255, 255, 128)
-    love.graphics.printf ("press space", 0, 200, scrWidth, "center")
+
+    if state:on("main") then
+        local y = 100
+        for _, m in ipairs(menuOptions) do
+            if (menuOptions[selectedItem] == m) then
+                love.graphics.setColor(200, 200, 255, 255)
+            else
+                love.graphics.setColor(255, 255, 255, 128)
+            end
+            love.graphics.printf (m, 0, y, scrWidth, "center")
+            y = y + 100
+        end
+    elseif state:on("about") then
+        love.graphics.setColor(128, 255, 255, 255)
+        love.graphics.printf ("about", 0, 300, scrWidth, "center")
+    end
 end
 
 function thisState:resize (w, h)
 
+end
+
+function thisState:menuAction()
+    local item = menuOptions[selectedItem]
+    if (item == "Play" or item == "Continue") then
+        mainstate:set("play")
+    elseif (item == "About") then
+        state:set("about")
+    elseif (item == "Leave") then
+        love.event.quit()
+    end
 end
 
 return thisState
