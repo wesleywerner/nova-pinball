@@ -173,6 +173,9 @@ function love.load()
 
     positionDrawingElements()
 
+    -- Pre-game welcome
+    led:add(0, "Welcome to Nova Pinball!")
+    led:add(0, "Hit space to play")
 end
 
 function love.update (dt)
@@ -198,8 +201,7 @@ function love.keypressed (key, isrepeat)
         if (key == " ") then
             pinball.cfg.translateOffset.y = 0
             states:new(states.play)
-            led:add(0, "Make the star go Nova!")
-            updateLedDisplayMessages(0)
+            led:add(100, "Make the star go Nova!")
         end
         if (key == "escape") then states:new(states.promptQuit) end
     elseif (states.current == states.play) then
@@ -208,8 +210,7 @@ function love.keypressed (key, isrepeat)
         if (key == "rshift") then pinball:moveRightFlippers() end
         if (key == " " and #pinball.bodies.balls == 0) then
             pinball:newBall()
-            led:add(0, "Make the star go Nova!")
-            updateLedDisplayMessages(0)
+            led:add(100, "Make the star go Nova!")
         end
     elseif (states.current == states.paused) then
         if (key == " ") then states:new(states.play) end
@@ -297,11 +298,7 @@ function updateLedDisplayMessages(dt)
     missionStatusUpdateTime = missionStatusUpdateTime - dt
     if (missionStatusUpdateTime < 0 or dt == 0) then
         missionStatusUpdateTime = 20
-        if (states.current == states.previewTable) then
-            -- Pre-game welcome
-            led:add(0, "Welcome to Nova Pinball!")
-            led:add(0, "Hit space to play", true)
-        elseif (states.current == states.play) then
+        if (states.current == states.play) then
             -- Display a hint of the next goal
             local title = mission:nextTarget()
             -- Show encouraging words while waiting on a goal
@@ -387,7 +384,7 @@ end
 function pinball.ballDrained (ballsInPlay)
     if (ballsInPlay == 0) then
         led:add(20, "Ball drained")
-        led:add(0, "Hit space to play", true)
+        led:add(0, "Hit space to play")
     end
 end
 
@@ -514,8 +511,6 @@ function mission.onMissionAdvanced(title)
         pinball:setBallDampening(0)
     end
 
-    updateLedDisplayMessages(0)
-    
 end
 
 -- When a ball is locked with pinball:lockBall()
