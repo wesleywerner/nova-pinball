@@ -374,7 +374,6 @@ end
 function pinball.ballDrained (ballsInPlay)
     if (ballsInPlay == 0) then
         led:add(20, "Ball drained")
-        led:add(0, "Hit space to play")
     end
 end
 
@@ -471,11 +470,11 @@ function mission.onMissionAdvanced(title)
     elseif (title == "collapse star") then
         led:add(10, "Star collapsing!")
         led:add(10, "Black hole created!")
-        spriteStates:item("black hole"):setVisible(true):scale(0.001)
+        spriteStates:item("black hole"):setVisible(true):scale(0.01)
     elseif (title == "wormhole") then
         -- show the worm hole
         led:add(10, "Wormhole Alert!", true)
-        pinball:setGravity(-0.1)
+        pinball:setGravity(0)
         pinball:setBallDampening(1)
         spriteStates:item("worm hole rays"):setVisible(true):scale(0.001)
         spriteStates:item("worm hole"):setVisible(true):scale(0.002)
