@@ -470,34 +470,48 @@ function mission.onMissionAdvanced(title)
     elseif (title == "collapse star") then
         led:add(10, "Star collapsing!")
         led:add(10, "Black hole created!")
-        spriteStates:item("black hole"):setVisible(true):scale(0.01)
+        pinball.showBlackHole()
     elseif (title == "wormhole") then
-        -- show the worm hole
         led:add(10, "Wormhole Alert!", true)
-        pinball:setGravity(0)
-        pinball:setBallDampening(1)
-        spriteStates:item("worm hole rays"):setVisible(true):scale(0.001)
-        spriteStates:item("worm hole"):setVisible(true):scale(0.002)
-        spriteStates:item("worm hole clouds"):setVisible(true):scale(0.002)
+        pinball.showWormhole()
     elseif (title == "reset") then
-        -- hide the nova rings and black hole
-        led:add(11, "Super Bonus!")
-        spriteStates:item("wheel 1"):scale(-0.1)
-        spriteStates:item("wheel 2"):scale(-0.1)
-        spriteStates:item("rays"):scale(-0.1)
-        spriteStates:item("red star"):scale(-0.1)
-        spriteStates:item("black hole"):scale(-0.1)
-        -- hide the wormhole and restore gravity
-        spriteStates:item("worm hole"):scale(-0.04)
-        spriteStates:item("worm hole clouds"):scale(-0.04)
-        -- Slowly retract the rays
-        spriteStates:item("worm hole rays"):scale(-0.015)
-        -- Show a star flare after reset
-        spriteStates:item("star flare"):scale(0.001):setVisible(true)
-        pinball:restoreGravity()
-        pinball:setBallDampening(0)
+        led:add(11, "Supergravity Bonus!")
+        pinball.resetMissionSprites()
+        pinball.showStarFlare()
     end
 
+end
+
+function pinball.resetMissionSprites()
+    -- hide the nova rings and black hole
+    spriteStates:item("wheel 1"):scale(-0.1)
+    spriteStates:item("wheel 2"):scale(-0.1)
+    spriteStates:item("rays"):scale(-0.1)
+    spriteStates:item("red star"):scale(-0.1)
+    spriteStates:item("black hole"):scale(-0.1)
+    -- hide the wormhole and restore gravity
+    spriteStates:item("worm hole"):scale(-0.04)
+    spriteStates:item("worm hole clouds"):scale(-0.04)
+    -- Slowly retract the rays
+    spriteStates:item("worm hole rays"):scale(-0.015)
+end
+
+function pinball.showStarFlare()
+    spriteStates:item("star flare"):scale(0.001):setVisible(true)
+    pinball:restoreGravity()
+    pinball:setBallDampening(0)
+end
+
+function pinball.showBlackHole()
+    spriteStates:item("black hole"):setVisible(true):scale(0.01)
+end
+
+function pinball.showWormhole()
+    pinball:setGravity(0)
+    pinball:setBallDampening(1)
+    spriteStates:item("worm hole rays"):setVisible(true):scale(0.001)
+    spriteStates:item("worm hole"):setVisible(true):scale(0.002)
+    spriteStates:item("worm hole clouds"):setVisible(true):scale(0.002)
 end
 
 -- When a ball is locked with pinball:lockBall()
