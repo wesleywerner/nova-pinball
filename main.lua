@@ -18,6 +18,7 @@
 
 statemanager = require ("modules.states")
 playstate = require("modules.play-state")
+menustate = require("modules.menu-state")
 
 function love.load()
 
@@ -32,11 +33,11 @@ function love.load()
     -- Set up main states
     mainstate = statemanager:new()
     mainstate:add("splash", 2, "menu")
-    mainstate:add("menu", 60, "about")
+    mainstate:add("menu")
     mainstate:add("play")
-    mainstate:add("about")
-    mainstate:set("play")
+    mainstate:set("menu")
 
+    menustate:load()
     playstate:load()
 
 end
@@ -46,7 +47,7 @@ function love.update (dt)
     if (mainstate:on("play")) then
         playstate:update(dt)
     elseif (mainstate:on("menu")) then
-        --menustate:update(dt)
+        menustate:update(dt)
     end
 end
 
@@ -54,7 +55,7 @@ function love.keypressed (key, isrepeat)
     if (mainstate:on("play")) then
         playstate:keypressed(key)
     elseif (mainstate:on("menu")) then
-        --menustate:keypressed(key)
+        menustate:keypressed(key)
     end
 end
 
@@ -62,7 +63,7 @@ function love.keyreleased(key)
     if (mainstate:on("play")) then
         playstate:keyreleased(key)
     elseif (mainstate:on("menu")) then
-        --menustate:keyreleased(key)
+        menustate:keyreleased(key)
     end
 end
 
@@ -70,7 +71,7 @@ function love.draw ( )
     if (mainstate:on("play")) then
         playstate:draw()
     elseif (mainstate:on("menu")) then
-        --menustate:draw()
+        menustate:draw()
     end
 end
 

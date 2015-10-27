@@ -76,8 +76,6 @@ function thisState:load()
 
     -- Set graphics
     love.graphics.setBackgroundColor(0, 0, 0)
-    local font = love.graphics.newFont ("fonts/advanced_led_board-7.ttf", 37)
-    love.graphics.setFont (font)
 
     -- Set initial game state
     pinball:newBall()
@@ -222,7 +220,7 @@ function thisState:keypressed (key)
         if (key == "escape") then states:set("prompt quit") end
     elseif (states:on("prompt quit")) then
         if (key == "y") then
-            love.event.quit()
+            mainstate:set("menu")
         else
             states:set("paused")
         end
