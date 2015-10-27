@@ -17,57 +17,51 @@
 -- Written by Wesley "keyboard monkey" Werner 2015
 
 local states = { }
-
+states.all = {}
 states.current = nil
 
-states.promptQuit = {
-    ["timeout"] = nil,
-    ["timer"] = nil,
-    ["next"] = nil
-    }
+function states:add (name, timeout, nextstate)
+    local s = {name=name, timeout=timeout, nextstate=nextstate, timer=0}
+    table.insert(self.all, s)
+end
 
-states.previewTable = {
-    ["timeout"] = nil,
-    ["timer"] = nil,
-    ["next"] = nil
-    }
-
-states.play = {
-    ["timeout"] = nil,
-    ["timer"] = nil,
-    ["next"] = nil
-    }
-
---states.launch = {
-    --["timeout"] = 0.5,
-    --["timer"] = 0,
-    --["next"] = states.play
-    --}
-
---states.drained = {
-    --["timeout"] = nil,
-    --["timer"] = nil,
-    --["next"] = nil
-    --}
-
-states.paused = {
-    ["timeout"] = nil,
-    ["timer"] = nil,
-    ["next"] = nil
-    }
+function states:new ()
+    local function deepcopy(orig)
+        local orig_type = type(orig)
+        local copy
+        if orig_type == 'table' then
+            copy = {}
+            for orig_key, orig_value in next, orig, nil do
+                copy[deepcopy(orig_key)] = deepcopy(orig_value)
+            end
+            setmetatable(copy, deepcopy(getmetatable(orig)))
+        else -- number, string, boolean, etc
+            copy = orig
+        end
+        return copy
+    end
     
+    local s = deepcopy(self)
+    s.current = nil
+    s.all = {}
+    return s
+end
 
-function states:new (n)
-    self.current = n
-    self.current.timer = 0
+function states:set(state)
+    self.current = state
+end
+
+function states:on(value)
+    return self.current == value
 end
 
 function states:update (dt)
-    if (self.current.timeout) then
-        self.current.timer = self.current.timer + dt
-        if (self.current.timer > self.current.timeout) then
-            if (self.current.next ~= nil) then
-                self:new (self.current.next)
+    local current = self.all[self.current]
+    if (current and current.timeout) then
+        current.timer = current.timer + dt
+        if (current.timer > current.timeout) then
+            if (current.nextstate ~= nil) then
+                self:set(current.nextstate)
             end
         end
     end

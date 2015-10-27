@@ -16,7 +16,8 @@
 -- Written by Wesley "keyboard monkey" Werner 2015
 -- https://github.com/wesleywerner/
 
-local states = require ("modules.states")
+local thisState = {}
+local states = nil
 local pinball = require ("nova-pinball-engine")
 local targetManager = require("modules.letter-targets")
 local bumperManager = require("modules.bumpers")
@@ -50,10 +51,14 @@ function loadFromFile ( )
     pinball:loadTable(tableDefinition)
 end
 
-function love.load()
+function thisState:load()
 
-    math.randomseed(os.time())
-    scrWidth, scrHeight = love.window.getDimensions()
+    -- Set up play states
+    states = statemanager:new()
+    states:add("preview")
+    states:add("play")
+    states:add("paused")
+    states:add("prompt quit")
 
     -- Load sprites
     sprites.background = loadSprite ("images/background.png")
@@ -76,7 +81,7 @@ function love.load()
 
     -- Set initial game state
     pinball:newBall()
-    states:new(states.previewTable)
+    states:set("preview")
 
     -- Load the table layout into the pinball engine
     loadFromFile()
@@ -178,16 +183,16 @@ function love.load()
     led:add(0, "Hit space to play")
 end
 
-function love.update (dt)
+function thisState:update (dt)
     states:update(dt)
     led:update(dt)
     updateLedDisplayMessages(dt)
-    if (states.current == states.previewTable) then
+    if (states:on("preview")) then
         if (previewPosition > -pinball.cfg.cameraOffset) then
             previewPosition = previewPosition - (dt*50)
             pinball.cfg.translateOffset.y = previewPosition
         end
-    elseif (states.current == states.play) then
+    elseif (states:on("play")) then
         pinball:update(dt)
         bumperManager:update(dt)
         spriteStates:update(dt)
@@ -196,30 +201,30 @@ function love.update (dt)
 
 end
 
-function love.keypressed (key, isrepeat)
-    if (states.current == states.previewTable) then
+function thisState:keypressed (key)
+    if (states:on("preview")) then
         if (key == " ") then
             pinball.cfg.translateOffset.y = 0
-            states:new(states.play)
+            states:set("play")
             led:add(100, "Make the star go Nova!")
         end
-        if (key == "escape") then states:new(states.promptQuit) end
-    elseif (states.current == states.play) then
-        if (key == "escape") then states:new(states.paused) end
+        if (key == "escape") then states:set("prompt quit") end
+    elseif (states:on("play")) then
+        if (key == "escape") then states:set("paused") end
         if (key == "lshift") then pinball:moveLeftFlippers() end
         if (key == "rshift") then pinball:moveRightFlippers() end
         if (key == " " and #pinball.bodies.balls == 0) then
             pinball:newBall()
             led:add(100, "Make the star go Nova!")
         end
-    elseif (states.current == states.paused) then
-        if (key == " ") then states:new(states.play) end
-        if (key == "escape") then states:new(states.promptQuit) end
-    elseif (states.current == states.promptQuit) then
+    elseif (states:on("paused")) then
+        if (key == " ") then states:set("play") end
+        if (key == "escape") then states:set("prompt quit") end
+    elseif (states:on("prompt quit")) then
         if (key == "y") then
             love.event.quit()
         else
-            states:new(states.paused)
+            states:set("paused")
         end
     end
     --if (key == "escape") then love.event.quit() end
@@ -230,12 +235,12 @@ function love.keypressed (key, isrepeat)
     end
 end
 
-function love.keyreleased(key)
+function thisState:keyreleased(key)
     if (key == "lshift") then pinball:releaseLeftFlippers() end
     if (key == "rshift") then pinball:releaseRightFlippers() end
 end
 
-function love.draw ( )
+function thisState:draw ( )
 
     -- Reset drawing color
     love.graphics.setColor (255, 255, 255, 255)
@@ -243,10 +248,6 @@ function love.draw ( )
     -- Fix the coordinate system so that we draw relative to the table.
     pinball:setCamera()
 
-    --if (states.current == states.previewTable) then
-        --love.graphics.translate(0, previewPosition)
-    --end
-    
     -- Draw the background image. It has a 20px border we account for.
     love.graphics.setColor(255, 255, 255, 255)
     sprites.background:draw()
@@ -267,9 +268,9 @@ function love.draw ( )
     led:draw()
 
     -- Simple text overlays
-    if (states.current == states.paused) then
+    if (states:on("paused")) then
         printShadowText("PAUSED", 200, {255, 128, 255, 200})
-    elseif (states.current == states.promptQuit) then
+    elseif (states:on("prompt quit")) then
         printShadowText("Leave? [Y/N]", 240, {255, 255, 128, 200})
     end
 
@@ -283,7 +284,7 @@ function printShadowText(text, y, color)
     love.graphics.printf (text, 0, y, w, "center")
 end
 
-function love.resize (w, h)
+function thisState:resize (w, h)
     pinball:resize (w, h)
 end
 
@@ -298,7 +299,7 @@ function updateLedDisplayMessages(dt)
     missionStatusUpdateTime = missionStatusUpdateTime - dt
     if (missionStatusUpdateTime < 0 or dt == 0) then
         missionStatusUpdateTime = 20
-        if (states.current == states.play) then
+        if (states:on("play")) then
             -- Display a hint of the next goal
             local title = mission:nextTarget()
             -- Show encouraging words while waiting on a goal
@@ -431,7 +432,7 @@ function loadSprite (path)
 end
 
 function onNovaTargetSwitch(letter)
-    --print("switched " .. letter)
+
 end
 
 function onNovaTargetComplete()
@@ -440,16 +441,15 @@ function onNovaTargetComplete()
 end
 
 function onLeftTargetSwitch(letter)
-    --print("switched " .. letter)
+
 end
 
 function onLeftTargetsComplete()
-    print("DOT target completed")
     mission:check("left targets")
 end
 
 function onrightTargetsSwitch(letter)
-    --print("switched " .. letter)
+
 end
 
 function onrightTargetsComplete()
@@ -462,7 +462,6 @@ function mission.onMissionCheckPassed(signal)
 end
 
 function mission.onMissionAdvanced(title)
-    print("mission goal complete: " .. title)
 
     if (title == "red giant") then
         led:add(10, "Star evolved into a Red Giant")
@@ -520,3 +519,5 @@ end
 -- When a locked ball delay expired and is released into play
 function pinball.ballUnlocked(id)
 end
+
+return thisState
