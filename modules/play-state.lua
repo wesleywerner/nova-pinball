@@ -150,20 +150,20 @@ function thisState:load()
     leftTargets.onComplete = onLeftTargetsComplete
     leftTargets.onSwitch = onLeftTargetSwitch
     local x, y = pinball:getObjectXY("dot4")
-    leftTargets:add("dot4", x, y, "images/dot-off.png", "images/dot-on.png")
+    leftTargets:add("dot4", x, y, "images/circle-target-off.png", "images/circle-target-on.png")
     local x, y = pinball:getObjectXY("dot5")
-    leftTargets:add("dot5", x, y, "images/dot-off.png", "images/dot-on.png")
+    leftTargets:add("dot5", x, y, "images/circle-target-off.png", "images/circle-target-on.png")
 
     -- Set up the right targets
     rightTargets = targetManager:new()
     rightTargets.onComplete = onrightTargetsComplete
     rightTargets.onSwitch = onrightTargetsSwitch
     local x, y = pinball:getObjectXY("dot1")
-    rightTargets:add("dot1", x, y, "images/dot-off.png", "images/dot-on.png")
+    rightTargets:add("dot1", x, y, "images/circle-target-off.png", "images/circle-target-on.png")
     local x, y = pinball:getObjectXY("dot2")
-    rightTargets:add("dot2", x, y, "images/dot-off.png", "images/dot-on.png")
+    rightTargets:add("dot2", x, y, "images/circle-target-off.png", "images/circle-target-on.png")
     local x, y = pinball:getObjectXY("dot3")
-    rightTargets:add("dot3", x, y, "images/dot-off.png", "images/dot-on.png")
+    rightTargets:add("dot3", x, y, "images/circle-target-off.png", "images/circle-target-on.png")
 
     -- Define the mission goals
     mission:define("red giant"):on("nova word")
