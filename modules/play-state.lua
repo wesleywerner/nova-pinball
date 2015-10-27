@@ -259,7 +259,6 @@ function thisState:draw ( )
     -- Draw the status box
     --love.graphics.setColor(0, 0, 0, 200)
     --love.graphics.rectangle("fill", 0, scrHeight - 60, scrWidth, scrHeight - 60)
-    love.graphics.setColor(200, 200, 255, 255)
     led:draw()
 
     -- Simple text overlays
@@ -267,14 +266,6 @@ function thisState:draw ( )
         printShadowText("PAUSED", 200, {255, 128, 255, 200})
     end
 
-end
-
-function printShadowText(text, y, color)
-    local w = love.graphics.getWidth()
-    love.graphics.setColor(0, 0, 0, 200)
-    love.graphics.printf (text, 1, y+1, w, "center")
-    love.graphics.setColor(unpack(color))
-    love.graphics.printf (text, 0, y, w, "center")
 end
 
 function thisState:resize (w, h)

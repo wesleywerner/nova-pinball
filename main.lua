@@ -79,3 +79,13 @@ function love.resize (w, h)
     scrWidth, scrHeight = w, h
     playstate:resize(w, h)
 end
+
+-- A global function to draw better readable words
+function printShadowText(text, y, color)
+    -- Shadow
+    love.graphics.setColor(0, 0, 0, 200)
+    love.graphics.printf (text, 2, y+2, scrWidth, "center")
+    -- Text
+    love.graphics.setColor(unpack(color))
+    love.graphics.printf (text, 0, y, scrWidth, "center")
+end

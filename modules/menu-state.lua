@@ -60,16 +60,17 @@ function thisState:keyreleased(key)
 end
 
 function thisState:draw ( )
-
+    love.graphics.setBackgroundColor(32, 32, 64)
     if state:on("main") then
         local y = 100
+        local color
         for _, m in ipairs(menuOptions) do
             if (menuOptions[selectedItem] == m) then
-                love.graphics.setColor(200, 200, 255, 255)
+                color = {200, 200, 255, 255}
             else
-                love.graphics.setColor(255, 255, 255, 128)
+                color = {255, 255, 255, 128}
             end
-            love.graphics.printf (m, 0, y, scrWidth, "center")
+            printShadowText(m, y, color)
             y = y + 100
         end
     elseif state:on("about") then

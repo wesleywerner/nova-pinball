@@ -63,12 +63,10 @@ end
 
 function led:draw()
     if (self.current) then
-        love.graphics.printf(
+        printShadowText(
             self.current.message,
-            self.position.x + self.current.position.x,
             self.position.y + self.current.position.y,
-            self.size.w,
-            "center"
+            {200, 200, 255, 255}
             )
     end
 end
