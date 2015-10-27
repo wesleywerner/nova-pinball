@@ -58,7 +58,6 @@ function thisState:load()
     states:add("preview")
     states:add("play")
     states:add("paused")
-    states:add("prompt quit")
 
     -- Load sprites
     sprites.background = loadSprite ("images/background.png")
@@ -206,7 +205,7 @@ function thisState:keypressed (key)
             states:set("play")
             led:add(100, "Make the star go Nova!")
         end
-        if (key == "escape") then states:set("prompt quit") end
+        if (key == "escape") then mainstate:set("menu") end
     elseif (states:on("play")) then
         if (key == "escape") then states:set("paused") end
         if (key == "lshift") then pinball:moveLeftFlippers() end
@@ -217,13 +216,7 @@ function thisState:keypressed (key)
         end
     elseif (states:on("paused")) then
         if (key == " ") then states:set("play") end
-        if (key == "escape") then states:set("prompt quit") end
-    elseif (states:on("prompt quit")) then
-        if (key == "y") then
-            mainstate:set("menu")
-        else
-            states:set("paused")
-        end
+        if (key == "escape") then mainstate:set("menu") end
     end
     --if (key == "escape") then love.event.quit() end
     -- advance the mission goal
@@ -268,8 +261,6 @@ function thisState:draw ( )
     -- Simple text overlays
     if (states:on("paused")) then
         printShadowText("PAUSED", 200, {255, 128, 255, 200})
-    elseif (states:on("prompt quit")) then
-        printShadowText("Leave? [Y/N]", 240, {255, 255, 128, 200})
     end
 
 end
