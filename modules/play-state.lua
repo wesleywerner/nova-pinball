@@ -70,6 +70,7 @@ function play:load()
 
     -- Load sprites
     sprites.background = loadSprite ("images/background.png")
+    sprites.launchCover = loadSprite("images/launcher-cover.png")
     sprites.ball = loadSprite ("images/ball.png")
     sprites.leftflipper = loadSprite ("images/leftflip.png")
     sprites.blackhole = loadSprite("images/black-hole.png")
@@ -100,6 +101,10 @@ function play:load()
     sprites.background.ox = 0   -- Position relative to top-left corner
     sprites.background.oy = 0   -- and not the center of the image
 
+    -- Position the launch cover over the ball
+    sprites.launchCover.x = pinball.table.ball.x
+    sprites.launchCover.y = pinball.table.ball.y
+    
     -- Center all these sprites around the black hole's position
     local x, y = pinball:getObjectXY("black hole")
     sprites.blackhole.x = x
@@ -268,7 +273,14 @@ function play:draw ( )
     -- Draw the pinball components
     pinball:draw()
 
+    -- Draw the launch cover over the pinball components
+    -- (reposition the camera as the pinball module resets it after it draws)
+    love.graphics.setColor (255, 255, 255, 255)
+    pinball:setCamera()
+    sprites.launchCover:draw()
+
     -- Draw the status box
+    love.graphics.origin()
     --love.graphics.setColor(0, 0, 0, 200)
     --love.graphics.rectangle("fill", 0, scrHeight - 60, scrWidth, scrHeight - 60)
     led:draw()
