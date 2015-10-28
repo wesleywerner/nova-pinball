@@ -47,11 +47,11 @@ local missionDescriptions = {
 
 -- A set of encouraging words while the mission state is waiting
 local waitingWords = {
-    "Keep it up!",
-    "Looking good!",
-    "Don't drop that ball!",
-    "Hope you're enjoying Nova Pinball!",
-    "You are in the Zone!"
+    "Keep it up",
+    "Looking good",
+    "Don't drop that ball",
+    "Hope you're enjoying Nova Pinball",
+    "You are in the Zone"
     }
 
 function loadFromFile ( )
@@ -201,7 +201,7 @@ function play:load()
     positionDrawingElements()
 
     -- Pre-game welcome
-    led:add(0, "Welcome to Nova Pinball!")
+    led:add(0, "Welcome to Nova Pinball")
     led:add(0, "Hit space to play")
 end
 
@@ -229,7 +229,7 @@ function play:keypressed (key)
         if (key == " ") then
             pinball.cfg.translateOffset.y = 0
             states:set("play")
-            led:add(100, "Make the star go Nova!")
+            led:add(100, "Make the star go Nova")
         end
         if (key == "escape") then mainstate:set("menu") end
     elseif (states:on("play")) then
@@ -238,7 +238,7 @@ function play:keypressed (key)
         if (key == "rshift") then pinball:moveRightFlippers() end
         if (key == " " and #pinball.bodies.balls == 0) then
             pinball:newBall()
-            led:add(100, "Make the star go Nova!")
+            led:add(100, "Make the star go Nova")
         end
     elseif (states:on("paused")) then
         if (key == " ") then states:set("play") end
@@ -414,7 +414,7 @@ end
 -- The number of balls still in play are passed.
 function pinball.ballDrained (ballsInPlay)
     if (play.safeMode > 0) then
-        led:add(10, "Ball Saved!")
+        led:add(10, "Ball Saved")
         pinball:newBall()
     elseif (ballsInPlay == 0) then
         led:add(20, "Ball drained")
@@ -431,12 +431,15 @@ function pinball.tagContact (tag, id)
             local v1 = (300 + math.random() * 600) * sign1
             local v2 = (300 + math.random() * 600) * sign2
             pinball:lockBall (id, sprites.blackhole.x, sprites.blackhole.y, 1, v1, v2)
+            play.addScore(2500)
             led:add(0, "Gravity Lock Bonus")
         end
     end
 
     if (tag == "left bumper" or tag == "middle bumper" or tag == "right bumper") then
         play.addScore(500)
+    elseif (tag == "left kicker" or tag == "right kicker") then
+        play.addScore(750)
     end
 
     novaTarget:switchOn(tag)
@@ -472,7 +475,8 @@ function onNovaTargetSwitch(letter)
 end
 
 function onNovaTargetComplete()
-    led:add(0, "Word Bonus!")
+    play.addScore(1250)
+    led:add(0, "Word Bonus")
     mission:check("nova word")
 end
 
@@ -481,6 +485,7 @@ function onLeftTargetSwitch(letter)
 end
 
 function onLeftTargetsComplete()
+    play.addScore(100)
     mission:check("left targets")
 end
 
@@ -489,6 +494,7 @@ function onrightTargetsSwitch(letter)
 end
 
 function onrightTargetsComplete()
+    play.addScore(100)
     mission:check("right targets")
 end
 
@@ -500,34 +506,41 @@ end
 function mission.onMissionAdvanced(title)
 
     if (title == "red giant") then
+        play.addScore(1000)
         led:add(10, "Star evolved into a Red Giant")
         spriteStates:item("red star"):setVisible(true):scale(0.001)
     elseif (title == "hydrogen release") then
-        led:add(10, "Hydrogen released!")
+        play.addScore(1250)
+        led:add(10, "Hydrogen released")
     elseif (title == "fusion stage 1") then
-        led:add(10, "Fusion first stage complete!")
+        play.addScore(1500)
+        led:add(10, "Fusion first stage complete")
         spriteStates:item("wheel 1"):setVisible(true):scale(0.0003)
     elseif (title == "fusion stage 2") then
-        led:add(10, "Fusion second stage complete!")
+        play.addScore(1750)
+        led:add(10, "Fusion second stage complete")
         spriteStates:item("wheel 2"):setVisible(true):scale(0.0003)
     elseif (title == "fusion burn") then
         led:add(10, "Fusion burning... ")
     elseif (title == "fusion unstable") then
-        led:add(10, "Fusion unstable!")
+        led:add(10, "Fusion unstable")
         spriteStates:item("rays"):setVisible(true):scale(0.0005)
     elseif (title == "collapse star") then
-        led:add(10, "Star collapsing!")
-        led:add(10, "Black hole created!")
+        play.addScore(2250)
+        led:add(10, "Star collapsing")
+        led:add(10, "Black hole created")
         play.showBlackHole()
     elseif (title == "wormhole") then
         led:add(10, "Wormhole Alert!", true)
         play.showWormhole()
     elseif (title == "reset") then
-        led:add(11, "Supergravity Bonus!")
+        play.addScore(10000)
+        led:add(11, "Supergravity Bonus")
         play.resetMissionSprites()
         play.showStarFlare()
         play.insertBonusMission()
     elseif (title == "bonus ball") then
+        play.addScore(1500)
         play.releaseBonusBall()
     elseif (title == "ball saver") then
         play.activateBallSaver()
