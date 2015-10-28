@@ -37,16 +37,24 @@ local function loadSprite (path)
     return sprite
 end
 
-function manager:add(tag, image)
-    self.bumpers[tag] = loadSprite(image)
+function manager:add(tag, image, flipX, flipY)
+    local s = loadSprite(image)
+    s.flipX = flipX or 1
+    s.flipY = flipY or 1
+    self.bumpers[tag] = s
 end
 
 function manager:draw(tag, x, y)
     local bumper = self.bumpers[tag]
     if (bumper) then
-        local scale = 1
-        if (bumper.hitCooldown > 0) then scale = 1.1 end     -- draw larger after a hit
-        love.graphics.draw(bumper.image, x, y, 0, scale, scale, bumper.ox, bumper.oy)
+        local scaleX = bumper.flipX
+        local scaleY = bumper.flipY
+        -- draw larger after a hit
+        if (bumper.hitCooldown > 0) then
+            scaleX = bumper.flipX * 1.1
+            scaleY = bumper.flipY * 1.1
+        end
+        love.graphics.draw(bumper.image, x, y, 0, scaleX, scaleY, bumper.ox, bumper.oy)
     end
 end
 
