@@ -145,6 +145,8 @@ function play:load()
     bumperManager:add("left bumper", "images/bumper.png")
     bumperManager:add("middle bumper", "images/bumper.png")
     bumperManager:add("right bumper", "images/bumper.png")
+    bumperManager:add("left kicker", "images/kicker.png")
+    bumperManager:add("right kicker", "images/kicker.png", -1)
 
     -- Set up the "NOVA" word target
     novaTarget = targetManager:new()
@@ -345,10 +347,11 @@ function pinball.drawBumper (tag, x, y, r)
     bumperManager:draw(tag, x, y)
 end
 
-function pinball.drawKicker (tag, points)
-    love.graphics.setLineWidth (1)
-    love.graphics.setColor(108, 196, 113)
-    love.graphics.polygon("fill", points)
+function pinball.drawKicker (tag, x, y, points)
+    --love.graphics.setLineWidth (1)
+    --love.graphics.setColor(108, 196, 113)
+    --love.graphics.polygon("fill", points)
+    bumperManager:draw(tag, x, y)
 end
 
 function pinball.drawTrigger (tag, points)
