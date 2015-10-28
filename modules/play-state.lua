@@ -39,6 +39,7 @@ play.ballStatXPosition = 0
 -- Store the current player score
 play.score = 0
 play.scoreFormatted = "0"
+play.balls = 6
 
 -- A lookup of mission targets and their human readable texts
 local missionDescriptions = {
@@ -312,7 +313,7 @@ function play:drawStats()
     love.graphics.setFont(smallFont)
 
     love.graphics.setColor(255, 255, 255, 255)
-    love.graphics.print("Balls:3", play.ballStatXPosition, 2)
+    love.graphics.print("Balls:" .. play.balls, play.ballStatXPosition, 2)
     love.graphics.print("Score:" .. play.scoreFormatted, 10, 2)
 end
 
@@ -325,7 +326,7 @@ function positionDrawingElements()
     led.size.w = w
     led.size.h = 40
     led.position.y = h - led.size.h
-    play.ballStatXPosition = scrWidth - smallFont:getWidth("Balls:0") - 10
+    play.ballStatXPosition = scrWidth - smallFont:getWidth("Balls: 0") - 10
 end
 
 function updateLedDisplayMessages(dt)
@@ -422,6 +423,7 @@ function pinball.ballDrained (ballsInPlay)
         pinball:newBall()
     elseif (ballsInPlay == 0) then
         led:add(20, "Ball drained")
+        play.balls = play.balls - 1
     end
 end
 
