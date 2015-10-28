@@ -367,18 +367,18 @@ function pinball.drawFlipper (orientation, position, angle, origin, points)
     -- origin {x,y} is offset from the physics body center
     -- points {} are polygon vertices
 
-    love.graphics.setColor(108, 113, 196)
-    love.graphics.polygon("fill", points)
-    love.graphics.setLineWidth (4)
-    love.graphics.setColor(68, 73, 156)
-    love.graphics.polygon("line", points)
+    --love.graphics.setColor(108, 113, 196)
+    --love.graphics.polygon("fill", points)
+    --love.graphics.setLineWidth (4)
+    --love.graphics.setColor(68, 73, 156)
+    --love.graphics.polygon("line", points)
 
     ---- The flipper body is positioned relative to it's center, given
     ---- as the origin parameter. When we draw the image we offset by the
     ---- origin to line the top-left corner of our image with the body.
-    --love.graphics.setColor(255, 255, 255, 255)
-    --local scaleX = (orientation == "left") and 1 or -1  -- a negative scale flips the image horizontally
-    --love.graphics.draw(sprites.leftflipper.image, position.x, position.y, angle, scaleX, 1, origin.x, origin.y)
+    love.graphics.setColor(255, 255, 255, 255)
+    local scaleX = (orientation == "left") and 1 or -1  -- a negative scale flips the image horizontally
+    love.graphics.draw(sprites.leftflipper.image, position.x, position.y, angle, scaleX, 1, origin.x, origin.y)
 end
 
 function pinball.drawBall (x, y, radius)
