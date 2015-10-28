@@ -236,9 +236,13 @@ function play:keypressed (key)
         if (key == "escape") then states:set("paused") end
         if (key == "lshift") then pinball:moveLeftFlippers() end
         if (key == "rshift") then pinball:moveRightFlippers() end
-        if (key == " " and #pinball.bodies.balls == 0) then
-            pinball:newBall()
-            led:add(100, "Make the star go Nova")
+        if (key == " ") then
+            if (#pinball.bodies.balls == 0) then
+                pinball:newBall()
+                led:add(100, "Make the star go Nova")
+            else
+                pinball:nudge(20, 20)
+            end
         end
     elseif (states:on("paused")) then
         if (key == " ") then states:set("play") end
