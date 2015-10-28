@@ -539,10 +539,12 @@ function mission.onMissionAdvanced(title)
         play.resetMissionSprites()
         play.showStarFlare()
         play.insertBonusMission()
+    elseif (title == "bonus ball notice") then
+        led:add(0, "Matter Jetisson")
+        led:add(0, "Score another ball")
     elseif (title == "bonus ball") then
-        play.addScore(1500)
+        play.addScore(15000)
         play.releaseBonusBall()
-    elseif (title == "ball saver") then
         play.activateBallSaver()
     end
 
@@ -581,12 +583,13 @@ function play.showWormhole()
 end
 
 function play.insertBonusMission()
-    led:add(0, "Matter Jetisson")
-    led:add(0, "Score another ball")
     if (not mission:has("bonus ball")) then
+        -- Pre-mission notice
+        local n = mission:define("bonus ball notice")
+        n:wait(30)
+        n:moveAfter("hydrogen release")
         -- Multi-ball mission
         local m = mission:define("bonus ball")
-        m:wait(30)
         m:on("left bumper")
         m:on("nova word")
         m:on("right bumper")
@@ -594,11 +597,7 @@ function play.insertBonusMission()
         m:on("middle bumper")
         m:on("left targets")
         m:on("right targets")
-        m:moveAfter("hydrogen release")
-        -- Ball saver cooldown
-        local n = mission:define("ball saver")
-        n:wait(30)
-        n:moveAfter("bonus ball")
+        m:moveAfter("bonus ball notice")
     end
 end
 
