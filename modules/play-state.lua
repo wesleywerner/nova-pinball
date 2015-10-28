@@ -28,6 +28,8 @@ local sprites = { }
 
 -- Pre-game scroll effect drawing offset
 play.previewPosition = 0
+-- Table nudge shake offset
+play.nudgeOffset = 0
 -- Tracks when to display the current mission goal on the LED display
 play.missionStatusUpdateTime = 0
 -- Safe-mode fires a new ball if any ball drains
@@ -199,7 +201,7 @@ function play:load()
     mission:define("reset"):wait(15)
     mission:start()
 
-    positionDrawingElements()
+    play.positionDrawingElements()
 
     -- Pre-game welcome
     led:add(0, "Welcome to Nova Pinball")
@@ -209,7 +211,7 @@ end
 function play:update (dt)
     states:update(dt)
     led:update(dt)
-    updateLedDisplayMessages(dt)
+    play.updateLedDisplayMessages(dt)
     play.updateSafemode(dt)
     if (states:on("preview")) then
         if (self.previewPosition > -pinball.cfg.cameraOffset) then
@@ -217,6 +219,7 @@ function play:update (dt)
             pinball.cfg.translateOffset.y = self.previewPosition
         end
     elseif (states:on("play")) then
+        play.updateNudge()
         pinball:update(dt)
         bumperManager:update(dt)
         spriteStates:update(dt)
@@ -243,6 +246,7 @@ function play:keypressed (key)
                 led:add(100, "Make the star go Nova")
             else
                 pinball:nudge(20, 20)
+                play.nudgeOffset = 20
             end
         end
     elseif (states:on("paused")) then
@@ -306,6 +310,10 @@ function play:draw ( )
 
 end
 
+function play:resize (w, h)
+    pinball:resize (w, h)
+end
+
 function play:drawStats()
     local height = 20
     love.graphics.setColor(0, 0, 0, 255)
@@ -317,11 +325,14 @@ function play:drawStats()
     love.graphics.print("Score:" .. play.scoreFormatted, 10, 2)
 end
 
-function play:resize (w, h)
-    pinball:resize (w, h)
+function play.updateNudge()
+    if (play.nudgeOffset > 0) then
+        pinball.cfg.translateOffset.y = play.nudgeOffset
+        play.nudgeOffset = play.nudgeOffset - (play.nudgeOffset / 2)
+    end
 end
 
-function positionDrawingElements()
+function play.positionDrawingElements()
     w, h = love.window.getDimensions()
     led.size.w = w
     led.size.h = 40
@@ -329,7 +340,7 @@ function positionDrawingElements()
     play.ballStatXPosition = scrWidth - smallFont:getWidth("Balls: 0") - 10
 end
 
-function updateLedDisplayMessages(dt)
+function play.updateLedDisplayMessages(dt)
     play.missionStatusUpdateTime = play.missionStatusUpdateTime - dt
     if (play.missionStatusUpdateTime < 0 or dt == 0) then
         play.missionStatusUpdateTime = 20
@@ -506,7 +517,7 @@ end
 
 function mission.onMissionCheckPassed(signal)
     -- Force to display the next goal
-    updateLedDisplayMessages(0)
+    play.updateLedDisplayMessages(0)
 end
 
 function mission.onMissionAdvanced(title)
