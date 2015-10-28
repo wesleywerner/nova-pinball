@@ -26,6 +26,8 @@ local spriteStates = require("modules.sprite-state-manager")
 local led = require("modules.led-display")
 local sprites = { }
 
+-- Calculated to center the table in the screen
+play.leftAlign = 0
 -- Pre-game scroll effect drawing offset
 play.previewPosition = 0
 -- Table nudge shake offset
@@ -214,7 +216,7 @@ function play:update (dt)
     play.updateLedDisplayMessages(dt)
     play.updateSafemode(dt)
     if (states:on("preview")) then
-        if (self.previewPosition > -pinball.cfg.cameraOffset) then
+        if (self.previewPosition > -(pinball.table.size.height-scrHeight)) then
             self.previewPosition = self.previewPosition - (dt*50)
             pinball.cfg.translateOffset.y = self.previewPosition
         end
@@ -273,6 +275,9 @@ function play:draw ( )
     love.graphics.setBackgroundColor(0, 0, 0)
     love.graphics.setColor (255, 255, 255, 255)
 
+    -- Center in the screen
+    love.graphics.translate(play.leftAlign, 0)
+
     -- Fix the coordinate system so that we draw relative to the table.
     pinball:setCamera()
 
@@ -292,7 +297,6 @@ function play:draw ( )
     -- Draw the launch cover over the pinball components
     -- (reposition the camera as the pinball module resets it after it draws)
     love.graphics.setColor (255, 255, 255, 255)
-    pinball:setCamera()
     sprites.launchCover:draw()
 
     -- Draw the status box
@@ -311,6 +315,7 @@ function play:draw ( )
 end
 
 function play:resize (w, h)
+    play.positionDrawingElements()
     pinball:resize (w, h)
 end
 
@@ -333,11 +338,11 @@ function play.updateNudge()
 end
 
 function play.positionDrawingElements()
-    w, h = love.window.getDimensions()
-    led.size.w = w
+    led.size.w = scrWidth
     led.size.h = 40
-    led.position.y = h - led.size.h
+    led.position.y = scrHeight - led.size.h
     play.ballStatXPosition = scrWidth - smallFont:getWidth("Balls: 0") - 10
+    play.leftAlign = (scrWidth - pinball.table.size.width) / 2
 end
 
 function play.updateLedDisplayMessages(dt)
