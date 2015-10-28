@@ -34,6 +34,11 @@ play.missionStatusUpdateTime = 0
 play.safeMode = 0
 -- How long safe-mode lasts (seconds)
 play.safeModePeriod = 60
+-- Position to draw the balls remaining stat line (gets updated on resize)
+play.ballStatXPosition = 0
+-- Store the current player score
+play.score = 0
+play.scoreFormatted = "0"
 
 -- A lookup of mission targets and their human readable texts
 local missionDescriptions = {
@@ -285,6 +290,8 @@ function play:draw ( )
     love.graphics.origin()
     --love.graphics.setColor(0, 0, 0, 200)
     --love.graphics.rectangle("fill", 0, scrHeight - 60, scrWidth, scrHeight - 60)
+    play:drawStats()
+    love.graphics.setFont(largeFont)
     led:draw()
 
     -- Simple text overlays
@@ -292,6 +299,17 @@ function play:draw ( )
         printShadowText("PAUSED", 200, {255, 128, 255, 200})
     end
 
+end
+
+function play:drawStats()
+    local height = 20
+    love.graphics.setColor(0, 0, 0, 255)
+    love.graphics.rectangle("fill", 0, 0, scrWidth, height)
+    love.graphics.setFont(smallFont)
+
+    love.graphics.setColor(255, 255, 255, 255)
+    love.graphics.print("Balls:3", play.ballStatXPosition, 2)
+    love.graphics.print("Score:" .. play.scoreFormatted, 10, 2)
 end
 
 function play:resize (w, h)
@@ -303,6 +321,7 @@ function positionDrawingElements()
     led.size.w = w
     led.size.h = 40
     led.position.y = h - led.size.h
+    play.ballStatXPosition = scrWidth - smallFont:getWidth("Balls:0") - 10
 end
 
 function updateLedDisplayMessages(dt)
@@ -414,6 +433,10 @@ function pinball.tagContact (tag, id)
             pinball:lockBall (id, sprites.blackhole.x, sprites.blackhole.y, 1, v1, v2)
             led:add(0, "Gravity Lock Bonus")
         end
+    end
+
+    if (tag == "left bumper" or tag == "middle bumper" or tag == "right bumper") then
+        play.addScore(500)
     end
 
     novaTarget:switchOn(tag)
@@ -588,6 +611,17 @@ end
 function play.deactivateBallSaver()
     play.safeMode = 0
     led:add(10, "Safe Mode Off")
+end
+
+function play.addScore(amount)
+    play.score = play.score + amount
+    -- store a thousand-formatted value
+    local formatted = play.score
+    while true do
+        formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
+        if (k==0) then break end
+    end
+    play.scoreFormatted = formatted
 end
 
 -- When a ball is locked with pinball:lockBall()

@@ -13,7 +13,11 @@ http://love2d.org/
 http://www.styleseven.com
 http://www.fontspace.com/style-7/advanced-led-board-7
 
-*Pinball engine* code by Wesley Werner
+*Erbos Draco Open NBP Font* by made by Nate Halley
+Licensed under Creative Commons (by-sa)
+http://www.fontspace.com/total-fontgeek-dtf-ltd/erbos-draco-monospaced-nbp
+
+*Nova pinball engine* code by Wesley Werner
 
 # LICENSE
 

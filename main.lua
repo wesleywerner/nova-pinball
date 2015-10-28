@@ -19,6 +19,8 @@
 statemanager = require ("modules.states")
 playstate = require("modules.play-state")
 menustate = require("modules.menu-state")
+largeFont = love.graphics.newFont("fonts/advanced_led_board-7.ttf", 37)
+smallFont = love.graphics.newFont("fonts/erbos_draco_1st_open_nbp.ttf", 20)
 
 function love.load()
 
@@ -27,8 +29,7 @@ function love.load()
 
     -- Set graphics
     love.graphics.setBackgroundColor(0, 0, 0)
-    local font = love.graphics.newFont ("fonts/advanced_led_board-7.ttf", 37)
-    love.graphics.setFont (font)
+    love.graphics.setFont(largeFont)
 
     -- Set up main states
     mainstate = statemanager:new()
