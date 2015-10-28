@@ -38,14 +38,14 @@ function led:update(dt)
     if (not self.current and #self.queue > 0) then self.current = table.remove(self.queue, 1) end
     -- Update message scroll
     if (self.current and self.current.direction == "up") then
-        self.current.position.y = self.current.position.y - (dt*100)
+        self.current.position.y = self.current.position.y - (dt*150)
         if (self.current.position.y <= 0) then
             self.current.direction = "wait"
             self.current.timer = self.WaitTime
         end
     end
     if (self.current and self.current.direction == "down") then
-        self.current.position.y = self.current.position.y + (dt*100)
+        self.current.position.y = self.current.position.y + (dt*150)
         if (self.current.position.y >= self.size.h) then
             self.current.direction = "destroy"
         end

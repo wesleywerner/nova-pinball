@@ -25,7 +25,15 @@ local mission = require("modules.mission")
 local spriteStates = require("modules.sprite-state-manager")
 local led = require("modules.led-display")
 local sprites = { }
-local previewPosition = 0
+
+-- Pre-game scroll effect drawing offset
+thisState.previewPosition = 0
+-- Tracks when to display the current mission goal on the LED display
+thisState.missionStatusUpdateTime = 0
+-- Safe-mode fires a new ball if any ball drains
+thisState.safeMode = 0
+-- How long safe-mode lasts (seconds)
+thisState.safeModePeriod = 60
 
 -- A lookup of mission targets and their human readable texts
 local missionDescriptions = {
@@ -40,9 +48,6 @@ local waitingWords = {
     "Hope you're enjoying Nova Pinball!",
     "You are in the Zone!"
     }
-
--- Tracks when to display the current mission goal on the LED display
-local missionStatusUpdateTime = 0
 
 function loadFromFile ( )
     local binser = require("modules.binser")
@@ -132,9 +137,9 @@ function thisState:load()
     spriteStates:add("black hole", sprites.blackhole):setScale(0)
 
     -- Set up the bumper manager
-    bumperManager:add("bumper1", "images/bumper.png")
-    bumperManager:add("bumper2", "images/bumper.png")
-    bumperManager:add("bumper3", "images/bumper.png")
+    bumperManager:add("left bumper", "images/bumper.png")
+    bumperManager:add("middle bumper", "images/bumper.png")
+    bumperManager:add("right bumper", "images/bumper.png")
 
     -- Set up the "NOVA" word target
     novaTarget = targetManager:new()
@@ -192,10 +197,11 @@ function thisState:update (dt)
     states:update(dt)
     led:update(dt)
     updateLedDisplayMessages(dt)
+    updateSafemode(dt)
     if (states:on("preview")) then
-        if (previewPosition > -pinball.cfg.cameraOffset) then
-            previewPosition = previewPosition - (dt*50)
-            pinball.cfg.translateOffset.y = previewPosition
+        if (self.previewPosition > -pinball.cfg.cameraOffset) then
+            self.previewPosition = self.previewPosition - (dt*50)
+            pinball.cfg.translateOffset.y = self.previewPosition
         end
     elseif (states:on("play")) then
         pinball:update(dt)
@@ -237,6 +243,7 @@ end
 function thisState:keyreleased(key)
     if (key == "lshift") then pinball:releaseLeftFlippers() end
     if (key == "rshift") then pinball:releaseRightFlippers() end
+    if key == "s" then activateBallSaver() end
 end
 
 function thisState:draw ( )
@@ -285,9 +292,9 @@ function positionDrawingElements()
 end
 
 function updateLedDisplayMessages(dt)
-    missionStatusUpdateTime = missionStatusUpdateTime - dt
-    if (missionStatusUpdateTime < 0 or dt == 0) then
-        missionStatusUpdateTime = 20
+    thisState.missionStatusUpdateTime = thisState.missionStatusUpdateTime - dt
+    if (thisState.missionStatusUpdateTime < 0 or dt == 0) then
+        thisState.missionStatusUpdateTime = 20
         if (states:on("play")) then
             -- Display a hint of the next goal
             local title = mission:nextTarget()
@@ -372,7 +379,10 @@ end
 -- Called when a ball has drained out of play.
 -- The number of balls still in play are passed.
 function pinball.ballDrained (ballsInPlay)
-    if (ballsInPlay == 0) then
+    if (thisState.safeMode > 0) then
+        led:add(10, "Ball Saved!")
+        pinball:newBall()
+    elseif (ballsInPlay == 0) then
         led:add(20, "Ball drained")
     end
 end
@@ -470,19 +480,24 @@ function mission.onMissionAdvanced(title)
     elseif (title == "collapse star") then
         led:add(10, "Star collapsing!")
         led:add(10, "Black hole created!")
-        pinball.showBlackHole()
+        showBlackHole()
     elseif (title == "wormhole") then
         led:add(10, "Wormhole Alert!", true)
-        pinball.showWormhole()
+        showWormhole()
     elseif (title == "reset") then
         led:add(11, "Supergravity Bonus!")
-        pinball.resetMissionSprites()
-        pinball.showStarFlare()
+        resetMissionSprites()
+        showStarFlare()
+        insertBonusMission()
+    elseif (title == "bonus ball") then
+        releaseBonusBall()
+    elseif (title == "ball saver") then
+        activateBallSaver()
     end
 
 end
 
-function pinball.resetMissionSprites()
+function resetMissionSprites()
     -- hide the nova rings and black hole
     spriteStates:item("wheel 1"):scale(-0.1)
     spriteStates:item("wheel 2"):scale(-0.1)
@@ -496,22 +511,68 @@ function pinball.resetMissionSprites()
     spriteStates:item("worm hole rays"):scale(-0.015)
 end
 
-function pinball.showStarFlare()
+function showStarFlare()
     spriteStates:item("star flare"):scale(0.001):setVisible(true)
     pinball:restoreGravity()
     pinball:setBallDampening(0)
 end
 
-function pinball.showBlackHole()
+function showBlackHole()
     spriteStates:item("black hole"):setVisible(true):scale(0.01)
 end
 
-function pinball.showWormhole()
+function showWormhole()
     pinball:setGravity(0)
     pinball:setBallDampening(1)
     spriteStates:item("worm hole rays"):setVisible(true):scale(0.001)
     spriteStates:item("worm hole"):setVisible(true):scale(0.002)
     spriteStates:item("worm hole clouds"):setVisible(true):scale(0.002)
+end
+
+function insertBonusMission()
+    led:add(0, "Matter Jetisson")
+    led:add(0, "Score another ball")
+    if (not mission:has("bonus ball")) then
+        -- Multi-ball mission
+        local m = mission:define("bonus ball")
+        m:wait(30)
+        m:on("left bumper")
+        m:on("nova word")
+        m:on("right bumper")
+        m:on("nova word")
+        m:on("middle bumper")
+        m:on("left targets")
+        m:on("right targets")
+        m:moveAfter("hydrogen release")
+        -- Ball saver cooldown
+        local n = mission:define("ball saver")
+        n:wait(30)
+        n:moveAfter("bonus ball")
+    end
+end
+
+function releaseBonusBall()
+    led:add(10, "Multi-ball Bonus")
+    pinball:newBall()
+end
+
+function updateSafemode(dt)
+    if (thisState.safeMode > 0) then
+        thisState.safeMode = thisState.safeMode - dt
+        if (thisState.safeMode < 0) then
+            deactivateBallSaver()
+        end
+    end
+end
+
+function activateBallSaver()
+    led:add(10, "Safe Mode Activated")
+    thisState.safeMode = thisState.safeModePeriod
+end
+
+function deactivateBallSaver()
+    thisState.safeMode = 0
+    led:add(10, "Safe Mode Off")
 end
 
 -- When a ball is locked with pinball:lockBall()
