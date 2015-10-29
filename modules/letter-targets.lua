@@ -22,20 +22,6 @@
 local targets = { }
 targets.letters = nil
 
-local function loadSprite (path)
-    -- Store sprites as
-    --      sprite.image    
-    --      sprite.size     (width, height)
-    --      sprite.ox       draw offset x
-    --      sprite.oy       draw offset y
-    local sprite = { }
-    sprite.image = love.graphics.newImage (path)
-    sprite.size = { sprite.image:getDimensions () }
-    sprite.ox = sprite.size[1] / 2
-    sprite.oy = sprite.size[2] / 2
-    return sprite
-end
-
 function targets:new()
     local function deepcopy(orig)
         local orig_type = type(orig)

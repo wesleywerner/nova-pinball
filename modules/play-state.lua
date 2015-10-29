@@ -472,26 +472,6 @@ function pinball.tagContact (tag, id)
     
 end
 
--- Load a sprite and calculate the center point.
-function loadSprite (path)
-    -- Store sprites as
-    --      sprite.image    
-    --      sprite.size     (width, height)
-    --      sprite.ox       draw offset x
-    --      sprite.oy       draw offset y
-    local sprite = { }
-    sprite.image = love.graphics.newImage (path)
-    sprite.size = { sprite.image:getDimensions () }
-    sprite.ox = sprite.size[1] / 2
-    sprite.oy = sprite.size[2] / 2
-    sprite.angle = 0
-    sprite.scale = 1
-    function sprite:draw()
-        love.graphics.draw(self.image, self.x, self.y, self.angle, self.scale, self.scale, self.ox, self.oy)
-    end
-    return sprite
-end
-
 function onNovaTargetSwitch(letter)
 
 end
