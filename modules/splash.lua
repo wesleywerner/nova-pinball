@@ -1,6 +1,7 @@
 local splash = {}
 
 function splash:load()
+    love.graphics.setFont(smallFont)
     love.graphics.setBackgroundColor(0, 0, 0, 255)
     -- center of screen
     self.center = {}
@@ -19,12 +20,25 @@ function splash:load()
     self.sprites = spritemanager:new()
     self.sprites:add("spokes", self.spokes):setRotation(0.1)
     self.sprites:add("heart", self.heart)
-    -- Word positioning
-    self.titleY = 0
-    self.loaded = true
     -- Fadeout
+    self.timeout = 5
     self.fading = false
     self.fadeAlpha = 0
+    -- Loading message
+    local actions = {
+        "Carving", "Grinding", "Wiring", "Winding", "Tightening", "Counting"
+        }
+    local things = {
+        " Flippers",
+        " Balls",
+        " Bumpers",
+        " Kickers",
+        " Slingshots",
+        " Bolts",
+        }
+    self.loadingMessage = actions[math.random(1, #actions)] .. things[math.random(1, #things)] .. "..."
+    -- Done Loading
+    self.loaded = true
 end
 
 function splash:unload()
@@ -38,16 +52,18 @@ function splash:update(dt)
     if self.loaded then
         if (self.heart.scale == 1) then self.sprites:item("heart"):scale(-0.2) end
         if (self.heart.scale < 0.85) then self.sprites:item("heart"):scale(0.3) end
-        if (self.titleY < scrHeight/2) then self.titleY = self.titleY + (100*dt) end
         if (self.fading) then
             self.fadeAlpha = self.fadeAlpha + (127*dt)
             if self.fadeAlpha >= 255 then
                 self.fadeAlpha = 255
                 self:unload()
                 mainstate:set("menu")
+                love.graphics.setFont(largeFont)
                 return
             end
         end
+        self.timeout = self.timeout - (1*dt)
+        if (self.timeout < 0) then self.fading = true end
         self.sprites:update(dt)
     end
 end
@@ -58,9 +74,9 @@ function splash:draw(dt)
         love.graphics.circle("fill", self.center.x, self.center.y, self.r)
         love.graphics.setColor(255, 255, 255)
         self.sprites:draw()
-        printShadowText("Radeocity", self.titleY, {255, 255, 255})
+        printShadowText(self.loadingMessage, scrHeight - 30, {200, 200, 100})
         if self.fading then
-            love.graphics.setColor(32, 32, 64, self.fadeAlpha)
+            love.graphics.setColor(0, 0, 0, self.fadeAlpha)
             love.graphics.rectangle("fill", 0, 0, scrWidth, scrHeight)
         end
     end
