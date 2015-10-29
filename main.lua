@@ -30,7 +30,6 @@ function love.load()
     scrWidth, scrHeight = love.window.getDimensions()
 
     -- Set graphics
-    love.graphics.setBackgroundColor(0, 0, 0)
     love.graphics.setFont(largeFont)
 
     -- Set up main states
@@ -38,7 +37,7 @@ function love.load()
     mainstate:add("splash", 2, "menu")
     mainstate:add("menu")
     mainstate:add("play")
-    mainstate:set("menu")
+    mainstate:set("splash")
 
     menustate:load()
     playstate:load()
