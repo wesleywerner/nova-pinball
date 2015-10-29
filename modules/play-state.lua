@@ -22,7 +22,7 @@ local pinball = require ("nova-pinball-engine")
 local targetManager = require("modules.letter-targets")
 local bumperManager = require("modules.bumpers")
 local mission = require("modules.mission")
-local spriteStates = require("modules.sprite-state-manager")
+local spriteStates = spritemanager:new()
 local led = require("modules.led-display")
 local sprites = { }
 
