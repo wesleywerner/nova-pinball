@@ -141,14 +141,14 @@ function play:load()
 
     -- Set up the sprite state manager
     spriteStates:add("star", sprites.star)
-    spriteStates:add("wheel 1", sprites.wheel1):setRotation(0.0004):setScale(0)
-    spriteStates:add("wheel 2", sprites.wheel2):setRotation(0.0006):setScale(0)
-    spriteStates:add("rays", sprites.rays):setRotation(-0.002):setScale(0)
+    spriteStates:add("wheel 1", sprites.wheel1):setRotation(0.01):setScale(0)
+    spriteStates:add("wheel 2", sprites.wheel2):setRotation(0.02):setScale(0)
+    spriteStates:add("rays", sprites.rays):setRotation(-0.1):setScale(0)
     spriteStates:add("red star", sprites.redStar):setScale(0)
-    spriteStates:add("star flare", sprites.starFlare):setRotation(-0.0003):setScale(0)
-    spriteStates:add("worm hole rays", sprites.wormholeRays):setRotation(0.01):setScale(0)
-    spriteStates:add("worm hole", sprites.wormhole):setRotation(0.01):setScale(0)
-    spriteStates:add("worm hole clouds", sprites.wormholeClouds):setRotation(0.02):setScale(0):setBlendmode("additive")
+    spriteStates:add("star flare", sprites.starFlare):setRotation(-0.01):setScale(0)
+    spriteStates:add("worm hole rays", sprites.wormholeRays):setRotation(0.1):setScale(0)
+    spriteStates:add("worm hole", sprites.wormhole):setRotation(0.1):setScale(0)
+    spriteStates:add("worm hole clouds", sprites.wormholeClouds):setRotation(0.6):setScale(0):setBlendmode("additive")
     spriteStates:add("black hole", sprites.blackhole):setScale(0)
 
     -- Set up the bumper manager
@@ -510,23 +510,23 @@ function mission.onMissionAdvanced(title)
     if (title == "red giant") then
         play.addScore(1000)
         led:add(10, "Star evolved into a Red Giant")
-        spriteStates:item("red star"):setVisible(true):scale(0.001)
+        spriteStates:item("red star"):setVisible(true):scale(0.1)
     elseif (title == "hydrogen release") then
         play.addScore(1250)
         led:add(10, "Hydrogen released")
     elseif (title == "fusion stage 1") then
         play.addScore(1500)
         led:add(10, "Fusion first stage complete")
-        spriteStates:item("wheel 1"):setVisible(true):scale(0.0003)
+        spriteStates:item("wheel 1"):setVisible(true):scale(0.02)
     elseif (title == "fusion stage 2") then
         play.addScore(1750)
         led:add(10, "Fusion second stage complete")
-        spriteStates:item("wheel 2"):setVisible(true):scale(0.0003)
+        spriteStates:item("wheel 2"):setVisible(true):scale(0.02)
     elseif (title == "fusion burn") then
         led:add(10, "Fusion burning... ")
     elseif (title == "fusion unstable") then
         led:add(10, "Fusion unstable")
-        spriteStates:item("rays"):setVisible(true):scale(0.0005)
+        spriteStates:item("rays"):setVisible(true):scale(0.03)
     elseif (title == "collapse star") then
         play.addScore(2250)
         led:add(10, "Star collapsing")
@@ -554,34 +554,34 @@ end
 
 function play.resetMissionSprites()
     -- hide the nova rings and black hole
-    spriteStates:item("wheel 1"):scale(-0.1)
-    spriteStates:item("wheel 2"):scale(-0.1)
-    spriteStates:item("rays"):scale(-0.1)
-    spriteStates:item("red star"):scale(-0.1)
-    spriteStates:item("black hole"):scale(-0.1)
+    spriteStates:item("wheel 1"):scale(-1)
+    spriteStates:item("wheel 2"):scale(-1)
+    spriteStates:item("rays"):scale(-1)
+    spriteStates:item("red star"):scale(-1)
+    spriteStates:item("black hole"):scale(-1)
     -- hide the wormhole and restore gravity
-    spriteStates:item("worm hole"):scale(-0.04)
-    spriteStates:item("worm hole clouds"):scale(-0.04)
+    spriteStates:item("worm hole"):scale(-0.6)
+    spriteStates:item("worm hole clouds"):scale(-0.6)
     -- Slowly retract the rays
-    spriteStates:item("worm hole rays"):scale(-0.015)
+    spriteStates:item("worm hole rays"):scale(-0.4)
 end
 
 function play.showStarFlare()
-    spriteStates:item("star flare"):scale(0.001):setVisible(true)
+    spriteStates:item("star flare"):scale(0.04):setVisible(true)
     pinball:restoreGravity()
     pinball:setBallDampening(0)
 end
 
 function play.showBlackHole()
-    spriteStates:item("black hole"):setVisible(true):scale(0.01)
+    spriteStates:item("black hole"):setVisible(true):scale(0.2)
 end
 
 function play.showWormhole()
     pinball:setGravity(0)
     pinball:setBallDampening(1)
-    spriteStates:item("worm hole rays"):setVisible(true):scale(0.001)
-    spriteStates:item("worm hole"):setVisible(true):scale(0.002)
-    spriteStates:item("worm hole clouds"):setVisible(true):scale(0.002)
+    spriteStates:item("worm hole rays"):setVisible(true):scale(0.1)
+    spriteStates:item("worm hole"):setVisible(true):scale(0.3)
+    spriteStates:item("worm hole clouds"):setVisible(true):scale(0.3)
 end
 
 function play.insertBonusMission()

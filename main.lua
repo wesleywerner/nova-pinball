@@ -16,11 +16,13 @@
 -- Written by Wesley "keyboard monkey" Werner 2015
 -- https://github.com/wesleywerner/
 
+spritemanager = require("modules.sprite-state-manager")
 statemanager = require ("modules.states")
 playstate = require("modules.play-state")
 menustate = require("modules.menu-state")
 largeFont = love.graphics.newFont("fonts/advanced_led_board-7.ttf", 37)
 smallFont = love.graphics.newFont("fonts/erbos_draco_1st_open_nbp.ttf", 20)
+local splash = nil
 
 function love.load()
 
@@ -41,12 +43,17 @@ function love.load()
     menustate:load()
     playstate:load()
 
+    splash = require("modules.splash")
+    splash:load()
+
 end
 
 function love.update (dt)
     mainstate:update(dt)
     if (mainstate:on("play")) then
         playstate:update(dt)
+    elseif (mainstate:on("splash")) then
+        splash:update(dt)
     elseif (mainstate:on("menu")) then
         menustate:update(dt)
     end
@@ -55,6 +62,8 @@ end
 function love.keypressed (key, isrepeat)
     if (mainstate:on("play")) then
         playstate:keypressed(key)
+    elseif (mainstate:on("splash")) then
+        splash:keypressed(key)
     elseif (mainstate:on("menu")) then
         menustate:keypressed(key)
     end
@@ -71,6 +80,8 @@ end
 function love.draw ( )
     if (mainstate:on("play")) then
         playstate:draw()
+    elseif (mainstate:on("splash")) then
+        splash:draw()
     elseif (mainstate:on("menu")) then
         menustate:draw()
     end

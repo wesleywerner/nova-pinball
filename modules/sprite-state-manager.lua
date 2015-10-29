@@ -88,7 +88,7 @@ function manager:update(dt)
         if (v.visible) then
             -- auto scale sprites towards "1"
             if (v.scaleIncrement) then
-                v.sprite.scale = v.sprite.scale + v.scaleIncrement
+                v.sprite.scale = v.sprite.scale + (v.scaleIncrement*dt)
                 -- Auto stop scaling
                 if (v.sprite.scale >= 1 and v.scaleIncrement > 0) then
                     v.sprite.scale = 1
@@ -101,7 +101,7 @@ function manager:update(dt)
                 end
             end
             if (v.angleIncrement) then
-                v.sprite.angle = v.sprite.angle + v.angleIncrement
+                v.sprite.angle = v.sprite.angle + (v.angleIncrement*dt)
             end
         end
     end
