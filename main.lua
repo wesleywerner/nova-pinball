@@ -37,7 +37,7 @@ function love.load()
     mainstate:add("splash", 2, "menu")
     mainstate:add("menu")
     mainstate:add("play")
-    mainstate:set("splash")
+    mainstate:set("play")
 
     menustate:load()
     playstate:load()

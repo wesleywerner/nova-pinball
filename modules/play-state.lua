@@ -24,6 +24,7 @@ local bumperManager = require("modules.bumpers")
 local mission = require("modules.mission")
 local spriteStates = spritemanager:new()
 local led = require("modules.led-display")
+local indicators = require("modules.indicators")
 local sprites = { }
 
 -- Calculated to center the table in the screen
@@ -191,6 +192,17 @@ function play:load()
     local x, y = pinball:getObjectXY("dot3")
     rightTargets:add("dot3", x, y, "images/circle-target-off.png", "images/circle-target-on.png")
 
+    -- Set up goal indicator lights
+    local x, y = pinball:getObjectXY("left ramp indicator")
+    indicators:add("left ramp", x, y,
+        {"images/arrow-indicator-off.png",
+         "images/arrow-indicator-on.png"})
+    local x, y = pinball:getObjectXY("right ramp indicator")
+    indicators:add("right ramp", x, y,
+        {"images/arrow-indicator-off.png",
+         "images/arrow-indicator-on.png"})
+
+
     -- Define the mission goals
     mission:define("red giant"):on("nova word")
     mission:define("hydrogen release"):on("left ramp"):on("right ramp")
@@ -212,15 +224,17 @@ end
 
 function play:update (dt)
     states:update(dt)
-    led:update(dt)
     play.updateLedDisplayMessages(dt)
     play.updateSafemode(dt)
+    indicators:update(dt)
     if (states:on("preview")) then
+        led:update(dt)
         if (self.previewPosition > -(pinball.table.size.height-scrHeight)) then
             self.previewPosition = self.previewPosition - (dt*50)
             pinball.cfg.translateOffset.y = self.previewPosition
         end
     elseif (states:on("play")) then
+        led:update(dt)
         play.updateNudge()
         pinball:update(dt)
         bumperManager:update(dt)
@@ -291,6 +305,7 @@ function play:draw ( )
     leftTargets:draw()
     rightTargets:draw()
     spriteStates:draw()
+    indicators:draw()
 
     -- Draw the pinball components
     pinball:draw()
@@ -504,6 +519,8 @@ end
 function mission.onMissionCheckPassed(signal)
     -- Force to display the next goal
     play.updateLedDisplayMessages(0)
+    indicators:reset()
+    indicators:set(mission:nextTarget(), true)
 end
 
 function mission.onMissionAdvanced(title)
