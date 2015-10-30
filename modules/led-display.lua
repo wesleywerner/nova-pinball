@@ -6,31 +6,39 @@ led.current = nil
 led.WaitTime = 1.5
 
 -- Add a new message to display.
--- Higher priorities get displayed first.
--- Sticky messages show until another message of the same or higher priority is added.
-function led:add(priority, message, sticky)
+-- Options is a comma seperated string of:
+--      "priority": queues at the top, displays next
+--      "sticky": shows until a priority message is added.
+--      "long": display longer than the default.
+function led:add(message, options)
+    options = options or ""
     local m = {
-        priority=priority,
+        priority=options:match("priority") and true or false,
         message=message,
-        sticky=sticky,
+        sticky=options:match("sticky") and true or false,
         timer=0,
         position={x=0, y=self.size.h},
-        direction="up"
+        direction="up",
+        long=options:match("long") and true or false
         }
     -- Avoid duplicating current message
     if (self.current and self.current.message == message) then return end
     -- Unsticky current
-    if (self.current and self.current.sticky and self.current.priority < priority) then
+    if (self.current and self.current.sticky and m.priority) then
         self.current.sticky = false
     end
-    -- Priority message
-    if (self.current and self.current.priority < priority) then
-        self.current.timer = 0
+    -- Insert priority messages to the top
+    if (m.priority) then
+        --self.current.timer = 0
         table.insert(self.queue, 1, m)
     else
         table.insert(self.queue, m)
     end
     
+end
+
+function led:clear()
+    self.queue = {}
 end
 
 function led:update(dt)
@@ -41,7 +49,7 @@ function led:update(dt)
         self.current.position.y = self.current.position.y - (dt*150)
         if (self.current.position.y <= 0) then
             self.current.direction = "wait"
-            self.current.timer = self.WaitTime
+            self.current.timer = self.WaitTime * (self.current.long and 3 or 1)
         end
     end
     if (self.current and self.current.direction == "down") then
