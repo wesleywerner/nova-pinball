@@ -18,8 +18,8 @@
 
 spritemanager = require("modules.sprite-state-manager")
 statemanager = require ("modules.states")
-playstate = require("modules.play-state")
-menustate = require("modules.menu-state")
+playstate = nil
+menustate = nil
 largeFont = love.graphics.newFont("fonts/advanced_led_board-7.ttf", 37)
 smallFont = love.graphics.newFont("fonts/erbos_draco_1st_open_nbp.ttf", 20)
 local splash = nil
@@ -37,10 +37,9 @@ function love.load()
     mainstate:add("splash", 2, "menu")
     mainstate:add("menu")
     mainstate:add("play")
+    --mainstate:set("splash")
+    loadAllModules()
     mainstate:set("play")
-
-    menustate:load()
-    playstate:load()
 
     splash = require("modules.splash")
     splash:load()
@@ -89,6 +88,15 @@ end
 function love.resize (w, h)
     scrWidth, scrHeight = w, h
     playstate:resize(w, h)
+end
+
+function loadAllModules()
+    if (not playstate) then
+        menustate = require("modules.menu-state")
+        playstate = require("modules.play-state")
+        menustate:load()
+        playstate:load()
+    end
 end
 
 -- A global function to draw better readable words

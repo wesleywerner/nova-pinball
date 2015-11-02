@@ -21,7 +21,6 @@ function splash:load()
     self.sprites:add("spokes", self.spokes):setRotation(0.1)
     self.sprites:add("heart", self.heart)
     -- Fadeout
-    self.timeout = 5
     self.fading = false
     self.fadeAlpha = 0
     -- Loading message
@@ -37,21 +36,38 @@ function splash:load()
         " Bolts",
         }
     self.loadingMessage = actions[math.random(1, #actions)] .. things[math.random(1, #things)] .. "..."
-    -- Done Loading
-    self.loaded = true
+    -- Loading state
+    self.splashLoaded = true
+    self.modulesLoadDelay = 2
+    self.modulesLoaded = false
 end
 
 function splash:unload()
-    self.loaded = nil
+    self.splashLoaded = nil
     self.heart = nil
     self.spokes = nil
     self.sprites = nil
 end
 
 function splash:update(dt)
-    if self.loaded then
+    if self.splashLoaded then
+    
+        -- Load all other modules
+        if (self.modulesLoadDelay) then
+            self.modulesLoadDelay = self.modulesLoadDelay - dt
+            if (self.modulesLoadDelay < 0) then
+                self.modulesLoadDelay = nil
+                loadAllModules()
+                self.modulesLoaded = true
+                self.fading = true
+            end
+        end
+
+        -- Beat the heart by scaling it up and down
         if (self.heart.scale == 1) then self.sprites:item("heart"):scale(-0.2) end
         if (self.heart.scale < 0.85) then self.sprites:item("heart"):scale(0.3) end
+
+        -- Fade the splash screen out
         if (self.fading) then
             self.fadeAlpha = self.fadeAlpha + (127*dt)
             if self.fadeAlpha >= 255 then
@@ -62,14 +78,14 @@ function splash:update(dt)
                 return
             end
         end
-        self.timeout = self.timeout - (1*dt)
-        if (self.timeout < 0) then self.fading = true end
+
+        -- Update the sprite manager which handles the sprite rotation and scaling
         self.sprites:update(dt)
     end
 end
 
 function splash:draw(dt)
-    if self.loaded then
+    if self.splashLoaded then
         love.graphics.setColor(0, 255, 0)
         love.graphics.circle("fill", self.center.x, self.center.y, self.r)
         love.graphics.setColor(255, 255, 255)
@@ -83,7 +99,7 @@ function splash:draw(dt)
 end
 
 function splash:keypressed(key)
-    if not self.fading then
+    if (self.modulesLoaded) then
         self.fading = true
     end
 end
