@@ -234,8 +234,8 @@ function play:loadTargets()
 
     -- Set up the left targets
     targets.leftTargets = targetManager:new()
-    targets.leftTargets.onComplete = onLeftTargetsComplete
-    targets.leftTargets.onSwitch = onLeftTargetSwitch
+    targets.leftTargets.onComplete = play.onLeftTargetsComplete
+    targets.leftTargets.onSwitch = play.onLeftTargetSwitch
     -- left 1
     local x, y = pinball:getObjectXY("dot4")
     local target = targets.leftTargets:add("dot4")
@@ -257,8 +257,8 @@ function play:loadTargets()
 
     -- Set up the right targets
     targets.rightTargets = targetManager:new()
-    targets.rightTargets.onComplete = onrightTargetsComplete
-    targets.rightTargets.onSwitch = onrightTargetsSwitch
+    targets.rightTargets.onComplete = play.onRightTargetsComplete
+    targets.rightTargets.onSwitch = play.onRightTargetsSwitch
     -- Right 1
     local x, y = pinball:getObjectXY("dot1")
     local target = targets.rightTargets:add("dot1")
@@ -567,6 +567,17 @@ function pinball.ballDrained (ballsInPlay)
     end
 end
 
+-- When a ball is locked with pinball:lockBall()
+function pinball.ballLocked(id)
+
+end
+
+-- When a locked ball delay expired and is released into play
+function pinball.ballUnlocked(id)
+
+end
+
+-- The ball made contact with a tagged component
 function pinball.tagContact (tag, id)
 
     if (tag == "black hole") then
@@ -608,20 +619,20 @@ function play.onWordTargetComplete()
     mission:check("nova word")
 end
 
-function onLeftTargetSwitch(letter)
+function play.onLeftTargetSwitch(letter)
 
 end
 
-function onLeftTargetsComplete()
+function play.onLeftTargetsComplete()
     play.addScore(100)
     mission:check("left targets")
 end
 
-function onrightTargetsSwitch(letter)
+function play.onRightTargetsSwitch(letter)
 
 end
 
-function onrightTargetsComplete()
+function play.onRightTargetsComplete()
     play.addScore(100)
     mission:check("right targets")
 end
@@ -778,14 +789,6 @@ function play.addScore(amount)
         if (k==0) then break end
     end
     play.scoreFormatted = formatted
-end
-
--- When a ball is locked with pinball:lockBall()
-function pinball.ballLocked(id)
-end
-
--- When a locked ball delay expired and is released into play
-function pinball.ballUnlocked(id)
 end
 
 return play
