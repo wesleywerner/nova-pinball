@@ -62,7 +62,7 @@ local waitingWords = {
     "You are in the Zone"
     }
 
-function loadFromFile ( )
+function play.loadTableFile()
     local binser = require("modules.binser")
     local mydata, size = love.filesystem.read("nova.pinball", nil)
     local tableDefinition = binser.deserialize(mydata)
@@ -92,7 +92,7 @@ function play:load()
     states:set("preview")
 
     -- Load the table layout into the pinball engine
-    loadFromFile()
+    play.loadTableFile()
 
     -- Position the background image
     local border = 20
