@@ -54,6 +54,8 @@ function thisState:keypressed (key)
             -- Selects the last menu option
             selectedItem = #currentOptions
         else
+            -- Save config
+            if state:on("config") then gameconfig:save() end
             -- Escape to the main menu
             state:set("main")
             currentOptions = mainOptions
@@ -138,16 +140,16 @@ end
 
 function thisState:buildConfigMenu()
     local cameraValue = "Follow Ball"
-    if (not gameconfig.values.cameraFollowsBall) then cameraValue = "Zoomed out" end
-    local flashValue = "flash"
-    if (not gameconfig.values.flashingTargets) then flashValue = "hidden" end
-    local fullscreenValue = "Fullscreen"
+    if (not gameconfig.values.cameraFollowsBall) then cameraValue = "Zoomed Out" end
+    local flashValue = "On"
+    if (not gameconfig.values.flashingTargets) then flashValue = "Off" end
+    local fullscreenValue = "Full"
     if (not gameconfig.values.fullscreen) then fullscreenValue = "Window" end
     currentOptions = {}
     currentOptions = {
         [1]="Camera: " .. cameraValue,
-        [2]="Flashy Targets: " .. flashValue,
-        [3]="View: " .. fullscreenValue
+        [2]="Target Lights: " .. flashValue,
+        [3]="Screen: " .. fullscreenValue
         }
 end
 
