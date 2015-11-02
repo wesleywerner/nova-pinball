@@ -40,7 +40,7 @@ function love.load()
     mainstate:add("play")
     --mainstate:set("splash")
     loadAllModules()
-    mainstate:set("play")
+    mainstate:set("menu")
 
     splash = require("modules.splash")
     splash:load()

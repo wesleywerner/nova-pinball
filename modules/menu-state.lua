@@ -18,7 +18,9 @@
 
 local thisState = {}
 local state = nil
-local menuOptions = {"Play", "About", "Leave"}
+local currentOptions = {}
+local mainOptions = {"Play", "Settings", "About", "Leave"}
+local configOptions = {}
 local selectedItem = 1
 
 function thisState:load()
@@ -26,8 +28,10 @@ function thisState:load()
     -- Set up menu states
     state = statemanager:new()
     state:add("main", 60, "about")
+    state:add("config")
     state:add("about")
     state:set("main")
+    currentOptions = mainOptions
 
 end
 
@@ -36,43 +40,56 @@ function thisState:update (dt)
 end
 
 function thisState:keypressed (key)
-    if state:on("main") then
-        if key == "up" then
-            selectedItem = selectedItem - 1
-            if (selectedItem < 1) then selectedItem = #menuOptions end
-        elseif key == "down" then
-            selectedItem = selectedItem + 1
-            if (selectedItem > #menuOptions) then selectedItem = 1 end
-        elseif key == "return" or key == "enter" or key == " " then
-            self:menuAction()
+    -- Menu navigation
+    if key == "up" then
+        selectedItem = selectedItem - 1
+        if (selectedItem < 1) then selectedItem = #currentOptions end
+    elseif key == "down" then
+        selectedItem = selectedItem + 1
+        if (selectedItem > #currentOptions) then selectedItem = 1 end
+    elseif key == "return" or key == "enter" or key == " " then
+        self:menuAction()
+    elseif key == "escape" then
+        if state:on("main") then
+            -- Selects the last menu option
+            selectedItem = #currentOptions
+        else
+            -- Escape to the main menu
+            state:set("main")
+            currentOptions = mainOptions
+            self:resetSelection()
         end
-    elseif state:on("about") then
-        state:set("main")
     end
 end
 
 function thisState:keyreleased(key)
     if (playstate:gameInProgress()) then
-        menuOptions[1] = "Continue"
+        mainOptions[1] = "Continue"
     else
-        menuOptions[1] = "Play"
+        mainOptions[1] = "Play"
+    end
+end
+
+function thisState:drawOptionsMenu()
+   local y = 100
+    local color
+    for _, m in ipairs(currentOptions) do
+        if (currentOptions[selectedItem] == m) then
+            color = {200, 200, 255, 255}
+        else
+            color = {255, 255, 255, 128}
+        end
+        printShadowText(m, y, color)
+        y = y + 100
     end
 end
 
 function thisState:draw ( )
     love.graphics.setBackgroundColor(32, 32, 64)
     if state:on("main") then
-        local y = 100
-        local color
-        for _, m in ipairs(menuOptions) do
-            if (menuOptions[selectedItem] == m) then
-                color = {200, 200, 255, 255}
-            else
-                color = {255, 255, 255, 128}
-            end
-            printShadowText(m, y, color)
-            y = y + 100
-        end
+        self:drawOptionsMenu()
+    elseif state:on("config") then
+        self:drawOptionsMenu()
     elseif state:on("about") then
         love.graphics.setColor(128, 255, 255, 255)
         love.graphics.printf ("about", 0, 300, scrWidth, "center")
@@ -83,15 +100,55 @@ function thisState:resize (w, h)
 
 end
 
+function thisState:resetSelection()
+    selectedItem = 1
+end
+
 function thisState:menuAction()
-    local item = menuOptions[selectedItem]
+    local item = currentOptions[selectedItem]
+
+    -- Main
     if (item == "Play" or item == "Continue") then
         mainstate:set("play")
+    elseif (item == "Settings") then
+        state:set("config")
+        self:buildConfigMenu()
+        self:resetSelection()
+        return
     elseif (item == "About") then
         state:set("about")
     elseif (item == "Leave") then
         love.event.quit()
     end
+
+    -- Config
+    if state:on("config") then
+        if (selectedItem == 1) then
+            gameconfig.values.cameraFollowsBall = not gameconfig.values.cameraFollowsBall
+            self:buildConfigMenu()
+        elseif (selectedItem == 2) then
+            gameconfig.values.flashingTargets = not gameconfig.values.flashingTargets
+            self:buildConfigMenu()
+        elseif (selectedItem == 3) then
+            gameconfig.values.fullscreen = not gameconfig.values.fullscreen
+            self:buildConfigMenu()
+        end
+    end
+end
+
+function thisState:buildConfigMenu()
+    local cameraValue = "Follow Ball"
+    if (not gameconfig.values.cameraFollowsBall) then cameraValue = "Zoomed out" end
+    local flashValue = "flash"
+    if (not gameconfig.values.flashingTargets) then flashValue = "hidden" end
+    local fullscreenValue = "Fullscreen"
+    if (not gameconfig.values.fullscreen) then fullscreenValue = "Window" end
+    currentOptions = {}
+    currentOptions = {
+        [1]="Camera: " .. cameraValue,
+        [2]="Flashy Targets: " .. flashValue,
+        [3]="View: " .. fullscreenValue
+        }
 end
 
 return thisState
