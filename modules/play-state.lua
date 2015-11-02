@@ -337,28 +337,13 @@ end
 
 function play:keypressed (key)
     if (states:on("preview")) then
-        if (key == " ") then
-            led:clear()
-            pinball.cfg.translateOffset.y = 0
-            states:set("play")
-            led:add("Make the star go Nova", "priority")
-            play:resetAllTargets()
-            targets.wordTarget:flash("nova word")
-        end
+        if (key == " ") then play:launchBall(true) end
         if (key == "escape") then mainstate:set("menu") end
     elseif (states:on("play")) then
         if (key == "escape") then states:set("paused") end
         if (key == "lshift") then pinball:moveLeftFlippers() end
         if (key == "rshift") then pinball:moveRightFlippers() end
-        if (key == " ") then
-            if (#pinball.bodies.balls == 0) then
-                pinball:newBall()
-                led:add("Make the star go Nova", "priority")
-            else
-                pinball:nudge(20, 20)
-                play.nudgeOffset = 20
-            end
-        end
+        if (key == " ") then play:launchBall() end
     elseif (states:on("paused")) then
         if (key == " ") then states:set("play") end
         if (key == "escape") then mainstate:set("menu") end
@@ -789,6 +774,28 @@ function play.addScore(amount)
         if (k==0) then break end
     end
     play.scoreFormatted = formatted
+end
+
+function play:launchBall(firstLaunch)
+    if (firstLaunch) then
+        led:clear()
+        -- Stop the pre-launch scroll effect
+        pinball.cfg.translateOffset.y = 0
+        states:set("play")
+        led:add("Make the star go Nova", "priority")
+        play:resetAllTargets()
+        -- Light up the first target (the mission check callback won't fire at this point as no goals are met yet)
+        targets.wordTarget:flash("nova word")
+    else
+        -- Launch another ball, or shake the table
+        if (#pinball.bodies.balls == 0) then
+            pinball:newBall()
+            led:add("Make the star go Nova", "priority")
+        else
+            pinball:nudge(20, 20)
+            play.nudgeOffset = 20
+        end
+    end
 end
 
 return play
