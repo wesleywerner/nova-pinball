@@ -28,6 +28,8 @@ function mission:update(dt)
         if (self:current().wait < 0) then
             self:current().wait = nil
             self:testState()
+            -- Notify event when this timeout completes
+            if (self.onMissionCheckPassed) then self.onMissionCheckPassed("wait") end
         end
     end
 end
@@ -85,7 +87,7 @@ function mission:check(signal)
     local idx = #self:current().has+1
     local max = #self:current().needs
     if (idx > max) then
-        print("max dependency reached.")
+        --print("max dependency reached.")
         return
     end
     if (self:current().needs[idx] == signal) then
