@@ -30,9 +30,6 @@ function love.load()
     math.randomseed(os.time())
     scrWidth, scrHeight = love.window.getDimensions()
 
-    -- Set graphics
-    love.graphics.setFont(largeFont)
-
     -- Set up main states
     mainstate = statemanager:new()
     mainstate:add("splash", 2, "menu")
@@ -44,6 +41,8 @@ function love.load()
 
     splash = require("modules.splash")
     splash:load()
+
+    love.graphics.setFont(largeFont)
 
 end
 
