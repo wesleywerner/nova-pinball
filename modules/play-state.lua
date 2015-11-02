@@ -19,13 +19,15 @@
 local play = {}
 local states = nil
 local pinball = require ("nova-pinball-engine")
-local targetManager = require("modules.letter-targets")
+local targetManager = require("modules.targets")
 local bumperManager = require("modules.bumpers")
 local mission = require("modules.mission")
 local spriteStates = spritemanager:new()
 local led = require("modules.led-display")
-local indicators = require("modules.indicators")
 local sprites = { }
+
+-- Stores a collection of all the targets on the table.
+local targets = {}
 
 -- Calculated to center the table in the screen
 play.leftAlign = 0
@@ -71,6 +73,7 @@ function play:gameInProgress()
     return states:on("play") or states:on("paused")
 end
 
+-- The main resource loading point for this pinball game
 function play:load()
 
     -- Set up play states
@@ -79,21 +82,7 @@ function play:load()
     states:add("play")
     states:add("paused")
 
-    -- Load sprites
-    sprites.background = loadSprite ("images/background.png")
-    sprites.launchCover = loadSprite("images/launcher-cover.png")
-    sprites.ball = loadSprite ("images/ball.png")
-    sprites.leftflipper = loadSprite ("images/leftflip.png")
-    sprites.blackhole = loadSprite("images/black-hole.png")
-    sprites.wheel1 = loadSprite("images/nova-wheel.png")
-    sprites.wheel2 = loadSprite("images/nova-wheel.png")
-    sprites.rays = loadSprite("images/nova-rays.png")
-    sprites.redStar = loadSprite("images/red-star.png")
-    sprites.wormholeRays = loadSprite("images/wormhole-rays.png")
-    sprites.wormhole = loadSprite("images/wormhole-background.png")
-    sprites.wormholeClouds = loadSprite("images/wormhole-clouds.png")
-    sprites.starFlare = loadSprite("images/star-flare.png")
-    sprites.star = loadSprite("images/stable-star.png")
+    play:loadSprites()
 
     -- Set graphics
     love.graphics.setBackgroundColor(0, 0, 0)
@@ -159,49 +148,7 @@ function play:load()
     bumperManager:add("left kicker", "images/kicker.png")
     bumperManager:add("right kicker", "images/kicker.png", -1)
 
-    -- Set up the "NOVA" word target
-    novaTarget = targetManager:new()
-    novaTarget.onComplete = onNovaTargetComplete
-    novaTarget.onSwitch = onNovaTargetSwitch
-    local x, y = pinball:getObjectXY("n")
-    novaTarget:add("n", x, y, "images/spot-off.png", "images/n-on.png")
-    local x, y = pinball:getObjectXY("o")
-    novaTarget:add("o", x, y, "images/spot-off.png", "images/o-on.png")
-    local x, y = pinball:getObjectXY("v")
-    novaTarget:add("v", x, y, "images/spot-off.png", "images/v-on.png")
-    local x, y = pinball:getObjectXY("a")
-    novaTarget:add("a", x, y, "images/spot-off.png", "images/a-on.png")
-
-    -- Set up the left targets
-    leftTargets = targetManager:new()
-    leftTargets.onComplete = onLeftTargetsComplete
-    leftTargets.onSwitch = onLeftTargetSwitch
-    local x, y = pinball:getObjectXY("dot4")
-    leftTargets:add("dot4", x, y, "images/circle-target-off.png", "images/circle-target-on.png")
-    local x, y = pinball:getObjectXY("dot5")
-    leftTargets:add("dot5", x, y, "images/circle-target-off.png", "images/circle-target-on.png")
-
-    -- Set up the right targets
-    rightTargets = targetManager:new()
-    rightTargets.onComplete = onrightTargetsComplete
-    rightTargets.onSwitch = onrightTargetsSwitch
-    local x, y = pinball:getObjectXY("dot1")
-    rightTargets:add("dot1", x, y, "images/circle-target-off.png", "images/circle-target-on.png")
-    local x, y = pinball:getObjectXY("dot2")
-    rightTargets:add("dot2", x, y, "images/circle-target-off.png", "images/circle-target-on.png")
-    local x, y = pinball:getObjectXY("dot3")
-    rightTargets:add("dot3", x, y, "images/circle-target-off.png", "images/circle-target-on.png")
-
-    -- Set up goal indicator lights
-    local x, y = pinball:getObjectXY("left ramp indicator")
-    indicators:add("left ramp", x, y,
-        {"images/arrow-indicator-off.png",
-         "images/arrow-indicator-on.png"})
-    local x, y = pinball:getObjectXY("right ramp indicator")
-    indicators:add("right ramp", x, y,
-        {"images/arrow-indicator-off.png",
-         "images/arrow-indicator-on.png"})
-
+    self:loadTargets()
 
     -- Define the mission goals
     mission:define("red giant"):on("nova word")
@@ -220,13 +167,157 @@ function play:load()
     -- Pre-game welcome
     led:add("Welcome to Nova Pinball!", "long")
     led:add("Hit space to launch the ball", "sticky")
+
+    play:flashAllTargets()
+end
+
+function play:loadSprites()
+    sprites.background = loadSprite ("images/background.png")
+    sprites.launchCover = loadSprite("images/launcher-cover.png")
+    sprites.ball = loadSprite ("images/ball.png")
+    sprites.leftflipper = loadSprite ("images/leftflip.png")
+    sprites.blackhole = loadSprite("images/black-hole.png")
+    sprites.wheel1 = loadSprite("images/nova-wheel.png")
+    sprites.wheel2 = loadSprite("images/nova-wheel.png")
+    sprites.rays = loadSprite("images/nova-rays.png")
+    sprites.redStar = loadSprite("images/red-star.png")
+    sprites.wormholeRays = loadSprite("images/wormhole-rays.png")
+    sprites.wormhole = loadSprite("images/wormhole-background.png")
+    sprites.wormholeClouds = loadSprite("images/wormhole-clouds.png")
+    sprites.starFlare = loadSprite("images/star-flare.png")
+    sprites.star = loadSprite("images/stable-star.png")
+end
+
+-- Load and position the words target, the left and right spot targets.
+function play:loadTargets()
+
+    -- "NOVA" word target
+    targets.wordTarget = targetManager:new()
+    targets.wordTarget.onComplete = play.onWordTargetComplete
+    targets.wordTarget.onSwitch = play.onWordTargetSwitch
+    -- N
+    local x, y = pinball:getObjectXY("n")
+    local target = targets.wordTarget:add("n")
+    target.x = x
+    target.y = y
+    target:setOffImage("images/word-target-off.png")
+    target:setOnImage("images/word-target-n.png")
+    target:setFlashImage("images/word-target-flash.png")
+    target:addToGroup("nova word")
+    -- O
+    local x, y = pinball:getObjectXY("o")
+    local target = targets.wordTarget:add("o")
+    target.x = x
+    target.y = y
+    target:setOffImage("images/word-target-off.png")
+    target:setOnImage("images/word-target-o.png")
+    target:setFlashImage("images/word-target-flash.png")
+    target:addToGroup("nova word")
+    -- V
+    local x, y = pinball:getObjectXY("v")
+    local target = targets.wordTarget:add("v")
+    target.x = x
+    target.y = y
+    target:setOffImage("images/word-target-off.png")
+    target:setOnImage("images/word-target-v.png")
+    target:setFlashImage("images/word-target-flash.png")
+    target:addToGroup("nova word")
+    -- A
+    local x, y = pinball:getObjectXY("a")
+    local target = targets.wordTarget:add("a")
+    target.x = x
+    target.y = y
+    target:setOffImage("images/word-target-off.png")
+    target:setOnImage("images/word-target-a.png")
+    target:setFlashImage("images/word-target-flash.png")
+    target:addToGroup("nova word")
+
+    -- Set up the left targets
+    targets.leftTargets = targetManager:new()
+    targets.leftTargets.onComplete = onLeftTargetsComplete
+    targets.leftTargets.onSwitch = onLeftTargetSwitch
+    -- left 1
+    local x, y = pinball:getObjectXY("dot4")
+    local target = targets.leftTargets:add("dot4")
+    target.x = x
+    target.y = y
+    target:setOffImage("images/circle-target-off.png")
+    target:setOnImage("images/circle-target-on.png")
+    target:setFlashImage("images/circle-target-flash.png")
+    target:addToGroup("left targets")
+    -- left 2
+    local x, y = pinball:getObjectXY("dot5")
+    local target = targets.leftTargets:add("dot5")
+    target.x = x
+    target.y = y
+    target:setOffImage("images/circle-target-off.png")
+    target:setOnImage("images/circle-target-on.png")
+    target:setFlashImage("images/circle-target-flash.png")
+    target:addToGroup("left targets")
+
+    -- Set up the right targets
+    targets.rightTargets = targetManager:new()
+    targets.rightTargets.onComplete = onrightTargetsComplete
+    targets.rightTargets.onSwitch = onrightTargetsSwitch
+    -- Right 1
+    local x, y = pinball:getObjectXY("dot1")
+    local target = targets.rightTargets:add("dot1")
+    target.x = x
+    target.y = y
+    target:setOffImage("images/circle-target-off.png")
+    target:setOnImage("images/circle-target-on.png")
+    target:setFlashImage("images/circle-target-flash.png")
+    target:addToGroup("right targets")
+    -- Right 2
+    local x, y = pinball:getObjectXY("dot2")
+    local target = targets.rightTargets:add("dot2")
+    target.x = x
+    target.y = y
+    target:setOffImage("images/circle-target-off.png")
+    target:setOnImage("images/circle-target-on.png")
+    target:setFlashImage("images/circle-target-flash.png")
+    target:addToGroup("right targets")
+    -- Right 3
+    local x, y = pinball:getObjectXY("dot3")
+    local target = targets.rightTargets:add("dot3")
+    target.x = x
+    target.y = y
+    target:setOffImage("images/circle-target-off.png")
+    target:setOnImage("images/circle-target-on.png")
+    target:setFlashImage("images/circle-target-flash.png")
+    target:addToGroup("right targets")
+
+    -- Add ramp indicator lights as pseudo targets (no hit interaction here)
+    targets.rampLights = targetManager:new()
+    -- Left
+    local x, y = pinball:getObjectXY("left ramp indicator")
+    local target = targets.rampLights:add("left ramp")
+    target.x = x
+    target.y = y
+    target:setOffImage("images/arrow-indicator-off.png")
+    --target:setOnImage("images/arrow-indicator-off.png")
+    target:setFlashImage("images/arrow-indicator-on.png")
+    -- Right
+    local x, y = pinball:getObjectXY("right ramp indicator")
+    local target = targets.rampLights:add("right ramp")
+    target.x = x
+    target.y = y
+    target:setOffImage("images/arrow-indicator-off.png")
+    target:setFlashImage("images/arrow-indicator-on.png")
+
 end
 
 function play:update (dt)
     states:update(dt)
     play.updateLedDisplayMessages(dt)
     play.updateSafemode(dt)
-    indicators:update(dt)
+
+    -- Update flashing targets
+    targets.wordTarget:update(dt)
+    targets.leftTargets:update(dt)
+    targets.rightTargets:update(dt)
+    targets.rampLights:update(dt)
+    
     if (states:on("preview")) then
         led:update(dt)
         if (self.previewPosition > -(pinball.table.size.height-scrHeight)) then
@@ -251,6 +342,8 @@ function play:keypressed (key)
             pinball.cfg.translateOffset.y = 0
             states:set("play")
             led:add("Make the star go Nova", "priority")
+            play:resetAllTargets()
+            targets.wordTarget:flash("nova word")
         end
         if (key == "escape") then mainstate:set("menu") end
     elseif (states:on("play")) then
@@ -301,11 +394,11 @@ function play:draw ( )
     sprites.background:draw()
 
     -- Draw targets and sprites
-    novaTarget:draw()
-    leftTargets:draw()
-    rightTargets:draw()
+    targets.wordTarget:draw()
+    targets.leftTargets:draw()
+    targets.rightTargets:draw()
+    targets.rampLights:draw()
     spriteStates:draw()
-    indicators:draw()
 
     -- Draw the pinball components
     pinball:draw()
@@ -350,6 +443,21 @@ function play.updateNudge()
     if (play.nudgeOffset > 0) then
         pinball.cfg.translateOffset.y = play.nudgeOffset
         play.nudgeOffset = play.nudgeOffset - (play.nudgeOffset / 2)
+    end
+end
+
+-- Set flashing on all targets
+function play:flashAllTargets()
+    for _, targetGroup in pairs(targets) do
+        targetGroup:reset()
+        targetGroup:flash(nil)
+    end
+end
+
+-- Reset flashing and status on all targets
+function play:resetAllTargets()
+    for _, targetGroup in pairs(targets) do
+        targetGroup:reset()
     end
 end
 
@@ -480,19 +588,21 @@ function pinball.tagContact (tag, id)
         play.addScore(750)
     end
 
-    novaTarget:switchOn(tag)
-    leftTargets:switchOn(tag)
-    rightTargets:switchOn(tag)
+    -- Switch targets on when their tag is hit
+    targets.wordTarget:switchOn(tag)
+    targets.leftTargets:switchOn(tag)
+    targets.rightTargets:switchOn(tag)
+    
     bumperManager:hit(tag)
     mission:check(tag)
     
 end
 
-function onNovaTargetSwitch(letter)
+function play.onWordTargetSwitch(letter)
 
 end
 
-function onNovaTargetComplete()
+function play.onWordTargetComplete()
     play.addScore(1250)
     led:add("Word Bonus")
     mission:check("nova word")
@@ -519,8 +629,18 @@ end
 function mission.onMissionCheckPassed(signal)
     -- Force to display the next goal
     play.updateLedDisplayMessages(0)
-    indicators:reset()
-    indicators:set(mission:nextTarget(), true)
+
+    -- Clear flashing targets
+    targets.wordTarget:clearFlashing()
+    targets.leftTargets:clearFlashing()
+    targets.rightTargets:clearFlashing()
+    targets.rampLights:clearFlashing()
+
+    -- Set new flashing targets
+    targets.wordTarget:flash(mission:nextTarget())
+    targets.leftTargets:flash(mission:nextTarget())
+    targets.rightTargets:flash(mission:nextTarget())
+    targets.rampLights:flash(mission:nextTarget())
 end
 
 function mission.onMissionAdvanced(title)
