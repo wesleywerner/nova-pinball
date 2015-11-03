@@ -37,23 +37,26 @@ scores.newScoreIndex = nil
 function scores:load()
     -- TODO load scores from file
     self.scores = {
-        {score=9000, initials="AAA", date="03/11/15"},
-        {score=8000, initials="BBB", date="03/11/15"},
-        {score=7000, initials="CCC", date="03/11/15"},
-        {score=6000, initials="DDD", date="03/11/15"},
-        {score=5000, initials="EEE", date="03/11/15"},
-        {score=4000, initials="FFF", date="03/11/15"},
-        {score=3000, initials="GGG", date="03/11/15"},
-        {score=2000, initials="HHH", date="03/11/15"},
+        {score=9000, initials="AAA", date="03/11/2015"},
+        {score=8000, initials="BBB", date="03/11/2015"},
+        {score=7000, initials="CCC", date="03/11/2015"},
+        {score=6000, initials="DDD", date="03/11/2015"},
+        {score=5000, initials="EEE", date="03/11/2015"},
+        {score=4000, initials="FFF", date="03/11/2015"},
+        {score=3000, initials="GGG", date="03/11/2015"},
+        {score=2000, initials="HHH", date="03/11/2015"},
         }
 end
 
 function scores:register(score)
     self.newScoreIndex = nil
+    -- Today's date
+    local dt = os.date("*t")
+    local dateString = string.format("%02d/%02d/%s", dt.day, dt.month, dt.year)
     -- Find the position of this score
     for i, entry in ipairs(self.scores) do
         if (score > entry.score) then
-            local newEntry = {score=score, initials="", date="FOO"}
+            local newEntry = {score=score, initials="", date=dateString}
             table.insert(self.scores, i, newEntry)
             self.newScoreIndex = i
             break
@@ -61,7 +64,7 @@ function scores:register(score)
     end
     -- Or add to the end
     if (not self.newScoreIndex) then
-        table.insert(self.scores, {score=score, initials="", date="FOO"})
+        table.insert(self.scores, {score=score, initials="", date=dateString})
         self.newScoreIndex = #self.scores
     end
     -- Cull the list
