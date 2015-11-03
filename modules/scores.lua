@@ -29,14 +29,18 @@ scores.initials = ""
 scores.isTyping = false
 -- The new score made it onto the list
 scores.newScoreGood = false
+-- The index of the new score (if any)
+scores.newScoreIndex = nil
 
 function scores:load()
     -- TODO load scores from file
     self.scores = {
         {score=3000, initials="AAA", date="01/02/11"},
+        {score=2999, initials="", date="03/11/15"},
         {score=2000, initials="BBB", date="01/03/11"},
         {score=1000, initials="CCC", date="06/04/11"},
         }
+    scores.newScoreIndex = 2
 end
 
 function scores:register(score)
@@ -55,14 +59,15 @@ function scores:keypressed(key)
     -- Entering Initials
     if (self.isTyping) then
         if (key == "return" or key == "enter") then
-            --addScore (nameInput)
             self.isTyping = false
+            -- TODO save new score file
         else
             if (self.initials:len() < 3 and string.find("0123456789abcdefghijklmnopqrstuvwxyz", key)) then
                 self.initials = self.initials .. string.upper(key)
             elseif (key == "backspace") then
                 self.initials = self.initials:sub(1, self.initials:len() - 1)
             end
+            self.scores[scores.newScoreIndex].initials = self.initials
         end
         return true
     end
@@ -75,12 +80,27 @@ function scores:keypressed(key)
 end
 
 function scores:draw()
-    if (self.isTyping) then
-        love.graphics.setColor (0, 255, 255, 255)
-    else
-        love.graphics.setColor (255, 255, 255, 255)
+    local y = 100
+    for i, entry in ipairs(self.scores) do
+        if (i == scores.newScoreIndex and self.isTyping) then
+            love.graphics.setColor (0, 255, 255, 255)
+        else
+            love.graphics.setColor (255, 255, 255, 255)
+        end
+        love.graphics.print(entry.initials, 100, y)
+        love.graphics.print(scores.formatNumber(entry.score), 200, y)
+        love.graphics.print(entry.date, 500, y)
+        y = y + 60
     end
-    love.graphics.print("INITIALS: " .. self.initials, 100, 100)
+end
+
+function scores.formatNumber(number)
+    local formatted = number
+    while true do
+        formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
+        if (k==0) then break end
+    end
+    return formatted
 end
 
 return scores
