@@ -57,6 +57,14 @@ function scores:register(score)
         table.insert(self.scores, {score=score, initials="", date="FOO"})
         self.newScoreIndex = #self.scores
     end
+    -- Cull the list
+    while (#self.scores > 4) do
+        table.remove(self.scores)
+    end
+    -- We did not make it after all :(
+    if (self.newScoreIndex > #self.scores) then
+        self.newScoreIndex = nil
+    end
     
     self.initials = ""
     -- TODO check if the new score made it on the list
@@ -84,7 +92,7 @@ function scores:keypressed(key)
         return true
     end
     
-    if (key == "escape") then
+    if (key == "escape" or key == " ") then
         return false
     end
 
@@ -99,7 +107,7 @@ function scores:draw()
         else
             love.graphics.setColor (255, 255, 255, 255)
         end
-        love.graphics.print(entry.initials, 100, y)
+        love.graphics.print(entry.initials, 80, y)
         love.graphics.print(scores.formatNumber(entry.score), 200, y)
         love.graphics.print(entry.date, 500, y)
         y = y + 60
