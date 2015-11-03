@@ -4,7 +4,7 @@ config.settings = {
     {meta = "cameraFollowsBall",
     title = "Camera",
     options = {"Ball", "Table"},
-    values = {true, false},
+    values = {1, 2},
     default = 1,
     details = {"Zoomed in and follows the ball",
               "Zoomed out, full table visible"
@@ -24,7 +24,7 @@ config.settings = {
     {meta = "fullscreen",
     title = "Screen",
     options = {"Full Screen", "Window"},
-    values = {true, false},
+    values = {1, 2},
     default = 2,
     details = {"",
               ""
@@ -41,7 +41,6 @@ function config:load()
         config.values = binser.deserialize(data)
     end
     config:applyMissing()
---    config:applyDefaults()
 end
 
 -- Apply default values to any missing settings
@@ -74,6 +73,10 @@ function config:getValue(meta, value)
             return setting.options[value]
         end
     end
+end
+
+function config:get(meta)
+    return self.values[meta]
 end
 
 return config

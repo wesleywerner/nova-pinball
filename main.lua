@@ -20,7 +20,7 @@ spritemanager = require("modules.sprite-state-manager")
 statemanager = require ("modules.states")
 playstate = nil
 menustate = nil
-gameconfig = nil
+cfg = nil
 largeFont = love.graphics.newFont("fonts/advanced_led_board-7.ttf", 37)
 smallFont = love.graphics.newFont("fonts/erbos_draco_1st_open_nbp.ttf", 20)
 local splash = nil
@@ -94,10 +94,10 @@ function loadAllModules()
     if (not playstate) then
         menustate = require("modules.menu-state")
         playstate = require("modules.play-state")
-        gameconfig = require("modules.game-config")
+        cfg = require("modules.game-config")
         menustate:load()
         playstate:load()
-        gameconfig:load()
+        cfg:load()
     end
 end
 

@@ -31,6 +31,7 @@ local targets = {}
 
 -- Calculated to center the table in the screen
 play.leftAlign = 0
+play.topAlign = 0
 -- Pre-game scroll effect drawing offset
 play.previewPosition = 0
 -- Table nudge shake offset
@@ -359,7 +360,11 @@ end
 function play:keyreleased(key)
     if (key == "lshift") then pinball:releaseLeftFlippers() end
     if (key == "rshift") then pinball:releaseRightFlippers() end
-    if key == "s" then play.activateBallSaver() end
+
+    -- Check the camera view
+    if (key == "enter" or key == "return" or key == " ") then
+        play.positionDrawingElements()
+    end
 end
 
 function play:draw ( )
@@ -369,7 +374,7 @@ function play:draw ( )
     love.graphics.setColor (255, 255, 255, 255)
 
     -- Center in the screen
-    love.graphics.translate(play.leftAlign, 0)
+    love.graphics.translate(play.leftAlign, play.topAlign)
 
     -- Fix the coordinate system so that we draw relative to the table.
     pinball:setCamera()
@@ -454,7 +459,22 @@ function play.positionDrawingElements()
     led.size.h = 34
     led.position.y = scrHeight - led.size.h
     play.ballStatXPosition = scrWidth - smallFont:getWidth("Balls: 0") - 10
-    play.leftAlign = (scrWidth - pinball.table.size.width) / 2
+
+    -- Set the camera mode from the game config
+    pinball.cfg.cameraFollowsBall = (cfg:get("cameraFollowsBall") == 1) and true or false
+    -- Recalculate the pinball scales
+    pinball:resize(scrWidth, scrHeight)
+    -- Apply drawing offsets for each mode
+    if (pinball.cfg.cameraFollowsBall) then
+        play.leftAlign = (scrWidth - pinball.table.size.width) / 2
+        play.topAlign = 0
+    else
+        play.leftAlign = (scrWidth - (pinball.table.size.width * pinball.cfg.drawScale)) / 2
+        -- Offset the top a little to draw past the stats bar
+        play.topAlign = 45
+        -- Scale the table a little smaller to account for the stats and LED bars
+        pinball.cfg.drawScale = pinball.cfg.drawScale - 0.1
+    end
 end
 
 function play.updateLedDisplayMessages(dt)

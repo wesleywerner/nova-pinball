@@ -57,7 +57,7 @@ function thisState:keypressed (key)
             selectedItem = #currentOptions
         else
             -- Save config
-            if state:on("config") then gameconfig:save() end
+            if state:on("config") then cfg:save() end
             -- Escape to the main menu
             state:set("main")
             currentOptions = mainOptions
@@ -90,8 +90,8 @@ function thisState:drawOptionsMenu()
 end
 
 function thisState:drawSelectedOptionDescription()
-    local setting = gameconfig.settings[selectedItem]
-    local value = gameconfig.values[setting.meta]
+    local setting = cfg.settings[selectedItem]
+    local value = cfg.values[setting.meta]
     local detail = setting.details[value]
     printShadowText(detail, scrHeight - 60, {200, 255, 200, 255})
 end
@@ -137,21 +137,21 @@ function thisState:menuAction()
     -- Config
     if state:on("config") then
         -- selected item index matches the setting index
-        local setting = gameconfig.settings[selectedItem]
-        local value = gameconfig.values[setting.meta]
+        local setting = cfg.settings[selectedItem]
+        local value = cfg.values[setting.meta]
         -- Rotate the value
         value = value + 1
         if (value > #setting.options) then value = 1 end
-        gameconfig.values[setting.meta] = value
+        cfg.values[setting.meta] = value
         self:buildConfigMenu()
     end
 end
 
 function thisState:buildConfigMenu()
     currentOptions = {}
-    for i, setting in ipairs(gameconfig.settings) do
-        local value = gameconfig.values[setting.meta]
-        local valueTitle = gameconfig:getValue(setting.meta, value)
+    for i, setting in ipairs(cfg.settings) do
+        local value = cfg.values[setting.meta]
+        local valueTitle = cfg:getValue(setting.meta, value)
         local item = string.format("%s: %s", setting.title, valueTitle)
         table.insert(currentOptions, item)
     end
