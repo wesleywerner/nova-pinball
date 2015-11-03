@@ -357,10 +357,7 @@ function play:update (dt)
             self.previewPosition = self.previewPosition + (dt*100)
             pinball.cfg.translateOffset.y = self.previewPosition
         else
-            -- View the high score list
-            scoreState:register(play.score)
-            self:resetGame()
-            mainstate:set("scores")
+            play:quitToScores()
         end
     elseif (states:on("play")) then
         led:update(dt)
@@ -388,10 +385,7 @@ function play:keypressed (key)
     elseif (states:on("game over")) then
         -- Quick escape to the high score list on game over
         if (key == "escape") then
-            scores:register(play.score)
-            self:resetGame()
-            mainstate:set("menu")
-            menu.state:set("scores")
+            play:quitToScores()
         end
     end
 
@@ -487,6 +481,14 @@ function play:endGame()
     pinball:resetCamera()
     states:set("game over")
     self.previewPosition = -(pinball.table.size.height-scrHeight)
+end
+
+-- Register the current score and quit to the scores list
+function play:quitToScores()
+    scores:register(play.score)
+    self:resetGame()
+    mainstate:set("menu")
+    menu.state:set("scores")
 end
 
 function play:drawStats()
