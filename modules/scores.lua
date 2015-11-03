@@ -27,8 +27,6 @@ scores.newScore = 0
 scores.initials = ""
 -- If the player is entering initials
 scores.isTyping = false
--- The new score made it onto the list
-scores.newScoreGood = false
 -- The index of the new score (if any)
 scores.newScoreIndex = nil
 
@@ -44,11 +42,25 @@ function scores:load()
 end
 
 function scores:register(score)
-    self.latest = score
+    self.newScoreIndex = nil
+    -- Find the position of this score
+    for i, entry in ipairs(self.scores) do
+        if (score > entry.score) then
+            local newEntry = {score=score, initials="", date="FOO"}
+            table.insert(self.scores, i, newEntry)
+            self.newScoreIndex = i
+            break
+        end
+    end
+    -- Or add to the end
+    if (not self.newScoreIndex) then
+        table.insert(self.scores, {score=score, initials="", date="FOO"})
+        self.newScoreIndex = #self.scores
+    end
+    
     self.initials = ""
     -- TODO check if the new score made it on the list
-    self.newScoreGood = true
-    self.isTyping = true
+    if (self.newScoreIndex) then self.isTyping = true end
 end
 
 function scores:update(dt)
