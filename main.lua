@@ -17,6 +17,7 @@
 -- https://github.com/wesleywerner/
 
 VERSION = "0.1"
+DEBUG = true
 spriteManager = require("modules.sprite-state-manager")
 stateManager = require ("modules.states")
 playstate = nil
@@ -29,6 +30,7 @@ local splash = nil
 function love.load()
 
     math.randomseed(os.time())
+    love.mouse.setVisible(false)
     scrWidth, scrHeight = love.window.getDimensions()
 
     -- Set up main states
