@@ -17,7 +17,7 @@ function splash:load()
     self.heart.x = self.center.x
     self.heart.y = self.center.y
     -- sprite manager
-    self.sprites = spritemanager:new()
+    self.sprites = spriteManager:new()
     self.sprites:add("spokes", self.spokes):setRotation(0.1)
     self.sprites:add("heart", self.heart)
     -- Fadeout

@@ -22,7 +22,7 @@ local pinball = require ("nova-pinball-engine")
 local targetManager = require("modules.targets")
 local bumperManager = require("modules.bumpers")
 local mission = require("modules.mission")
-local spriteStates = spritemanager:new()
+local spriteStates = spriteManager:new()
 local led = require("modules.led-display")
 local sprites = { }
 
@@ -80,7 +80,7 @@ end
 function play:load()
 
     -- Set up play states
-    states = statemanager:new()
+    states = stateManager:new()
     states:add("preview")
     states:add("play")
     states:add("paused")

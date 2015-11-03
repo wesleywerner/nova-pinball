@@ -16,8 +16,8 @@
 -- Written by Wesley "keyboard monkey" Werner 2015
 -- https://github.com/wesleywerner/
 
-spritemanager = require("modules.sprite-state-manager")
-statemanager = require ("modules.states")
+spriteManager = require("modules.sprite-state-manager")
+stateManager = require ("modules.states")
 playstate = nil
 menustate = nil
 cfg = nil
@@ -31,7 +31,7 @@ function love.load()
     scrWidth, scrHeight = love.window.getDimensions()
 
     -- Set up main states
-    mainstate = statemanager:new()
+    mainstate = stateManager:new()
     mainstate:add("splash", 2, "menu")
     mainstate:add("menu")
     mainstate:add("play")

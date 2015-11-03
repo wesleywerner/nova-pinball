@@ -28,7 +28,7 @@ function thisState:load()
     ballSprite = loadSprite("images/ball.png")
     
     -- Set up menu states
-    state = statemanager:new()
+    state = stateManager:new()
     state:add("main", 60, "about")
     state:add("config")
     state:add("about")
