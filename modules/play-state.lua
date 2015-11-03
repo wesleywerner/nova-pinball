@@ -395,10 +395,13 @@ function play:draw ( )
 
     -- Draw the status box
     love.graphics.origin()
-    --love.graphics.setColor(0, 0, 0, 200)
-    --love.graphics.rectangle("fill", 0, scrHeight - 60, scrWidth, scrHeight - 60)
     play:drawStats()
+
+    -- Draw the LED display
+    love.graphics.setColor(0, 0, 0, 255)
+    love.graphics.rectangle("fill", 0, scrHeight - led.size.h, scrWidth, led.size.h)
     love.graphics.setFont(largeFont)
+    love.graphics.setColor(50, 255, 50, 255)
     led:draw()
 
     -- Simple text overlays
@@ -448,7 +451,7 @@ end
 
 function play.positionDrawingElements()
     led.size.w = scrWidth
-    led.size.h = 40
+    led.size.h = 34
     led.position.y = scrHeight - led.size.h
     play.ballStatXPosition = scrWidth - smallFont:getWidth("Balls: 0") - 10
     play.leftAlign = (scrWidth - pinball.table.size.width) / 2
