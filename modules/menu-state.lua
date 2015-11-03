@@ -23,6 +23,20 @@ local mainOptions = {"Play", "Settings", "About", "Leave"}
 local selectedItem = 1
 local ballSprite = nil
 
+-- About screen
+local scrollManager = require("modules.line-scroller")
+local aboutHeading = scrollManager:new()
+local aboutDetail = scrollManager:new()
+local aboutLineIndex = 1
+local aboutLines = {
+    {"NOVA PINBALL", "VERSION " .. VERSION},
+    {"MADE WITH LÖVE", "love2d.org"},
+    {"FREE", "GNU General Public License"},
+    {"URL", "wesleywerner.github.io/nova-pinball"},
+    {"LED Board-7 Font", "Sizenko Alexander"},
+    {"Erbos Draco NBP Font", "Nate Halley"},
+    }
+
 function thisState:load()
 
     ballSprite = loadSprite("images/ball.png")
@@ -36,38 +50,67 @@ function thisState:load()
     currentOptions = mainOptions
 
     love.window.setFullscreen(cfg:get("fullscreen") == 1)
+
+    -- Position where the about text heading and detail will move towards
+    aboutDetail.y = aboutDetail.y + 60
+    aboutDetail.startX = scrWidth * 1.4
+    aboutDetail.goalX = scrWidth / 10
+    aboutHeading.startX = -scrWidth * 0.5
+    aboutHeading.goalX = scrWidth / 2
 end
 
 function thisState:update (dt)
     state:update(dt)
+    
+    if state:on("about") then
+        aboutHeading:update(dt)
+        aboutDetail:update(dt)
+        if (not aboutHeading:busy() and not aboutDetail:busy()) then
+            aboutHeading:go(aboutLines[aboutLineIndex][1])
+            aboutDetail:go(aboutLines[aboutLineIndex][2])
+            aboutLineIndex = aboutLineIndex + 1
+            if (aboutLineIndex > #aboutLines) then aboutLineIndex = 1 end
+        end
+    end
 end
 
 function thisState:keypressed (key)
     -- Menu navigation
-    if key == "up" then
+    if (key == "up") then
         selectedItem = selectedItem - 1
         if (selectedItem < 1) then selectedItem = #currentOptions end
-    elseif key == "down" then
+    elseif (key == "down") then
         selectedItem = selectedItem + 1
         if (selectedItem > #currentOptions) then selectedItem = 1 end
-    elseif key == "return" or key == "enter" or key == " " then
+    elseif (key == "return" or key == "enter" or key == " ") then
         self:menuAction()
-    elseif key == "escape" then
-        if state:on("main") then
-            -- Selects the last menu option
+    end
+    
+    if (state:on("main")) then
+        if (key == "escape") then
+            -- Focus the last main menu item
             selectedItem = #currentOptions
-        else
+        end
+    elseif (state:on("config")) then
+        if (key == "escape") then
             -- Save config
-            if state:on("config") then
-                love.window.setFullscreen(cfg:get("fullscreen") == 1)
-                cfg:save()
-            end
+            love.window.setFullscreen(cfg:get("fullscreen") == 1)
+            cfg:save()
             -- Escape to the main menu
             state:set("main")
             currentOptions = mainOptions
             self:resetSelection()
         end
+    elseif (state:on("about")) then
+        if (key == " ") then
+            -- Skip through the credits
+            aboutDetail:out()
+            aboutHeading:out()
+        elseif (key == "escape") then
+            state:set("main")
+        end
     end
+
 end
 
 function thisState:keyreleased(key)
@@ -109,7 +152,9 @@ function thisState:draw ( )
         self:drawSelectedOptionDescription()
     elseif state:on("about") then
         love.graphics.setColor(128, 255, 255, 255)
-        love.graphics.printf ("about", 0, 300, scrWidth, "center")
+        aboutHeading:draw()
+        love.graphics.setColor(255, 255, 128, 255)
+        aboutDetail:draw()
     end
 end
 
