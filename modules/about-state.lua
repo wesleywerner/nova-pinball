@@ -1,0 +1,85 @@
+-- This program is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU General Public License as published by
+-- the Free Software Foundation, either version 3 of the License, or
+-- any later version.
+   
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-- GNU General Public License for more details.
+   
+-- You should have received a copy of the GNU General Public License
+-- along with this program. If not, see http://www.gnu.org/licenses/.
+
+-----------------------------------------------------------------------
+
+-- Written by Wesley "keyboard monkey" Werner 2015
+-- https://github.com/wesleywerner/
+
+local about = {}
+local sprites = {}
+local spriteStates = spriteManager:new()
+local scrollManager = require("modules.line-scroller")
+local aboutHeading = scrollManager:new()
+local aboutDetail = scrollManager:new()
+local aboutLineIndex = 1
+local aboutLines = {
+    {"NOVA PINBALL", "VERSION " .. VERSION},
+    {"MADE WITH LÖVE", "love2d.org"},
+    {"FREE", "GNU General Public License"},
+    {"URL", "wesleywerner.github.io/nova-pinball"},
+    {"LED Board-7 Font", "Sizenko Alexander"},
+    {"Erbos Draco NBP Font", "Nate Halley"},
+    }
+
+function about:load()
+    -- Position where the about text heading and detail will move towards
+    aboutDetail.y = aboutDetail.y + 60
+    aboutDetail.startX = scrWidth * 1.4
+    aboutDetail.goalX = scrWidth / 10
+    aboutHeading.startX = -scrWidth * 0.5
+    aboutHeading.goalX = scrWidth / 2
+
+    sprites.background = loadSprite("images/about-screen-background.png")
+    sprites.spikes = loadSprite("images/about-screen-spikes.png")
+    -- Rotating checkerboard
+    local spr = spriteStates:add("checkers", sprites.background):setRotation(0.05)
+    spr:setBlendmode("additive")
+    spr.sprite.x = scrWidth / 2
+    spr.sprite.y = scrHeight / 2
+end
+
+function about:update(dt)
+    spriteStates:update(dt)
+    aboutHeading:update(dt)
+    aboutDetail:update(dt)
+    -- Display the next information line
+    if (not aboutHeading:busy() and not aboutDetail:busy()) then
+        aboutHeading:go(aboutLines[aboutLineIndex][1])
+        aboutDetail:go(aboutLines[aboutLineIndex][2])
+        aboutLineIndex = aboutLineIndex + 1
+        if (aboutLineIndex > #aboutLines) then aboutLineIndex = 1 end
+    end
+end
+
+function about:draw()
+    love.graphics.setColor(255, 255, 255, 255)
+    -- background
+    love.graphics.draw(sprites.background.image, 0, 0)
+    -- rotating overlay
+    spriteStates:draw()
+    -- spikes
+    love.graphics.draw(sprites.spikes.image, 0, 0)
+    -- texts
+    love.graphics.setColor(128, 255, 255, 255)
+    aboutHeading:draw()
+    love.graphics.setColor(255, 255, 128, 255)
+    aboutDetail:draw()
+end
+
+function about:forward()
+    aboutDetail:out()
+    aboutHeading:out()
+end
+
+return about

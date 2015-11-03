@@ -21,56 +21,28 @@ local state = nil
 local currentOptions = {}
 local mainOptions = {"Play", "Settings", "About", "Leave"}
 local selectedItem = 1
-local ballSprite = nil
-
--- About screen
-local scrollManager = require("modules.line-scroller")
-local aboutHeading = scrollManager:new()
-local aboutDetail = scrollManager:new()
-local aboutLineIndex = 1
-local aboutLines = {
-    {"NOVA PINBALL", "VERSION " .. VERSION},
-    {"MADE WITH LÖVE", "love2d.org"},
-    {"FREE", "GNU General Public License"},
-    {"URL", "wesleywerner.github.io/nova-pinball"},
-    {"LED Board-7 Font", "Sizenko Alexander"},
-    {"Erbos Draco NBP Font", "Nate Halley"},
-    }
+local sprites = {}
+local about = nil
 
 function thisState:load()
-
-    ballSprite = loadSprite("images/ball.png")
-    
-    -- Set up menu states
     state = stateManager:new()
     state:add("main", 60, "about")
     state:add("config")
     state:add("about")
     state:set("main")
     currentOptions = mainOptions
-
+    -- Load the about display module
+    about = require("modules.about-state")
+    about:load()
+    -- Apply the screen setting
     love.window.setFullscreen(cfg:get("fullscreen") == 1)
-
-    -- Position where the about text heading and detail will move towards
-    aboutDetail.y = aboutDetail.y + 60
-    aboutDetail.startX = scrWidth * 1.4
-    aboutDetail.goalX = scrWidth / 10
-    aboutHeading.startX = -scrWidth * 0.5
-    aboutHeading.goalX = scrWidth / 2
+    sprites.ball = loadSprite("images/ball.png")
 end
 
 function thisState:update (dt)
-    state:update(dt)
-    
+    state:update(dt)    
     if state:on("about") then
-        aboutHeading:update(dt)
-        aboutDetail:update(dt)
-        if (not aboutHeading:busy() and not aboutDetail:busy()) then
-            aboutHeading:go(aboutLines[aboutLineIndex][1])
-            aboutDetail:go(aboutLines[aboutLineIndex][2])
-            aboutLineIndex = aboutLineIndex + 1
-            if (aboutLineIndex > #aboutLines) then aboutLineIndex = 1 end
-        end
+        about:update(dt)
     end
 end
 
@@ -103,9 +75,7 @@ function thisState:keypressed (key)
         end
     elseif (state:on("about")) then
         if (key == " ") then
-            -- Skip through the credits
-            aboutDetail:out()
-            aboutHeading:out()
+            about:forward()
         elseif (key == "escape") then
             state:set("main")
         end
@@ -127,7 +97,7 @@ function thisState:drawOptionsMenu()
     for _, m in ipairs(currentOptions) do
         if (currentOptions[selectedItem] == m) then
             color = {255, 255, 255, 255}
-            love.graphics.draw(ballSprite.image, 160, y)
+            love.graphics.draw(sprites.ball.image, 160, y)
         else
             color = {200, 200, 200, 255}
         end
@@ -151,10 +121,7 @@ function thisState:draw ( )
         self:drawOptionsMenu()
         self:drawSelectedOptionDescription()
     elseif state:on("about") then
-        love.graphics.setColor(128, 255, 255, 255)
-        aboutHeading:draw()
-        love.graphics.setColor(255, 255, 128, 255)
-        aboutDetail:draw()
+        about:draw()
     end
 end
 
