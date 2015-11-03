@@ -95,9 +95,9 @@ function loadAllModules()
         menustate = require("modules.menu-state")
         playstate = require("modules.play-state")
         cfg = require("modules.game-config")
+        cfg:load()
         menustate:load()
         playstate:load()
-        cfg:load()
     end
 end
 

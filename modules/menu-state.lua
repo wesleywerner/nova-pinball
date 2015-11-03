@@ -35,6 +35,7 @@ function thisState:load()
     state:set("main")
     currentOptions = mainOptions
 
+    love.window.setFullscreen(cfg:get("fullscreen") == 1)
 end
 
 function thisState:update (dt)
@@ -57,7 +58,10 @@ function thisState:keypressed (key)
             selectedItem = #currentOptions
         else
             -- Save config
-            if state:on("config") then cfg:save() end
+            if state:on("config") then
+                love.window.setFullscreen(cfg:get("fullscreen") == 1)
+                cfg:save()
+            end
             -- Escape to the main menu
             state:set("main")
             currentOptions = mainOptions
