@@ -25,10 +25,18 @@ local aboutLineIndex = 1
 local aboutLines = {
     {"NOVA PINBALL", "VERSION " .. VERSION},
     {"MADE WITH LÖVE", "love2d.org"},
-    {"FREE", "GNU General Public License"},
-    {"URL", "wesleywerner.github.io/nova-pinball"},
-    {"LED Board-7 Font", "Sizenko Alexander"},
-    {"Erbos Draco NBP Font", "Nate Halley"},
+    {"COPYLEFT", "GNU General Public License"},
+    {"YOU ARE FREE", "Copy, Study, Modify the game"},
+
+    {"FONT", "CREDITS", 0},
+    {"LED Board-7", "Sizenko Alexander"},
+    {"Erbos Draco NBP", "Nate Halley"},
+
+    {"SPECIAL THANKS", "", 0},
+    {":)", "JADIE"},
+    
+    {"POWERED BY", "Kittens", 0},
+    {"WWW", "wesleywerner.github.io/nova-pinball", 10},
     }
 
 function about:load()
@@ -36,8 +44,8 @@ function about:load()
     aboutDetail.y = aboutDetail.y + 60
     aboutDetail.startX = scrWidth * 1.4
     aboutDetail.goalX = scrWidth / 10
-    aboutHeading.startX = -scrWidth * 0.5
-    aboutHeading.goalX = scrWidth / 2
+    aboutHeading.startX = -scrWidth * 0.6
+    aboutHeading.goalX = scrWidth / 3
 end
 
 function about:update(dt)
@@ -45,8 +53,9 @@ function about:update(dt)
     aboutDetail:update(dt)
     -- Display the next information line
     if (not aboutHeading:busy() and not aboutDetail:busy()) then
-        aboutHeading:go(aboutLines[aboutLineIndex][1])
-        aboutDetail:go(aboutLines[aboutLineIndex][2])
+        local line = aboutLines[aboutLineIndex]
+        aboutHeading:go(line[1], line[3])   -- Heading & pause time
+        aboutDetail:go(line[2], line[3])    -- Detail & pause time
         aboutLineIndex = aboutLineIndex + 1
         if (aboutLineIndex > #aboutLines) then aboutLineIndex = 1 end
     end
