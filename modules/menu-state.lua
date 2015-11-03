@@ -20,11 +20,13 @@ local thisState = {}
 local state = nil
 local currentOptions = {}
 local mainOptions = {"Play", "Settings", "About", "Leave"}
-local configOptions = {}
 local selectedItem = 1
+local ballSprite = nil
 
 function thisState:load()
 
+    ballSprite = loadSprite("images/ball.png")
+    
     -- Set up menu states
     state = statemanager:new()
     state:add("main", 60, "about")
@@ -77,13 +79,21 @@ function thisState:drawOptionsMenu()
     local color
     for _, m in ipairs(currentOptions) do
         if (currentOptions[selectedItem] == m) then
-            color = {200, 200, 255, 255}
+            color = {255, 255, 255, 255}
+            love.graphics.draw(ballSprite.image, 160, y)
         else
-            color = {255, 255, 255, 128}
+            color = {200, 200, 200, 255}
         end
         printShadowText(m, y, color)
         y = y + 100
     end
+end
+
+function thisState:drawSelectedOptionDescription()
+    local setting = gameconfig.settings[selectedItem]
+    local value = gameconfig.values[setting.meta]
+    local detail = setting.details[value]
+    printShadowText(detail, scrHeight - 60, {200, 255, 200, 255})
 end
 
 function thisState:draw ( )
@@ -92,6 +102,7 @@ function thisState:draw ( )
         self:drawOptionsMenu()
     elseif state:on("config") then
         self:drawOptionsMenu()
+        self:drawSelectedOptionDescription()
     elseif state:on("about") then
         love.graphics.setColor(128, 255, 255, 255)
         love.graphics.printf ("about", 0, 300, scrWidth, "center")
@@ -125,32 +136,25 @@ function thisState:menuAction()
 
     -- Config
     if state:on("config") then
-        if (selectedItem == 1) then
-            gameconfig.values.cameraFollowsBall = not gameconfig.values.cameraFollowsBall
-            self:buildConfigMenu()
-        elseif (selectedItem == 2) then
-            gameconfig.values.flashingTargets = not gameconfig.values.flashingTargets
-            self:buildConfigMenu()
-        elseif (selectedItem == 3) then
-            gameconfig.values.fullscreen = not gameconfig.values.fullscreen
-            self:buildConfigMenu()
-        end
+        -- selected item index matches the setting index
+        local setting = gameconfig.settings[selectedItem]
+        local value = gameconfig.values[setting.meta]
+        -- Rotate the value
+        value = value + 1
+        if (value > #setting.options) then value = 1 end
+        gameconfig.values[setting.meta] = value
+        self:buildConfigMenu()
     end
 end
 
 function thisState:buildConfigMenu()
-    local cameraValue = "Follow Ball"
-    if (not gameconfig.values.cameraFollowsBall) then cameraValue = "Zoomed Out" end
-    local flashValue = "On"
-    if (not gameconfig.values.flashingTargets) then flashValue = "Off" end
-    local fullscreenValue = "Full"
-    if (not gameconfig.values.fullscreen) then fullscreenValue = "Window" end
     currentOptions = {}
-    currentOptions = {
-        [1]="Camera: " .. cameraValue,
-        [2]="Target Lights: " .. flashValue,
-        [3]="Screen: " .. fullscreenValue
-        }
+    for i, setting in ipairs(gameconfig.settings) do
+        local value = gameconfig.values[setting.meta]
+        local valueTitle = gameconfig:getValue(setting.meta, value)
+        local item = string.format("%s: %s", setting.title, valueTitle)
+        table.insert(currentOptions, item)
+    end
 end
 
 return thisState
