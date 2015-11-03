@@ -308,6 +308,27 @@ function play:loadTargets()
     target:setOffImage("images/arrow-indicator-off.png")
     target:setFlashImage("images/arrow-indicator-on.png")
 
+    -- Bumper lights
+    targets.bumpers = targetManager:new()
+    -- Left
+    local x, y = pinball:getObjectXY("left bumper")
+    local target = targets.bumpers:add("left bumper")
+    target.x = x
+    target.y = y
+    target:setFlashImage("images/bumper-flash.png")
+    -- Middle
+    local x, y = pinball:getObjectXY("middle bumper")
+    local target = targets.bumpers:add("middle bumper")
+    target.x = x
+    target.y = y
+    target:setFlashImage("images/bumper-flash.png")
+    -- Right
+    local x, y = pinball:getObjectXY("right bumper")
+    local target = targets.bumpers:add("right bumper")
+    target.x = x
+    target.y = y
+    target:setFlashImage("images/bumper-flash.png")
+
 end
 
 function play:update (dt)
@@ -320,6 +341,7 @@ function play:update (dt)
     targets.leftTargets:update(dt)
     targets.rightTargets:update(dt)
     targets.rampLights:update(dt)
+    targets.bumpers:update(dt)
     
     if (states:on("preview")) then
         led:update(dt)
@@ -402,6 +424,8 @@ function play:draw ( )
     -- Draw the pinball components
     pinball:draw()
 
+    targets.bumpers:draw()
+
     -- Draw the launch cover over the pinball components
     -- (reposition the camera as the pinball module resets it after it draws)
     love.graphics.setColor (255, 255, 255, 255)
@@ -465,7 +489,7 @@ end
 
 function play.positionDrawingElements()
     led.size.w = scrWidth
-    led.size.h = 34
+    led.size.h = 36
     led.position.y = scrHeight - led.size.h
     play.ballStatXPosition = scrWidth - smallFont:getWidth("Balls: 0") - 10
 
@@ -668,12 +692,14 @@ function mission.onMissionCheckPassed(signal)
     targets.leftTargets:clearFlashing()
     targets.rightTargets:clearFlashing()
     targets.rampLights:clearFlashing()
+    targets.bumpers:clearFlashing()
 
     -- Set new flashing targets
     targets.wordTarget:flash(mission:nextTarget())
     targets.leftTargets:flash(mission:nextTarget())
     targets.rightTargets:flash(mission:nextTarget())
     targets.rampLights:flash(mission:nextTarget())
+    targets.bumpers:flash(mission:nextTarget())
 end
 
 function mission.onMissionAdvanced(title)
