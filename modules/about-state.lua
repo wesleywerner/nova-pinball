@@ -18,7 +18,6 @@
 
 local about = {}
 local sprites = {}
-local spriteStates = spriteManager:new()
 local scrollManager = require("modules.line-scroller")
 local aboutHeading = scrollManager:new()
 local aboutDetail = scrollManager:new()
@@ -39,18 +38,9 @@ function about:load()
     aboutDetail.goalX = scrWidth / 10
     aboutHeading.startX = -scrWidth * 0.5
     aboutHeading.goalX = scrWidth / 2
-
-    sprites.background = loadSprite("images/about-screen-background.png")
-    sprites.spikes = loadSprite("images/about-screen-spikes.png")
-    -- Rotating checkerboard
-    local spr = spriteStates:add("checkers", sprites.background):setRotation(0.05)
-    spr:setBlendmode("additive")
-    spr.sprite.x = scrWidth / 2
-    spr.sprite.y = scrHeight / 2
 end
 
 function about:update(dt)
-    spriteStates:update(dt)
     aboutHeading:update(dt)
     aboutDetail:update(dt)
     -- Display the next information line
@@ -63,13 +53,6 @@ function about:update(dt)
 end
 
 function about:draw()
-    love.graphics.setColor(255, 255, 255, 255)
-    -- background
-    love.graphics.draw(sprites.background.image, 0, 0)
-    -- rotating overlay
-    spriteStates:draw()
-    -- spikes
-    love.graphics.draw(sprites.spikes.image, 0, 0)
     -- texts
     love.graphics.setColor(128, 255, 255, 255)
     aboutHeading:draw()

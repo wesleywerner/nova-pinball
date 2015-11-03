@@ -22,6 +22,7 @@ local currentOptions = {}
 local mainOptions = {"Play", "Settings", "About", "Leave"}
 local selectedItem = 1
 local sprites = {}
+local spriteStates = spriteManager:new()
 local about = nil
 
 function thisState:load()
@@ -36,11 +37,20 @@ function thisState:load()
     about:load()
     -- Apply the screen setting
     love.window.setFullscreen(cfg:get("fullscreen") == 1)
+    -- Load image resources
     sprites.ball = loadSprite("images/ball.png")
+    sprites.background = loadSprite("images/about-screen-background.png")
+    sprites.spikes = loadSprite("images/about-screen-spikes.png")
+    -- Rotating checkerboard
+    local spr = spriteStates:add("checkers", sprites.background):setRotation(0.05)
+    spr:setBlendmode("subtractive")
+    spr.sprite.x = scrWidth / 2
+    spr.sprite.y = scrHeight / 2
 end
 
 function thisState:update (dt)
-    state:update(dt)    
+    state:update(dt)
+    spriteStates:update(dt)
     if state:on("about") then
         about:update(dt)
     end
@@ -114,7 +124,14 @@ function thisState:drawSelectedOptionDescription()
 end
 
 function thisState:draw ( )
-    love.graphics.setBackgroundColor(32, 32, 64)
+    love.graphics.setColor(255, 255, 255, 255)
+    -- Draw background
+    love.graphics.draw(sprites.background.image, 0, 0)
+    -- Draw rotating overlay
+    spriteStates:draw()
+    -- Draw spikes
+    love.graphics.draw(sprites.spikes.image, 0, 0)
+    -- Draw the menus
     if state:on("main") then
         self:drawOptionsMenu()
     elseif state:on("config") then
