@@ -21,6 +21,7 @@
 
 local manager = { }
 manager.items = nil
+manager.flashingEnabled = true
 
 function manager:new()
     local function deepcopy(orig)
@@ -137,6 +138,9 @@ function manager:reset()
 end
 
 function manager:update(dt)
+    -- Do not flash if the manager is disabled
+    if (not self.flashingEnabled) then return end
+    -- Flash off targets
     for _, target in pairs(self.items) do
         -- Do not bother updating on targets, they do not need to flash for attention.
         if (not target.on and target.flashing) then

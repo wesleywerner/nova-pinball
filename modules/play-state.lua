@@ -32,6 +32,8 @@ local targets = {}
 -- Calculated to center the table in the screen
 play.leftAlign = 0
 play.topAlign = 0
+-- Show hints of the next target in the LED display
+play.ledHints = true
 -- Pre-game scroll effect drawing offset
 play.previewPosition = 0
 -- Table nudge shake offset
@@ -361,9 +363,16 @@ function play:keyreleased(key)
     if (key == "lshift") then pinball:releaseLeftFlippers() end
     if (key == "rshift") then pinball:releaseRightFlippers() end
 
-    -- Check the camera view
+    -- Apply any config settings
     if (key == "enter" or key == "return" or key == " ") then
+        -- Pinball engine camera view
         play.positionDrawingElements()
+        -- LED and Lights (1 is LED, 2 is lights, 3 is both
+        play.ledHints = (cfg:get("missionHints") == 1 or cfg:get("missionHints") == 3)
+        local flashHints = (cfg:get("missionHints") == 2 or cfg:get("missionHints") == 3)
+        for _, target in pairs(targets) do
+            target.flashingEnabled = flashHints
+        end
     end
 end
 
@@ -494,7 +503,12 @@ function play.updateLedDisplayMessages(dt)
                 -- A generic message if no descriptive text is available for this goal
                 title = "Shoot for the " .. title
             end
-            led:add(title)
+            if (play.ledHints) then
+                led:add(title)
+            elseif (mission:nextTarget() == "wait") then
+                -- Always show waiting messages
+                led:add(title)
+            end
         end
     end
 end

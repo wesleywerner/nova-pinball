@@ -10,15 +10,15 @@ config.settings = {
               "Zoomed out, full table visible"
               }
     },
-    {meta = "flashingTargets",
+    {meta = "missionHints",
     title = "Mission Hints",
-    options = {"LED", "Lights", "Full", "None"},
+    options = {"LED", "Lights", "Both", "None"},
     values = {1, 2, 3, 4},
     default = 3,
-    details = {"Hints in the LED display",
-              "Hints with flashing lights",
-              "Hints with both LED and lights",
-              "No hints"
+    details = {"Words in the LED display",
+              "Flashing Lights",
+              "Words & Lights",
+              "No Hints"
               }
     },
     {meta = "fullscreen",
