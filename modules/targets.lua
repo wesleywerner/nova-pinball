@@ -80,7 +80,9 @@ end
 
 function manager:draw()
     for _, v in pairs(self.items) do
-        love.graphics.draw(v.sprite.image, v.x, v.y, 0, 1, 1, v.sprite.ox, v.sprite.oy)
+        if (v.sprite) then
+            love.graphics.draw(v.sprite.image, v.x, v.y, 0, 1, 1, v.sprite.ox, v.sprite.oy)
+        end
     end
 end
 
