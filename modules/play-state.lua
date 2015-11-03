@@ -358,6 +358,8 @@ function play:update (dt)
             pinball.cfg.translateOffset.y = self.previewPosition
         else
             -- View the high score list
+            scoreState:register(play.score)
+            self:resetGame()
             mainstate:set("scores")
         end
     elseif (states:on("play")) then
@@ -385,7 +387,11 @@ function play:keypressed (key)
         if (key == "escape") then mainstate:set("menu") end
     elseif (states:on("game over")) then
         -- Quick escape to the high score list on game over
-        if (key == "escape") then mainstate:set("scores") end
+        if (key == "escape") then
+            scores:register(play.score)
+            mainstate:set("menu")
+            menu.state:set("scores")
+        end
     end
 
     -- DEBUG Functions
@@ -888,6 +894,18 @@ function play:launchBall(firstLaunch)
             play.nudgeOffset = 20
         end
     end
+end
+
+function play:resetGame()
+    play.score = 0
+    play.scoreFormatted = "0"
+    play.balls = 6
+    pinball:newBall()
+    states:set("preview")
+    led:clear()
+    led:add("Welcome to Nova Pinball!", "long")
+    led:add("Hit space to launch the ball", "sticky")
+    play:flashAllTargets()
 end
 
 return play

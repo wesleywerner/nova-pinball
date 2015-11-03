@@ -17,20 +17,21 @@
 -- https://github.com/wesleywerner/
 
 local thisState = {}
-local state = nil
+thisState.state = nil
 local currentOptions = {}
-local mainOptions = {"Play", "Settings", "About", "Leave"}
+local mainOptions = {"Play", "Scores", "Settings", "About", "Leave"}
 local selectedItem = 1
 local sprites = {}
 local spriteStates = spriteManager:new()
 local about = nil
 
 function thisState:load()
-    state = stateManager:new()
-    state:add("main", 60, "about")
-    state:add("config")
-    state:add("about")
-    state:set("main")
+    self.state = stateManager:new()
+    self.state:add("main", 60, "about")
+    self.state:add("scores")
+    self.state:add("config")
+    self.state:add("about")
+    self.state:set("main")
     currentOptions = mainOptions
     -- Load the about display module
     about = require("modules.about-state")
@@ -49,10 +50,12 @@ function thisState:load()
 end
 
 function thisState:update (dt)
-    state:update(dt)
+    self.state:update(dt)
     spriteStates:update(dt)
-    if state:on("about") then
+    if self.state:on("about") then
         about:update(dt)
+    elseif self.state:on("scores") then
+        scores:update(dt)
     end
 end
 
@@ -64,30 +67,36 @@ function thisState:keypressed (key)
     elseif (key == "down") then
         selectedItem = selectedItem + 1
         if (selectedItem > #currentOptions) then selectedItem = 1 end
-    elseif (key == "return" or key == "enter" or key == " ") then
-        self:menuAction()
     end
     
-    if (state:on("main")) then
+    if (self.state:on("main")) then
         if (key == "escape") then
             -- Focus the last main menu item
             selectedItem = #currentOptions
+        elseif (key == "return" or key == "enter" or key == " ") then
+            self:menuAction()
         end
-    elseif (state:on("config")) then
+    elseif (self.state:on("config")) then
         if (key == "escape") then
             -- Save config
             love.window.setFullscreen(cfg:get("fullscreen") == 1)
             cfg:save()
             -- Escape to the main menu
-            state:set("main")
+            self.state:set("main")
             currentOptions = mainOptions
             self:resetSelection()
+        elseif (key == "return" or key == "enter" or key == " ") then
+            self:menuAction()
         end
-    elseif (state:on("about")) then
+    elseif (self.state:on("about")) then
         if (key == " ") then
             about:forward()
         elseif (key == "escape") then
-            state:set("main")
+            self.state:set("main")
+        end
+    elseif (self.state:on("scores")) then
+        if (not scores:keypressed(key)) then
+            self.state:set("main")
         end
     end
 
@@ -132,13 +141,15 @@ function thisState:draw ( )
     -- Draw spikes
     love.graphics.draw(sprites.spikes.image, 0, 0)
     -- Draw the menus
-    if state:on("main") then
+    if self.state:on("main") then
         self:drawOptionsMenu()
-    elseif state:on("config") then
+    elseif self.state:on("config") then
         self:drawOptionsMenu()
         self:drawSelectedOptionDescription()
-    elseif state:on("about") then
+    elseif self.state:on("about") then
         about:draw()
+    elseif self.state:on("scores") then
+        scores:draw()
     end
 end
 
@@ -156,19 +167,21 @@ function thisState:menuAction()
     -- Main
     if (item == "Play" or item == "Continue") then
         mainstate:set("play")
+    elseif (item == "Scores") then
+        self.state:set("scores")
     elseif (item == "Settings") then
-        state:set("config")
+        self.state:set("config")
         self:buildConfigMenu()
         self:resetSelection()
         return
     elseif (item == "About") then
-        state:set("about")
+        self.state:set("about")
     elseif (item == "Leave") then
         love.event.quit()
     end
 
     -- Config
-    if state:on("config") then
+    if self.state:on("config") then
         -- selected item index matches the setting index
         local setting = cfg.settings[selectedItem]
         local value = cfg.values[setting.meta]

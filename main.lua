@@ -21,7 +21,9 @@ DEBUG = true
 spriteManager = require("modules.sprite-state-manager")
 stateManager = require ("modules.states")
 playstate = nil
-menustate = nil
+mainstate = nil
+menu = nil
+scores = nil
 cfg = nil
 largeFont = love.graphics.newFont("fonts/advanced_led_board-7.ttf", 37)
 smallFont = love.graphics.newFont("fonts/erbos_draco_1st_open_nbp.ttf", 20)
@@ -56,7 +58,7 @@ function love.update (dt)
     elseif (mainstate:on("splash")) then
         splash:update(dt)
     elseif (mainstate:on("menu")) then
-        menustate:update(dt)
+        menu:update(dt)
     end
 end
 
@@ -66,7 +68,7 @@ function love.keypressed (key, isrepeat)
     elseif (mainstate:on("splash")) then
         splash:keypressed(key)
     elseif (mainstate:on("menu")) then
-        menustate:keypressed(key)
+        menu:keypressed(key)
     end
 end
 
@@ -74,7 +76,7 @@ function love.keyreleased(key)
     if (mainstate:on("play")) then
         playstate:keyreleased(key)
     elseif (mainstate:on("menu")) then
-        menustate:keyreleased(key)
+        menu:keyreleased(key)
     end
 end
 
@@ -84,7 +86,7 @@ function love.draw ( )
     elseif (mainstate:on("splash")) then
         splash:draw()
     elseif (mainstate:on("menu")) then
-        menustate:draw()
+        menu:draw()
     end
 end
 
@@ -95,12 +97,14 @@ end
 
 function loadAllModules()
     if (not playstate) then
-        menustate = require("modules.menu-state")
+        menu = require("modules.menu-state")
         playstate = require("modules.play-state")
+        scores = require("modules.scores")
         cfg = require("modules.game-config")
         cfg:load()
-        menustate:load()
+        menu:load()
         playstate:load()
+        scores:load()
     end
 end
 
