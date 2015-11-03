@@ -19,6 +19,10 @@
 -- A score tracking and display module
 
 local scores = {}
+-- Maximum number of scores to keep
+scores.maxScores = 8
+-- List of culled scores
+scores.culled = {}
 -- The top scores
 scores.high = {}
 -- The newest earned score
@@ -33,12 +37,15 @@ scores.newScoreIndex = nil
 function scores:load()
     -- TODO load scores from file
     self.scores = {
-        {score=3000, initials="AAA", date="01/02/11"},
-        {score=2999, initials="", date="03/11/15"},
-        {score=2000, initials="BBB", date="01/03/11"},
-        {score=1000, initials="CCC", date="06/04/11"},
+        {score=9000, initials="AAA", date="03/11/15"},
+        {score=8000, initials="BBB", date="03/11/15"},
+        {score=7000, initials="CCC", date="03/11/15"},
+        {score=6000, initials="DDD", date="03/11/15"},
+        {score=5000, initials="EEE", date="03/11/15"},
+        {score=4000, initials="FFF", date="03/11/15"},
+        {score=3000, initials="GGG", date="03/11/15"},
+        {score=2000, initials="HHH", date="03/11/15"},
         }
-    scores.newScoreIndex = 2
 end
 
 function scores:register(score)
@@ -58,8 +65,9 @@ function scores:register(score)
         self.newScoreIndex = #self.scores
     end
     -- Cull the list
-    while (#self.scores > 4) do
-        table.remove(self.scores)
+    scores.culled = {}
+    while (#self.scores > self.maxScores) do
+        table.insert(self.culled, table.remove(self.scores))
     end
     -- We did not make it after all :(
     if (self.newScoreIndex > #self.scores) then
@@ -100,13 +108,29 @@ function scores:keypressed(key)
 end
 
 function scores:draw()
-    local y = 100
+    local y = 50
     for i, entry in ipairs(self.scores) do
-        if (i == scores.newScoreIndex and self.isTyping) then
-            love.graphics.setColor (0, 255, 255, 255)
+        if (i == scores.newScoreIndex) then
+            if (self.isTyping) then
+                -- Highligh initial being entered
+                love.graphics.setColor (0, 255, 255, 255)
+            else
+                -- Highlight latest score
+                love.graphics.setColor (100, 255, 100, 255)
+            end
         else
+            -- Normal score
             love.graphics.setColor (255, 255, 255, 255)
         end
+        love.graphics.print(entry.initials, 80, y)
+        love.graphics.print(scores.formatNumber(entry.score), 200, y)
+        love.graphics.print(entry.date, 500, y)
+        y = y + 50
+    end
+    -- Draw culled scores
+    y = y + 50
+    love.graphics.setColor (255, 100, 100, 255)
+    for i, entry in ipairs(self.culled) do
         love.graphics.print(entry.initials, 80, y)
         love.graphics.print(scores.formatNumber(entry.score), 200, y)
         love.graphics.print(entry.date, 500, y)
