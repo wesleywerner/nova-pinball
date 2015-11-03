@@ -67,11 +67,11 @@ function scroll:new()
     end
 
     -- Set the text value and reset the positions to the start
-    function T:go(value)
+    function T:go(value, optionalPauseTime)
         self.text = value
         self.x = self.startX
         self.mode = "IN"
-        self.pauseTimer = scroll.pauseTime
+        self.pauseTimer = optionalPauseTime or scroll.pauseTime
     end
 
     -- Forcibly remove this scroller
