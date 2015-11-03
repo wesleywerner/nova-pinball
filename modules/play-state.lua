@@ -389,6 +389,7 @@ function play:keypressed (key)
         -- Quick escape to the high score list on game over
         if (key == "escape") then
             scores:register(play.score)
+            self:resetGame()
             mainstate:set("menu")
             menu.state:set("scores")
         end
