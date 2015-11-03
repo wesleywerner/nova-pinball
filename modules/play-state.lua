@@ -84,6 +84,7 @@ function play:load()
     states:add("preview")
     states:add("play")
     states:add("paused")
+    states:add("game over")
 
     play:loadSprites()
 
@@ -349,6 +350,16 @@ function play:update (dt)
             self.previewPosition = self.previewPosition - (dt*50)
             pinball.cfg.translateOffset.y = self.previewPosition
         end
+    elseif (states:on("game over")) then
+        led:update(dt)
+        -- Scroll the camera up until the table is out of view
+        if (self.previewPosition < pinball.table.size.height) then
+            self.previewPosition = self.previewPosition + (dt*100)
+            pinball.cfg.translateOffset.y = self.previewPosition
+        else
+            -- View the high score list
+            mainstate:set("scores")
+        end
     elseif (states:on("play")) then
         led:update(dt)
         play.updateNudge()
@@ -372,12 +383,20 @@ function play:keypressed (key)
     elseif (states:on("paused")) then
         if (key == " ") then states:set("play") end
         if (key == "escape") then mainstate:set("menu") end
+    elseif (states:on("game over")) then
+        -- Quick escape to the high score list on game over
+        if (key == "escape") then mainstate:set("scores") end
     end
-    --if (key == "escape") then love.event.quit() end
+
+    -- DEBUG Functions
     -- advance the mission goal
-    if (key == "f2") then
+    if (DEBUG and key == "f2") then
         mission:skipWait()
         mission:check(mission:nextTarget())
+    end
+    -- end the game
+    if (DEBUG and key == "e") then
+        play:endGame()
     end
 end
 
@@ -445,6 +464,8 @@ function play:draw ( )
     -- Simple text overlays
     if (states:on("paused")) then
         printShadowText("PAUSED", 200, {255, 128, 255, 200})
+    elseif (states:on("game over")) then
+        printShadowText("GAME OVER", 200, {255, 128, 255, 200})
     end
 
 end
@@ -452,6 +473,13 @@ end
 function play:resize (w, h)
     play.positionDrawingElements()
     pinball:resize (w, h)
+end
+
+-- Set the game over state and position the camera for upward scroll
+function play:endGame()
+    pinball:resetCamera()
+    states:set("game over")
+    self.previewPosition = -(pinball.table.size.height-scrHeight)
 end
 
 function play:drawStats()
@@ -610,6 +638,7 @@ function pinball.ballDrained (ballsInPlay)
     elseif (ballsInPlay == 0) then
         led:add("Ball drained", "priority")
         play.balls = play.balls - 1
+        if (play.balls == 0) then play:endGame() end
     end
 end
 
