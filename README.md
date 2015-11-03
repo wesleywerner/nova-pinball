@@ -1,23 +1,31 @@
 # NOVA PINBALL
 
-A pinball simulator written in LÖVE.
+_Copyleft 2015 Wesley Werner_
 
-Created by Wesley "keyboard monkey" Werner
+**Your mission**: Make the star go nova. There are in-game hints that point out the next target to achieve your goal.
+
+# GOOD TO KNOW
+
+* The `SHIFT` keys control the flippers
+* The `SPACE` key launches the ball, and nudges the table
+* Written in LUA with [LOVE, a 2D game framework](http://love2d.org/)
+* Powered by kittens
 
 # CREDITS
 
-*LOVE*, a 2D game framework
-http://love2d.org/
+Thanks goes to these people for letting me use their work:
 
-*Advanced LED Board-7 Font* by Sizenko Alexander
-http://www.styleseven.com
+**Advanced LED Board-7 Font** by Sizenko Alexander  
+http://www.styleseven.com  
 http://www.fontspace.com/style-7/advanced-led-board-7
 
-*Erbos Draco Open NBP Font* by made by Nate Halley
-Licensed under Creative Commons (by-sa)
+**Erbos Draco Open NBP Font** by made by Nate Halley  
+Licensed under Creative Commons (by-sa)  
 http://www.fontspace.com/total-fontgeek-dtf-ltd/erbos-draco-monospaced-nbp
 
-*Nova pinball engine* code by Wesley Werner
+# ENGINE
+
+The game is created on top of the Nova Pinball Engine, also available under the same license, [here](https://github.com/wesleywerner/nova-pinball-engine).
 
 # LICENSE
 
