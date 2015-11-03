@@ -109,7 +109,7 @@ function thisState:drawOptionsMenu()
             color = {255, 255, 255, 255}
             love.graphics.draw(sprites.ball.image, 160, y)
         else
-            color = {200, 200, 200, 255}
+            color = {200, 200, 255, 255}
         end
         printShadowText(m, y, color)
         y = y + 100
