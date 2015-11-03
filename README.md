@@ -19,7 +19,7 @@ Thanks goes to these people for letting me use their work:
 http://www.styleseven.com  
 http://www.fontspace.com/style-7/advanced-led-board-7
 
-**Erbos Draco Open NBP Font** by made by Nate Halley  
+**Erbos Draco Open NBP Font** by Nate Halley  
 Licensed under Creative Commons (by-sa)  
 http://www.fontspace.com/total-fontgeek-dtf-ltd/erbos-draco-monospaced-nbp
 
