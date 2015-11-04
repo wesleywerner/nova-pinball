@@ -128,7 +128,7 @@ function scores:keypressed(key)
         return true
     end
     
-    if (key == "escape" or key == " ") then
+    if (key == "escape" or key == " " or key == "return" or key == "enter") then
         return false
     end
 
