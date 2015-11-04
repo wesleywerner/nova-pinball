@@ -7,7 +7,8 @@ _Copyleft 2015 Wesley Werner_
 # GOOD TO KNOW
 
 * The `SHIFT` keys control the flippers
-* The `SPACE` key launches the ball, and nudges the table
+* The `SPACE` key launches the ball
+* The `SPACE` key nudges the table if a ball is in play
 * Written in LUA with [LOVE, a 2D game framework](http://love2d.org/)
 * Powered by kittens
 

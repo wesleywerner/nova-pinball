@@ -50,6 +50,15 @@ play.ballStatXPosition = 0
 play.score = 0
 play.scoreFormatted = "0"
 play.balls = 6
+-- Tracks how many nudges the player did
+play.nudgeCount = 0
+-- Nudges before we tilt
+play.nudgeThreshhold = 3
+-- Cooldown before decreasing the nudge count
+play.nudgeCooldown = 5
+play.nudgeTimer = play.nudgeCooldown
+-- Too many nudges in a short time tilts the game (flippers turn off)
+play.tilt = false
 
 -- A lookup of mission targets and their human readable texts
 local missionDescriptions = {
@@ -361,11 +370,12 @@ function play:update (dt)
         end
     elseif (states:on("play")) then
         led:update(dt)
-        play.updateNudge()
+        play.updateShakeAnimation(dt)
         pinball:update(dt)
         bumperManager:update(dt)
         spriteStates:update(dt)
         mission:update(dt)
+        play:updateNudgeCounters(dt)
     end
 
 end
@@ -376,8 +386,8 @@ function play:keypressed (key)
         if (key == "escape") then mainstate:set("menu") end
     elseif (states:on("play")) then
         if (key == "escape") then states:set("paused") end
-        if (key == "lshift") then pinball:moveLeftFlippers() end
-        if (key == "rshift") then pinball:moveRightFlippers() end
+        if (key == "lshift" and not play.tilt) then pinball:moveLeftFlippers() end
+        if (key == "rshift" and not play.tilt) then pinball:moveRightFlippers() end
         if (key == " ") then play:launchBall() end
     elseif (states:on("paused")) then
         if (key == " ") then states:set("play") end
@@ -502,7 +512,7 @@ function play:drawStats()
     love.graphics.print("Score:" .. play.scoreFormatted, 10, 2)
 end
 
-function play.updateNudge()
+function play.updateShakeAnimation(dt)
     if (play.nudgeOffset > 0) then
         pinball.cfg.translateOffset.y = play.nudgeOffset
         play.nudgeOffset = play.nudgeOffset - (play.nudgeOffset / 2)
@@ -664,6 +674,8 @@ end
 -- The ball made contact with a tagged component
 function pinball.tagContact (tag, id)
 
+    if (play.tilt) then return end
+    
     if (tag == "black hole") then
         local blackHoleVisible = spriteStates:item("black hole").visible
         if blackHoleVisible then
@@ -867,14 +879,16 @@ function play.deactivateBallSaver()
 end
 
 function play.addScore(amount)
-    play.score = play.score + amount
-    -- store a thousand-formatted value
-    local formatted = play.score
-    while true do
-        formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
-        if (k==0) then break end
+    if (not play.tilt) then
+        play.score = play.score + amount
+        -- store a thousand-formatted value
+        local formatted = play.score
+        while true do
+            formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
+            if (k==0) then break end
+        end
+        play.scoreFormatted = formatted
     end
-    play.scoreFormatted = formatted
 end
 
 function play:launchBall(firstLaunch)
@@ -892,9 +906,30 @@ function play:launchBall(firstLaunch)
         if (#pinball.bodies.balls == 0) then
             pinball:newBall()
             led:add("Make the star go Nova", "priority")
+            -- Reset tilt and nudges
+            play.tilt = false
+            play.nudgeCount = 0
         else
-            pinball:nudge(0, 0, -100, 0)
-            play.nudgeOffset = 20
+            if (not play.tilt) then
+                pinball:nudge(0, 0, -100, 0)
+                play.nudgeOffset = 20
+                play.nudgeCount = play.nudgeCount + 1
+                if (play.nudgeCount == play.nudgeThreshhold) then
+                    play.tilt = true
+                    led:add("TILT!", "priority,sticky")
+                end
+            end
+        end
+    end
+end
+
+function play:updateNudgeCounters(dt)
+    if (play.nudgeCount > 0) then
+        play.nudgeTimer = play.nudgeTimer - dt
+        if (play.nudgeTimer < 0) then
+            -- Decrease the nudge count
+            play.nudgeCount = play.nudgeCount - 1
+            play.nudgeTimer = play.nudgeCooldown
         end
     end
 end
