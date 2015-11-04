@@ -373,7 +373,6 @@ end
 function play:update (dt)
     states:update(dt)
     play.updateLedDisplayMessages(dt)
-    play.updateSafemode(dt)
 
     -- Update flashing targets
     targets.wordTarget:update(dt)
@@ -405,6 +404,7 @@ function play:update (dt)
         spriteStates:update(dt)
         mission:update(dt)
         play:updateNudgeCounters(dt)
+        play.updateSafemode(dt)
     end
 
 end
