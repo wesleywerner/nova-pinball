@@ -30,6 +30,15 @@ config.settings = {
               ""
               }
     },
+    {meta = "sfx",
+    title = "Game Sounds",
+    options = {"On", "Off"},
+    values = {1, 2},
+    default = 1,
+    details = {"Noisy",
+              "Silence"
+              }
+    },
 }
 
 -- Load config from file

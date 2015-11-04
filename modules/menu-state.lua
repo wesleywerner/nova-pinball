@@ -65,11 +65,11 @@ end
 function thisState:keypressed (key)
     -- Menu navigation
     if (key == "up") then
-        love.audio.play(menuSound)
+        aplay(menuSound)
         selectedItem = selectedItem - 1
         if (selectedItem < 1) then selectedItem = #currentOptions end
     elseif (key == "down") then
-        love.audio.play(menuSound)
+        aplay(menuSound)
         selectedItem = selectedItem + 1
         if (selectedItem > #currentOptions) then selectedItem = 1 end
     end
@@ -168,7 +168,7 @@ end
 
 function thisState:menuAction()
     local item = currentOptions[selectedItem]
-    love.audio.play(menuSound)
+    aplay(menuSound)
     if (item == "Play" or item == "Continue") then
         mainstate:set("play")
     elseif (item == "Scores") then

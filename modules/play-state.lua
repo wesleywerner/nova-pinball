@@ -416,11 +416,11 @@ function play:keypressed (key)
     elseif (states:on("play")) then
         if (key == "escape") then states:set("paused") end
         if (key == "lshift" and not play.tilt) then
-            love.audio.play(sounds.leftFlipper)
+            aplay(sounds.leftFlipper)
             pinball:moveLeftFlippers()
         end
         if (key == "rshift" and not play.tilt) then
-            love.audio.play(sounds.rightFlipper)
+            aplay(sounds.rightFlipper)
             pinball:moveRightFlippers()
         end
         if (key == " ") then play:launchBall() end
@@ -686,7 +686,7 @@ end
 -- Called when a ball has drained out of play.
 -- The number of balls still in play are passed.
 function pinball.ballDrained (ballsInPlay)
-    love.audio.play(sounds.drained)
+    aplay(sounds.drained)
     if (play.safeMode > 0) then
         led:add("Ball Saved", "priority")
         pinball:newBall()
@@ -699,12 +699,12 @@ end
 
 -- When a ball is locked with pinball:lockBall()
 function pinball.ballLocked(id)
-    love.audio.play(sounds.blackHoleLock)
+    aplay(sounds.blackHoleLock)
 end
 
 -- When a locked ball delay expired and is released into play
 function pinball.ballUnlocked(id)
-    love.audio.play(sounds.blackHoleRelease)
+    aplay(sounds.blackHoleRelease)
 end
 
 -- The ball made contact with a tagged component
@@ -724,27 +724,27 @@ function pinball.tagContact (tag, id)
     end
 
     if (tag == "left bumper") then
-        love.audio.play(sounds.leftBumper)
+        aplay(sounds.leftBumper)
         play.addScore(500)
     end
     if (tag == "middle bumper") then
-        love.audio.play(sounds.middleBumper)
+        aplay(sounds.middleBumper)
         play.addScore(500)
     end
     if (tag == "right bumper") then
-        love.audio.play(sounds.rightBumper)
+        aplay(sounds.rightBumper)
         play.addScore(500)
     end
     if (tag == "left kicker" or tag == "right kicker") then
         play.addScore(750)
-        love.audio.play(sounds.leftBumper)
+        aplay(sounds.leftBumper)
     end
     if (tag == "left ramp" or tag == "right ramp") then
-        love.audio.play(sounds.ramp)
+        aplay(sounds.ramp)
     end
 
     if (tag == "wall") then
-        love.audio.play(sounds.wall)
+        aplay(sounds.wall)
     end
 
     -- Switch targets on when their tag is hit
@@ -758,18 +758,18 @@ function pinball.tagContact (tag, id)
 end
 
 function play.onWordTargetSwitch(letter)
-    love.audio.play(sounds.target)
+    aplay(sounds.target)
 end
 
 function play.onWordTargetComplete()
     play.addScore(1250)
-    love.audio.play(sounds.wordBonus)
+    aplay(sounds.wordBonus)
     led:add("Word Bonus")
     mission:check("nova word")
 end
 
 function play.onLeftTargetSwitch(letter)
-    love.audio.play(sounds.target)
+    aplay(sounds.target)
 end
 
 function play.onLeftTargetsComplete()
@@ -778,7 +778,7 @@ function play.onLeftTargetsComplete()
 end
 
 function play.onRightTargetsSwitch(letter)
-    love.audio.play(sounds.target)
+    aplay(sounds.target)
 end
 
 function play.onRightTargetsComplete()
@@ -814,17 +814,17 @@ function mission.onMissionAdvanced(title)
     elseif (title == "hydrogen release") then
         play.addScore(1250)
         led:add("Hydrogen released", "priority")
-        love.audio.play(sounds.hydrogenReleased)
+        aplay(sounds.hydrogenReleased)
     elseif (title == "fusion stage 1") then
         play.addScore(1500)
         led:add("Fusion first stage complete", "priority")
         spriteStates:item("wheel 1"):setVisible(true):scale(0.02)
-        love.audio.play(sounds.fusion1)
+        aplay(sounds.fusion1)
     elseif (title == "fusion stage 2") then
         play.addScore(1750)
         led:add("Fusion second stage complete", "priority")
         spriteStates:item("wheel 2"):setVisible(true):scale(0.02)
-        love.audio.play(sounds.fusion2)
+        aplay(sounds.fusion2)
     elseif (title == "fusion burn") then
         led:add("Fusion burning... ", "priority")
     elseif (title == "fusion unstable") then
@@ -842,7 +842,7 @@ function mission.onMissionAdvanced(title)
     elseif (title == "reset") then
         play.addScore(10000)
         led:add("Supergravity Bonus", "priority")
-        love.audio.play(sounds.supergravityBonus)
+        aplay(sounds.supergravityBonus)
         play.resetMissionSprites()
         play.showStarFlare()
         play.insertBonusMission()
@@ -873,7 +873,7 @@ function play.resetMissionSprites()
     -- Slowly retract the rays
     spriteStates:item("worm hole rays"):scale(-0.4)
     love.audio.stop(sounds.wormhole)
-    love.audio.play(sounds.wormholeClose)
+    aplay(sounds.wormholeClose)
 end
 
 function play.showStarFlare()
@@ -884,7 +884,7 @@ end
 
 function play.showBlackHole()
     spriteStates:item("black hole"):setVisible(true):scale(0.2)
-    love.audio.play(sounds.blackHole)
+    aplay(sounds.blackHole)
 end
 
 function play.showWormhole()
@@ -893,8 +893,8 @@ function play.showWormhole()
     spriteStates:item("worm hole rays"):setVisible(true):scale(0.1)
     spriteStates:item("worm hole"):setVisible(true):scale(0.3)
     spriteStates:item("worm hole clouds"):setVisible(true):scale(0.3)
-    love.audio.play(sounds.wormhole)
-    love.audio.play(sounds.timewarp)
+    aplay(sounds.wormhole)
+    aplay(sounds.timewarp)
 end
 
 function play.insertBonusMission()
@@ -963,7 +963,7 @@ function play:launchBall(firstLaunch)
         play:resetAllTargets()
         -- Light up the first target (the mission check callback won't fire at this point as no goals are met yet)
         targets.wordTarget:flash("nova word")
-        love.audio.play(sounds.launch)
+        aplay(sounds.launch)
     else
         -- Launch another ball, or shake the table
         if (#pinball.bodies.balls == 0) then
@@ -972,7 +972,7 @@ function play:launchBall(firstLaunch)
             -- Reset tilt and nudges
             play.tilt = false
             play.nudgeCount = 0
-            love.audio.play(sounds.launch)
+            aplay(sounds.launch)
         else
             if (not play.tilt) then
                 pinball:nudge(0, 0, -100, 0)
@@ -982,7 +982,7 @@ function play:launchBall(firstLaunch)
                     play.tilt = true
                     led:add("TILT!", "priority,sticky")
                 end
-                love.audio.play(sounds.nudge)
+                aplay(sounds.nudge)
             end
         end
     end

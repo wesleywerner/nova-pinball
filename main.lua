@@ -137,3 +137,10 @@ function loadSprite (path)
     end
     return sprite
 end
+
+-- Plays an audio source considering the config sound setting
+function aplay(source)
+    if (cfg:get("sfx") == 1) then
+        love.audio.play(source)
+    end
+end
