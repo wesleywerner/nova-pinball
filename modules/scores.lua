@@ -35,7 +35,7 @@ scores.isTyping = false
 scores.newScoreIndex = nil
 
 function scores:load()
-    -- TODO load scores from file
+    -- Default scores
     self.scores = {
         {score=9000, initials="AAA", date="03/11/2015"},
         {score=8000, initials="BBB", date="03/11/2015"},
@@ -46,6 +46,31 @@ function scores:load()
         {score=3000, initials="GGG", date="03/11/2015"},
         {score=2000, initials="HHH", date="03/11/2015"},
         }
+    -- Load scores from file
+    local exists = love.filesystem.exists("scores")
+    if exists then
+        local pickle = require("modules.pickle")
+        local rawData, size = love.filesystem.read("scores")
+        local data = pickle.unpickle(rawData)
+        -- Validate
+        if (type(data) == "table") then
+            for _, entry in ipairs(data) do
+                if (not entry.score) or (not entry.initials) or (not entry.date) then
+                    print("The scores file is invalid")
+                    return
+                end
+            end
+            self.scores = data
+        else
+            print("The scores file is invalid")
+        end
+    end
+end
+
+function scores:save()
+    local pickle = require("modules.pickle")
+    local data = pickle.pickle(self.scores)
+    love.filesystem.write("scores", data, data:len())
 end
 
 function scores:register(score)
@@ -78,7 +103,7 @@ function scores:register(score)
     end
     
     self.initials = ""
-    -- TODO check if the new score made it on the list
+    -- The new score made it on the list
     if (self.newScoreIndex) then self.isTyping = true end
 end
 
@@ -91,7 +116,7 @@ function scores:keypressed(key)
     if (self.isTyping) then
         if (key == "return" or key == "enter") then
             self.isTyping = false
-            -- TODO save new score file
+            self:save()
         else
             if (self.initials:len() < 3 and string.find("0123456789abcdefghijklmnopqrstuvwxyz", key)) then
                 self.initials = self.initials .. string.upper(key)
