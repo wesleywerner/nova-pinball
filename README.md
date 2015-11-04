@@ -23,6 +23,9 @@ http://www.fontspace.com/style-7/advanced-led-board-7
 Licensed under Creative Commons (by-sa)  
 http://www.fontspace.com/total-fontgeek-dtf-ltd/erbos-draco-monospaced-nbp
 
+**File Pickler** by Steve Dekorte  
+http://www.dekorte.com, Apr 2000
+
 # ENGINE
 
 The game is created on top of the Nova Pinball Engine, also available under the same license, [here](https://github.com/wesleywerner/nova-pinball-engine).
