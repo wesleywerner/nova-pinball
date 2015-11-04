@@ -90,7 +90,7 @@ function splash:draw(dt)
         love.graphics.circle("fill", self.center.x, self.center.y, self.r)
         love.graphics.setColor(255, 255, 255)
         self.sprites:draw()
-        printShadowText(self.loadingMessage, scrHeight - 30, {200, 200, 100})
+        printShadowText(self.loadingMessage, scrHeight - 40, {200, 200, 100})
         if self.fading then
             love.graphics.setColor(0, 0, 0, self.fadeAlpha)
             love.graphics.rectangle("fill", 0, 0, scrWidth, scrHeight)
