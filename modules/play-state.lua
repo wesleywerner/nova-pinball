@@ -710,9 +710,7 @@ end
 -- The ball made contact with a tagged component
 function pinball.tagContact (tag, id)
 
-    if (play.tilt) then return end
-    
-    if (tag == "black hole") then
+    if (tag == "black hole" and not play.tilt) then
         local blackHoleVisible = spriteStates:item("black hole").visible
         if blackHoleVisible then
             local sign1 = math.random(-1, 1) < 0 and -1 or 1
@@ -755,7 +753,7 @@ function pinball.tagContact (tag, id)
     targets.rightTargets:switchOn(tag)
     
     bumperManager:hit(tag)
-    mission:check(tag)
+    if (not play.tilt) then mission:check(tag) end
     
 end
 
