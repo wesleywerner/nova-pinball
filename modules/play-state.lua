@@ -893,7 +893,7 @@ function play:launchBall(firstLaunch)
             pinball:newBall()
             led:add("Make the star go Nova", "priority")
         else
-            pinball:nudge(20, 20)
+            pinball:nudge(0, 0, -100, 0)
             play.nudgeOffset = 20
         end
     end
