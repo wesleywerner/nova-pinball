@@ -25,6 +25,7 @@ local mission = require("modules.mission")
 local spriteStates = spriteManager:new()
 local led = require("modules.led-display")
 local sprites = { }
+local sounds = {}
 
 -- Stores a collection of all the targets on the table.
 local targets = {}
@@ -103,6 +104,24 @@ function play:load()
     -- Set initial game state
     pinball:newBall()
     states:set("preview")
+
+    -- Load audio
+    sounds.wall = love.audio.newSource("audio/wall.wav")
+    sounds.bumper = love.audio.newSource("audio/bumper.wav")
+    sounds.wordBonus = love.audio.newSource("audio/wordbonus.wav")
+    sounds.target = love.audio.newSource("audio/target.wav")
+    sounds.ramp = love.audio.newSource("audio/ramp.wav")
+    sounds.launch = love.audio.newSource("audio/launch.wav")
+    sounds.wormhole = love.audio.newSource("audio/wormhole.wav")
+    sounds.wormhole:setLooping(true)
+    sounds.wormholeClose = love.audio.newSource("audio/wormhole-close.wav")
+    sounds.timewarp = love.audio.newSource("audio/timewarp.wav")
+    sounds.blackhole = love.audio.newSource("audio/blackhole-release.wav")
+    sounds.blackholeLock = love.audio.newSource("audio/blackhole-lock.wav")
+    sounds.nudge = love.audio.newSource("audio/nudge.wav")
+    sounds.hydrogenReleased = love.audio.newSource("audio/hydrogen-released.wav")
+    sounds.drained = love.audio.newSource("audio/ball-drained.wav")
+    sounds.supergravityBonus = love.audio.newSource("audio/supergravity-bonus.wav")
 
     -- Load the table layout into the pinball engine
     play.loadTableFile()
@@ -651,6 +670,7 @@ end
 -- Called when a ball has drained out of play.
 -- The number of balls still in play are passed.
 function pinball.ballDrained (ballsInPlay)
+    love.audio.play(sounds.drained)
     if (play.safeMode > 0) then
         led:add("Ball Saved", "priority")
         pinball:newBall()
@@ -663,12 +683,12 @@ end
 
 -- When a ball is locked with pinball:lockBall()
 function pinball.ballLocked(id)
-
+    love.audio.play(sounds.blackholeLock)
 end
 
 -- When a locked ball delay expired and is released into play
 function pinball.ballUnlocked(id)
-
+    love.audio.play(sounds.blackhole)
 end
 
 -- The ball made contact with a tagged component
@@ -691,8 +711,18 @@ function pinball.tagContact (tag, id)
 
     if (tag == "left bumper" or tag == "middle bumper" or tag == "right bumper") then
         play.addScore(500)
+        love.audio.play(sounds.bumper)
     elseif (tag == "left kicker" or tag == "right kicker") then
         play.addScore(750)
+        love.audio.play(sounds.bumper)
+    end
+
+    if (tag == "left ramp" or tag == "right ramp") then
+        love.audio.play(sounds.ramp)
+    end
+
+    if (tag == "wall") then
+        love.audio.play(sounds.wall)
     end
 
     -- Switch targets on when their tag is hit
@@ -706,17 +736,18 @@ function pinball.tagContact (tag, id)
 end
 
 function play.onWordTargetSwitch(letter)
-
+    love.audio.play(sounds.target)
 end
 
 function play.onWordTargetComplete()
     play.addScore(1250)
+    love.audio.play(sounds.wordBonus)
     led:add("Word Bonus")
     mission:check("nova word")
 end
 
 function play.onLeftTargetSwitch(letter)
-
+    love.audio.play(sounds.target)
 end
 
 function play.onLeftTargetsComplete()
@@ -725,7 +756,7 @@ function play.onLeftTargetsComplete()
 end
 
 function play.onRightTargetsSwitch(letter)
-
+    love.audio.play(sounds.target)
 end
 
 function play.onRightTargetsComplete()
@@ -761,6 +792,7 @@ function mission.onMissionAdvanced(title)
     elseif (title == "hydrogen release") then
         play.addScore(1250)
         led:add("Hydrogen released", "priority")
+        love.audio.play(sounds.hydrogenReleased)
     elseif (title == "fusion stage 1") then
         play.addScore(1500)
         led:add("Fusion first stage complete", "priority")
@@ -786,6 +818,7 @@ function mission.onMissionAdvanced(title)
     elseif (title == "reset") then
         play.addScore(10000)
         led:add("Supergravity Bonus", "priority")
+        love.audio.play(sounds.supergravityBonus)
         play.resetMissionSprites()
         play.showStarFlare()
         play.insertBonusMission()
@@ -815,6 +848,8 @@ function play.resetMissionSprites()
     spriteStates:item("worm hole clouds"):scale(-0.6)
     -- Slowly retract the rays
     spriteStates:item("worm hole rays"):scale(-0.4)
+    love.audio.stop(sounds.wormhole)
+    love.audio.play(sounds.wormholeClose)
 end
 
 function play.showStarFlare()
@@ -833,6 +868,8 @@ function play.showWormhole()
     spriteStates:item("worm hole rays"):setVisible(true):scale(0.1)
     spriteStates:item("worm hole"):setVisible(true):scale(0.3)
     spriteStates:item("worm hole clouds"):setVisible(true):scale(0.3)
+    love.audio.play(sounds.wormhole)
+    love.audio.play(sounds.timewarp)
 end
 
 function play.insertBonusMission()
@@ -901,6 +938,7 @@ function play:launchBall(firstLaunch)
         play:resetAllTargets()
         -- Light up the first target (the mission check callback won't fire at this point as no goals are met yet)
         targets.wordTarget:flash("nova word")
+        love.audio.play(sounds.launch)
     else
         -- Launch another ball, or shake the table
         if (#pinball.bodies.balls == 0) then
@@ -909,6 +947,7 @@ function play:launchBall(firstLaunch)
             -- Reset tilt and nudges
             play.tilt = false
             play.nudgeCount = 0
+            love.audio.play(sounds.launch)
         else
             if (not play.tilt) then
                 pinball:nudge(0, 0, -100, 0)
@@ -918,6 +957,7 @@ function play:launchBall(firstLaunch)
                     play.tilt = true
                     led:add("TILT!", "priority,sticky")
                 end
+                love.audio.play(sounds.nudge)
             end
         end
     end
