@@ -17,7 +17,7 @@
 -- https://github.com/wesleywerner/
 
 VERSION = "0.1"
-DEBUG = true
+DEBUG = false
 spriteManager = require("modules.sprite-state-manager")
 stateManager = require ("modules.states")
 playstate = nil
