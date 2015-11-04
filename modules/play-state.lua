@@ -66,9 +66,9 @@ local waitingWords = {
     }
 
 function play.loadTableFile()
-    local binser = require("modules.binser")
     local mydata, size = love.filesystem.read("nova.pinball", nil)
-    local tableDefinition = binser.deserialize(mydata)
+    local pickle = require("pickle")
+    local tableDefinition = pickle.unpickle(mydata)
     pinball:loadTable(tableDefinition)
 end
 
