@@ -27,6 +27,9 @@ http://www.fontspace.com/total-fontgeek-dtf-ltd/erbos-draco-monospaced-nbp
 **File Pickler** by Steve Dekorte  
 http://www.dekorte.com, Apr 2000
 
+**SFXR sound effect generator** by Tomas Pettersson
+http://www.drpetter.se/project_sfxr.html
+
 # ENGINE
 
 The game is created on top of the Nova Pinball Engine, also available under the same license, [here](https://github.com/wesleywerner/nova-pinball-engine).

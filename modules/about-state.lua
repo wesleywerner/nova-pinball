@@ -26,11 +26,12 @@ local aboutLines = {
     {"NOVA PINBALL", "VERSION " .. VERSION},
     {"MADE WITH LÖVE", "love2d.org"},
     {"COPYLEFT", "GNU General Public License"},
-    {"YOU ARE FREE", "Copy, Study, Modify the game"},
+    {"YOU ARE FREE TO", "Copy, Study, Modify the game"},
 
-    {"FONT", "CREDITS", 0},
-    {"LED Board-7", "Sizenko Alexander"},
-    {"Erbos Draco NBP", "Nate Halley"},
+    {"CREDITS", "", 0},
+    {"LED Board-7 Font", "Sizenko Alexander"},
+    {"Erbos Draco NBP Font", "Nate Halley"},
+    {"SFXR SOUND GENERATOR", "Tomas Pettersson - www.drpetter.se"},
 
     {"SPECIAL THANKS", "", 0},
     {":)", "JADIE"},
