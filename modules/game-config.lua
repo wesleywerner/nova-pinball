@@ -70,7 +70,7 @@ end
 
 -- Save config to file
 function config:save()
-    local pickle = require("pickle")
+    local pickle = require("modules.pickle")
     local data = pickle.pickle(config.values)
     love.filesystem.write("config", data, nil)
 end
