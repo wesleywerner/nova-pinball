@@ -116,10 +116,13 @@ function play:load()
     sounds.wormhole:setLooping(true)
     sounds.wormholeClose = love.audio.newSource("audio/wormhole-close.wav")
     sounds.timewarp = love.audio.newSource("audio/timewarp.wav")
-    sounds.blackhole = love.audio.newSource("audio/blackhole-release.wav")
-    sounds.blackholeLock = love.audio.newSource("audio/blackhole-lock.wav")
+    sounds.blackHole = love.audio.newSource("audio/blackhole.wav")
+    sounds.blackHoleRelease = love.audio.newSource("audio/blackhole-release.wav")
+    sounds.blackHoleLock = love.audio.newSource("audio/blackhole-lock.wav")
     sounds.nudge = love.audio.newSource("audio/nudge.wav")
     sounds.hydrogenReleased = love.audio.newSource("audio/hydrogen-released.wav")
+    sounds.fusion1 = sounds.hydrogenReleased
+    sounds.fusion2 = sounds.hydrogenReleased
     sounds.drained = love.audio.newSource("audio/ball-drained.wav")
     sounds.supergravityBonus = love.audio.newSource("audio/supergravity-bonus.wav")
 
@@ -683,12 +686,12 @@ end
 
 -- When a ball is locked with pinball:lockBall()
 function pinball.ballLocked(id)
-    love.audio.play(sounds.blackholeLock)
+    love.audio.play(sounds.blackHoleLock)
 end
 
 -- When a locked ball delay expired and is released into play
 function pinball.ballUnlocked(id)
-    love.audio.play(sounds.blackhole)
+    love.audio.play(sounds.blackHoleRelease)
 end
 
 -- The ball made contact with a tagged component
@@ -797,10 +800,12 @@ function mission.onMissionAdvanced(title)
         play.addScore(1500)
         led:add("Fusion first stage complete", "priority")
         spriteStates:item("wheel 1"):setVisible(true):scale(0.02)
+        love.audio.play(sounds.fusion1)
     elseif (title == "fusion stage 2") then
         play.addScore(1750)
         led:add("Fusion second stage complete", "priority")
         spriteStates:item("wheel 2"):setVisible(true):scale(0.02)
+        love.audio.play(sounds.fusion2)
     elseif (title == "fusion burn") then
         led:add("Fusion burning... ", "priority")
     elseif (title == "fusion unstable") then
@@ -860,6 +865,7 @@ end
 
 function play.showBlackHole()
     spriteStates:item("black hole"):setVisible(true):scale(0.2)
+    love.audio.play(sounds.blackHole)
 end
 
 function play.showWormhole()
@@ -975,15 +981,22 @@ function play:updateNudgeCounters(dt)
 end
 
 function play:resetGame()
+    -- Reposition the camera to default
+    self.previewPosition = 0
+    -- Reset mission progress and sprites
+    mission:reset()
+    play.resetMissionSprites()
+    -- Clear score and ball count
     play.score = 0
     play.scoreFormatted = "0"
     play.balls = 6
     pinball:newBall()
-    states:set("preview")
+    -- Prepare for the next game:
     led:clear()
     led:add("Welcome to Nova Pinball!", "long")
     led:add("Hit space to launch the ball", "sticky")
     play:flashAllTargets()
+    states:set("preview")
 end
 
 return play
