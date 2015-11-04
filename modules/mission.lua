@@ -125,6 +125,10 @@ function mission:reset()
     end
 end
 
+function mission:clear()
+    self.steps = {}
+end
+
 function mission:nextTarget()
     -- This step still has a delay
     if (self:current().wait) then return "wait" end

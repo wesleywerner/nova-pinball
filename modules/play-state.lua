@@ -188,19 +188,7 @@ function play:load()
     bumperManager:add("right kicker", "images/kicker.png", -1)
 
     self:loadTargets()
-
-    -- Define the mission goals
-    mission:define("red giant"):on("nova word")
-    mission:define("hydrogen release"):on("left ramp"):on("right ramp")
-    mission:define("fusion stage 1"):on("left targets"):on("left ramp"):on("left bumper")
-    mission:define("fusion stage 2"):on("right targets"):on("right ramp"):on("right bumper")
-    mission:define("fusion burn"):wait(60)      -- triggered via a timed delay
-    mission:define("fusion unstable"):wait(60)  -- ditto
-    mission:define("collapse star"):on("left ramp"):on("right ramp"):on("nova word")
-    mission:define("wormhole"):on("black hole"):on("black hole"):on("black hole")
-    mission:define("reset"):wait(7)
-    mission:start()
-
+    play:setupMission()
     play.positionDrawingElements()
 
     -- Pre-game welcome
@@ -225,6 +213,21 @@ function play:loadSprites()
     sprites.wormholeClouds = loadSprite("images/wormhole-clouds.png")
     sprites.starFlare = loadSprite("images/star-flare.png")
     sprites.star = loadSprite("images/stable-star.png")
+end
+
+function play:setupMission()
+    -- Define the mission goals
+    mission:clear()
+    mission:define("red giant"):on("nova word")
+    mission:define("hydrogen release"):on("left ramp"):on("right ramp")
+    mission:define("fusion stage 1"):on("left targets"):on("left ramp"):on("left bumper")
+    mission:define("fusion stage 2"):on("right targets"):on("right ramp"):on("right bumper")
+    mission:define("fusion burn"):wait(60)      -- triggered via a timed delay
+    mission:define("fusion unstable"):wait(60)  -- ditto
+    mission:define("collapse star"):on("left ramp"):on("right ramp"):on("nova word")
+    mission:define("wormhole"):on("black hole"):on("black hole"):on("black hole")
+    mission:define("reset"):wait(7)
+    mission:start()
 end
 
 -- Load and position the words target, the left and right spot targets.
@@ -1002,7 +1005,7 @@ function play:resetGame()
     -- Reposition the camera to default
     self.previewPosition = 0
     -- Reset mission progress and sprites
-    mission:reset()
+    play:setupMission()
     play.resetMissionSprites()
     -- Clear score and ball count
     play.score = 0
