@@ -36,9 +36,9 @@ config.settings = {
 function config:load()
     local exists = love.filesystem.exists("config")
     if (exists) then
-        local binser = require("modules.binser")
         local data, size = love.filesystem.read("config", nil)
-        config.values = binser.deserialize(data)
+        local pickle = require("pickle")
+        config.values = pickle.unpickle(data)
     end
     config:applyMissing()
 end
@@ -61,8 +61,8 @@ end
 
 -- Save config to file
 function config:save()
-    local binser = require("modules.binser")
-    local data = binser.serialize(config.values)
+    local pickle = require("pickle")
+    local data = pickle.pickle(config.values)
     love.filesystem.write("config", data, nil)
 end
 

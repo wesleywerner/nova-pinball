@@ -67,7 +67,7 @@ local waitingWords = {
 
 function play.loadTableFile()
     local mydata, size = love.filesystem.read("nova.pinball", nil)
-    local pickle = require("pickle")
+    local pickle = require("modules.pickle")
     local tableDefinition = pickle.unpickle(mydata)
     pinball:loadTable(tableDefinition)
 end
