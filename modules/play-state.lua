@@ -106,8 +106,12 @@ function play:load()
     states:set("preview")
 
     -- Load audio
+    sounds.leftFlipper = love.audio.newSource("audio/flipper.wav")
+    sounds.rightFlipper = love.audio.newSource("audio/flipper.wav")
     sounds.wall = love.audio.newSource("audio/wall.wav")
-    sounds.bumper = love.audio.newSource("audio/bumper.wav")
+    sounds.leftBumper = love.audio.newSource("audio/bumper.wav")
+    sounds.middleBumper = love.audio.newSource("audio/bumper.wav")
+    sounds.rightBumper = love.audio.newSource("audio/bumper.wav")
     sounds.wordBonus = love.audio.newSource("audio/wordbonus.wav")
     sounds.target = love.audio.newSource("audio/target.wav")
     sounds.ramp = love.audio.newSource("audio/ramp.wav")
@@ -188,13 +192,13 @@ function play:load()
     -- Define the mission goals
     mission:define("red giant"):on("nova word")
     mission:define("hydrogen release"):on("left ramp"):on("right ramp")
-    mission:define("fusion stage 1"):on("left targets"):on("left ramp")
-    mission:define("fusion stage 2"):on("right targets"):on("right ramp")
+    mission:define("fusion stage 1"):on("left targets"):on("left ramp"):on("left bumper")
+    mission:define("fusion stage 2"):on("right targets"):on("right ramp"):on("right bumper")
     mission:define("fusion burn"):wait(60)      -- triggered via a timed delay
     mission:define("fusion unstable"):wait(60)  -- ditto
     mission:define("collapse star"):on("left ramp"):on("right ramp"):on("nova word")
     mission:define("wormhole"):on("black hole"):on("black hole"):on("black hole")
-    mission:define("reset"):wait(15)
+    mission:define("reset"):wait(7)
     mission:start()
 
     play.positionDrawingElements()
@@ -408,8 +412,14 @@ function play:keypressed (key)
         if (key == "escape") then mainstate:set("menu") end
     elseif (states:on("play")) then
         if (key == "escape") then states:set("paused") end
-        if (key == "lshift" and not play.tilt) then pinball:moveLeftFlippers() end
-        if (key == "rshift" and not play.tilt) then pinball:moveRightFlippers() end
+        if (key == "lshift" and not play.tilt) then
+            love.audio.play(sounds.leftFlipper)
+            pinball:moveLeftFlippers()
+        end
+        if (key == "rshift" and not play.tilt) then
+            love.audio.play(sounds.rightFlipper)
+            pinball:moveRightFlippers()
+        end
         if (key == " ") then play:launchBall() end
     elseif (states:on("paused")) then
         if (key == " ") then states:set("play") end
@@ -712,14 +722,22 @@ function pinball.tagContact (tag, id)
         end
     end
 
-    if (tag == "left bumper" or tag == "middle bumper" or tag == "right bumper") then
+    if (tag == "left bumper") then
+        love.audio.play(sounds.leftBumper)
         play.addScore(500)
-        love.audio.play(sounds.bumper)
-    elseif (tag == "left kicker" or tag == "right kicker") then
-        play.addScore(750)
-        love.audio.play(sounds.bumper)
     end
-
+    if (tag == "middle bumper") then
+        love.audio.play(sounds.middleBumper)
+        play.addScore(500)
+    end
+    if (tag == "right bumper") then
+        love.audio.play(sounds.rightBumper)
+        play.addScore(500)
+    end
+    if (tag == "left kicker" or tag == "right kicker") then
+        play.addScore(750)
+        love.audio.play(sounds.leftBumper)
+    end
     if (tag == "left ramp" or tag == "right ramp") then
         love.audio.play(sounds.ramp)
     end
