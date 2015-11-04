@@ -391,7 +391,7 @@ function play:update (dt)
         led:update(dt)
         -- Scroll the camera up until the table is out of view
         if (self.previewPosition < pinball.table.size.height) then
-            self.previewPosition = self.previewPosition + (dt*100)
+            self.previewPosition = self.previewPosition + (dt*150)
             pinball.cfg.translateOffset.y = self.previewPosition
         else
             play:quitToScores()
