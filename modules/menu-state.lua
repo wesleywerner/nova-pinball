@@ -24,6 +24,7 @@ local selectedItem = 1
 local sprites = {}
 local spriteStates = spriteManager:new()
 local about = nil
+local menuSound = nil
 
 function thisState:load()
     self.state = stateManager:new()
@@ -47,6 +48,8 @@ function thisState:load()
     spr:setBlendmode("subtractive")
     spr.sprite.x = scrWidth / 2
     spr.sprite.y = scrHeight / 2
+    -- Menu sounds
+    menuSound = love.audio.newSource("audio/menu.wav", "static")
 end
 
 function thisState:update (dt)
@@ -62,9 +65,11 @@ end
 function thisState:keypressed (key)
     -- Menu navigation
     if (key == "up") then
+        love.audio.play(menuSound)
         selectedItem = selectedItem - 1
         if (selectedItem < 1) then selectedItem = #currentOptions end
     elseif (key == "down") then
+        love.audio.play(menuSound)
         selectedItem = selectedItem + 1
         if (selectedItem > #currentOptions) then selectedItem = 1 end
     end
@@ -163,8 +168,7 @@ end
 
 function thisState:menuAction()
     local item = currentOptions[selectedItem]
-
-    -- Main
+    love.audio.play(menuSound)
     if (item == "Play" or item == "Continue") then
         mainstate:set("play")
     elseif (item == "Scores") then
