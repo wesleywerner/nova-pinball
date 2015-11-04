@@ -545,6 +545,10 @@ function play:drawStats()
     love.graphics.setColor(255, 255, 255, 255)
     love.graphics.print("Balls:" .. play.balls, play.ballStatXPosition, 2)
     love.graphics.print("Score:" .. play.scoreFormatted, 10, 2)
+    if (DEBUG) then
+        love.graphics.setColor(255, 100, 100, 255)
+        love.graphics.print("DEBUG", play.ballStatXPosition-200, 2)
+    end
 end
 
 function play.updateShakeAnimation(dt)
