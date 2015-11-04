@@ -111,14 +111,18 @@ function mission:testState()
         self.currentIdx = self.currentIdx + 1
     else
         -- Reset the steps
-        self.currentIdx = 1
-        for _, step in pairs(self.steps) do
-            step.has = {}
-            if (step.waitDefault) then step.wait = step.waitDefault end
-        end
+        self:reset()
     end
     -- Fire the callback
     if (self.onMissionAdvanced) then self.onMissionAdvanced(completedTitle) end
+end
+
+function mission:reset()
+    self.currentIdx = 1
+    for _, step in pairs(self.steps) do
+        step.has = {}
+        if (step.waitDefault) then step.wait = step.waitDefault end
+    end
 end
 
 function mission:nextTarget()
