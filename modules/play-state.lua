@@ -415,11 +415,11 @@ function play:keypressed (key)
         if (key == "escape") then mainstate:set("menu") end
     elseif (states:on("play")) then
         if (key == "escape") then states:set("paused") end
-        if (key == "lshift" and not play.tilt) then
+        if (key == "lshift" or key == "left") and (not play.tilt) then
             aplay(sounds.leftFlipper)
             pinball:moveLeftFlippers()
         end
-        if (key == "rshift" and not play.tilt) then
+        if (key == "rshift" or key == "right") and (not play.tilt) then
             aplay(sounds.rightFlipper)
             pinball:moveRightFlippers()
         end
@@ -429,7 +429,7 @@ function play:keypressed (key)
         if (key == "escape") then mainstate:set("menu") end
     elseif (states:on("game over")) then
         -- Quick escape to the high score list on game over
-        if (key == "escape") then
+        if (key == "escape" or key == " ") then
             play:quitToScores()
         end
     end
@@ -447,8 +447,8 @@ function play:keypressed (key)
 end
 
 function play:keyreleased(key)
-    if (key == "lshift") then pinball:releaseLeftFlippers() end
-    if (key == "rshift") then pinball:releaseRightFlippers() end
+    if (key == "lshift" or key == "left") then pinball:releaseLeftFlippers() end
+    if (key == "rshift" or key == "right") then pinball:releaseRightFlippers() end
 
     -- Apply any config settings
     if (key == "enter" or key == "return" or key == " ") then
@@ -624,8 +624,13 @@ function play.updateLedDisplayMessages(dt)
 end
 
 function pinball.drawWall (points)
-    --love.graphics.setLineWidth (6)
-    --love.graphics.setColor(92, 201, 201, 255)
+    -- Fat
+    love.graphics.setLineWidth(6)
+    love.graphics.setColor(55, 53, 140, 255)
+    love.graphics.line(points)
+    ---- Thin
+    --love.graphics.setLineWidth(3)
+    --love.graphics.setColor(38, 68, 114, 255)
     --love.graphics.line(points)
 end
 
