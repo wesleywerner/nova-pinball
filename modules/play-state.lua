@@ -319,15 +319,6 @@ function play:loadTargets()
     target:setOnImage("images/circle-target-on.png")
     target:setFlashImage("images/circle-target-flash.png")
     target:addToGroup("right targets")
-    -- Right 3
-    local x, y = pinball:getObjectXY("dot3")
-    local target = targets.rightTargets:add("dot3")
-    target.x = x
-    target.y = y
-    target:setOffImage("images/circle-target-off.png")
-    target:setOnImage("images/circle-target-on.png")
-    target:setFlashImage("images/circle-target-flash.png")
-    target:addToGroup("right targets")
 
     -- Add ramp indicator lights as pseudo targets (no hit interaction here)
     targets.rampLights = targetManager:new()
