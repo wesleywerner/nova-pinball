@@ -707,8 +707,8 @@ end
 function pinball.ballDrained (ballsInPlay)
     aplay(sounds.drained)
     if (play.safeMode > 0) then
+        play:launchBall(false)
         led:add("Ball Saved", "priority")
-        pinball:newBall()
     elseif (ballsInPlay == 0) then
         led:add("Ball drained", "priority")
         play.balls = play.balls - 1
