@@ -15,10 +15,10 @@ config.settings = {
     options = {"LED", "Lights", "Both", "None"},
     values = {1, 2, 3, 4},
     default = 3,
-    details = {"Words in the LED display",
-              "Flashing Lights",
+    details = {"Hints in the LED display",
+              "Lights up the next goal",
               "Words & Lights",
-              "No Hints"
+              "No Mission Hints (Expert Mode)"
               }
     },
     {meta = "fullscreen",
@@ -35,8 +35,8 @@ config.settings = {
     options = {"On", "Off"},
     values = {1, 2},
     default = 1,
-    details = {"Noisy",
-              "Silence"
+    details = {"",
+              ""
               }
     },
     {meta = "music",
@@ -44,8 +44,8 @@ config.settings = {
     options = {"On", "Off"},
     values = {1, 2},
     default = 1,
-    details = {"Music",
-              "Silence"
+    details = {"",
+              ""
               }
     },
 }
