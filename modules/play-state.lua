@@ -60,6 +60,9 @@ play.nudgeCooldown = 5
 play.nudgeTimer = play.nudgeCooldown
 -- Too many nudges in a short time tilts the game (flippers turn off)
 play.tilt = false
+-- Pre-draw walls onto a canvas (performance optimization)
+play.predraw = true
+play.wallCanvas = nil
 
 -- A lookup of mission targets and their human readable texts
 local missionDescriptions = {
@@ -190,6 +193,11 @@ function play:load()
     self:loadTargets()
     play:setupMission()
     play.positionDrawingElements()
+
+    -- Pre-draw walls now
+    play.wallCanvas = love.graphics.newCanvas(scrWidth, pinball.table.size.height)
+    pinball:draw()
+    play.predraw = false
 
     -- Pre-game welcome
     led:add("Welcome to Nova Pinball!", "long")
@@ -480,6 +488,10 @@ function play:draw ( )
     -- Draw the pinball components
     pinball:draw()
 
+    -- Draw the walls (at the top-most table point y1, that may be negative)
+    love.graphics.draw(play.wallCanvas, 0, pinball.table.size.y1)
+
+    -- Draw bumpers
     targets.bumpers:draw()
 
     -- Draw the launch cover over the pinball components
@@ -615,14 +627,21 @@ function play.updateLedDisplayMessages(dt)
 end
 
 function pinball.drawWall (points)
-    -- Fat
-    love.graphics.setLineWidth(6)
-    love.graphics.setColor(55, 53, 140, 255)
-    love.graphics.line(points)
-    ---- Thin
-    --love.graphics.setLineWidth(3)
-    --love.graphics.setColor(38, 68, 114, 255)
-    --love.graphics.line(points)
+    -- Draw the table walls onto a canvas
+    if (play.predraw) then
+        -- Accommodate points that go into the negative Y-axiz
+        local YInc = (pinball.table.size.y1 < 0) and pinball.table.size.y1*-1 or 0
+        for i = 1, #points - 1, 2 do
+            local yp = points[i+1] + YInc
+            points[i+1] = yp
+        end
+        play.wallCanvas:renderTo( function()
+            love.graphics.setLineWidth(6)
+            love.graphics.setColor(55, 53, 140, 255)
+            love.graphics.line(points)
+            end
+        )
+    end
 end
 
 function pinball.drawBumper (tag, x, y, r)
