@@ -914,6 +914,8 @@ function play.showWormhole()
     spriteStates:item("worm hole clouds"):setVisible(true):scale(0.3)
     aplay(sounds.wormhole)
     aplay(sounds.timewarp)
+    -- Activate safe mode during the wormhole
+    play.activateBallSaver()
 end
 
 function play.insertBonusMission()
