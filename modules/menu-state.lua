@@ -50,7 +50,7 @@ function thisState:load()
     spr.sprite.y = scrHeight / 2
     -- Menu sounds
     menuSound = love.audio.newSource("audio/menu.wav", "static")
-    playlist:play()
+    if (cfg:get("music") == 1) then playlist:play() end
 end
 
 function thisState:update (dt)
@@ -84,8 +84,15 @@ function thisState:keypressed (key)
         end
     elseif (self.state:on("config")) then
         if (key == "escape") then
-            -- Save config
+            -- Apply window/fullscreen
             love.window.setFullscreen(cfg:get("fullscreen") == 1)
+            -- Play/Stop music
+            if (cfg:get("music") == 1) then
+                playlist:play()
+            else
+                playlist:stop()
+            end
+            -- Save config
             cfg:save()
             -- Escape to the main menu
             self.state:set("main")
