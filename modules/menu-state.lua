@@ -124,7 +124,8 @@ function thisState:keyreleased(key)
 end
 
 function thisState:drawOptionsMenu()
-   local y = 100
+    love.graphics.setFont(largeFont)
+    local y = 100
     local color
     for _, m in ipairs(currentOptions) do
         if (currentOptions[selectedItem] == m) then
@@ -134,7 +135,7 @@ function thisState:drawOptionsMenu()
             color = {200, 200, 255, 255}
         end
         printShadowText(m, y, color)
-        y = y + 100
+        y = y + 80
     end
 end
 
@@ -142,6 +143,7 @@ function thisState:drawSelectedOptionDescription()
     local setting = cfg.settings[selectedItem]
     local value = cfg.values[setting.meta]
     local detail = setting.details[value]
+    love.graphics.setFont(smallFont)
     printShadowText(detail, scrHeight - 60, {200, 255, 200, 255})
 end
 
