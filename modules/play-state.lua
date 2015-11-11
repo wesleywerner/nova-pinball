@@ -327,16 +327,16 @@ function play:loadTargets()
     local target = targets.rampLights:add("left ramp")
     target.x = x
     target.y = y
-    target:setOffImage("images/arrow-indicator-off.png")
+    target:setOffImage("images/slingshot-off.png")
     --target:setOnImage("images/arrow-indicator-off.png")
-    target:setFlashImage("images/arrow-indicator-on.png")
+    target:setFlashImage("images/slingshot-on.png")
     -- Right
     local x, y = pinball:getObjectXY("right ramp indicator")
     local target = targets.rampLights:add("right ramp")
     target.x = x
     target.y = y
-    target:setOffImage("images/arrow-indicator-off.png")
-    target:setFlashImage("images/arrow-indicator-on.png")
+    target:setOffImage("images/slingshot-off.png")
+    target:setFlashImage("images/slingshot-on.png")
 
     -- Bumper lights
     targets.bumpers = targetManager:new()
