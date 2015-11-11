@@ -977,11 +977,16 @@ function play:launchBall(firstLaunch)
         led:clear()
         -- Stop the pre-launch scroll effect
         pinball.cfg.translateOffset.y = 0
+        -- Switch to the play game state
         states:set("play")
+        -- Display the LED message
         led:add("Make the star go Nova", "priority")
-        play:resetAllTargets()
         -- Light up the first target (the mission check callback won't fire at this point as no goals are met yet)
+        play:resetAllTargets()
         targets.wordTarget:flash("nova word")
+        -- First ball gets a safe period
+        play.activateBallSaver()
+        -- Play the launch sound
         aplay(sounds.launch)
     else
         -- Launch another ball, or shake the table
