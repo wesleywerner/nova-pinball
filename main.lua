@@ -16,8 +16,8 @@
 -- Written by Wesley "keyboard monkey" Werner 2015
 -- https://github.com/wesleywerner/
 
-VERSION = "0.1.1"
-DEBUG = false
+VERSION = "0.1.1-dev"
+DEBUG = true
 spriteManager = require("modules.sprite-state-manager")
 stateManager = require ("modules.states")
 playstate = nil
@@ -52,6 +52,7 @@ function love.load()
 end
 
 function love.update (dt)
+    dt = math.min(1/60, dt)
     mainstate:update(dt)
     if (mainstate:on("play")) then
         playstate:update(dt)
