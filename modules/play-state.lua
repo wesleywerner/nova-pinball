@@ -331,7 +331,7 @@ function play:loadTargets()
     -- Add ramp indicator lights as pseudo targets (no hit interaction here)
     targets.rampLights = targetManager:new()
     -- Left
-    local x, y = pinball:getObjectXY("left ramp indicator")
+    local x, y = pinball:getObjectXY("left ramp slingshot")
     local target = targets.rampLights:add("left ramp")
     target.x = x
     target.y = y
@@ -339,7 +339,7 @@ function play:loadTargets()
     --target:setOnImage("images/arrow-indicator-off.png")
     target:setFlashImage("images/slingshot-on.png")
     -- Right
-    local x, y = pinball:getObjectXY("right ramp indicator")
+    local x, y = pinball:getObjectXY("right ramp slingshot")
     local target = targets.rampLights:add("right ramp")
     target.x = x
     target.y = y
