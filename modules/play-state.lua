@@ -443,6 +443,10 @@ function play:keypressed (key)
     if (DEBUG and key == "e") then
         play:endGame()
     end
+    -- extra ball
+    if (DEBUG and key == "b") then
+        pinball:newBall()        
+    end
 end
 
 function play:keyreleased(key)
@@ -992,9 +996,8 @@ function play:launchBall(firstLaunch)
         aplay(sounds.launch)
     else
         -- Launch another ball, or shake the table
-        if (#pinball.bodies.balls == 0) then
+        if (#pinball.bodies.balls == 0 or play.safeMode > 0) then
             pinball:newBall()
-            led:add("Make the star go Nova", "priority")
             -- Reset tilt and nudges
             play.tilt = false
             play.nudgeCount = 0
