@@ -50,6 +50,7 @@ function thisState:load()
     spr.sprite.y = scrHeight / 2
     -- Menu sounds
     menuSound = love.audio.newSource("audio/menu.wav", "static")
+    playlist:play()
 end
 
 function thisState:update (dt)
