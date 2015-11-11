@@ -39,6 +39,15 @@ config.settings = {
               "Silence"
               }
     },
+    {meta = "music",
+    title = "Music",
+    options = {"On", "Off"},
+    values = {1, 2},
+    default = 1,
+    details = {"Music",
+              "Silence"
+              }
+    },
 }
 
 -- Load config from file
