@@ -25,6 +25,7 @@ mainstate = nil
 menu = nil
 scores = nil
 cfg = nil
+playlist = nil
 largeFont = love.graphics.newFont("fonts/advanced_led_board-7.ttf", 37)
 smallFont = love.graphics.newFont("fonts/erbos_draco_1st_open_nbp.ttf", 20)
 local splash = nil
@@ -56,10 +57,12 @@ function love.update (dt)
     mainstate:update(dt)
     if (mainstate:on("play")) then
         playstate:update(dt)
+        playlist:update(dt)
     elseif (mainstate:on("splash")) then
         splash:update(dt)
     elseif (mainstate:on("menu")) then
         menu:update(dt)
+        playlist:update(dt)
     end
 end
 
@@ -102,10 +105,12 @@ function loadAllModules()
         playstate = require("modules.play-state")
         scores = require("modules.scores")
         cfg = require("modules.game-config")
+        playlist = require("music.playlist")
         cfg:load()
         menu:load()
         playstate:load()
         scores:load()
+        playlist:load()
     end
 end
 
