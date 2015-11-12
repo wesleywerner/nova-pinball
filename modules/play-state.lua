@@ -996,7 +996,7 @@ function play:launchBall(firstLaunch)
         aplay(sounds.launch)
     else
         -- Launch another ball, or shake the table
-        if (#pinball.bodies.balls == 0 or play.safeMode > 0) then
+        if (#pinball.bodies.balls == 0) then
             pinball:newBall()
             -- Reset tilt and nudges
             play.tilt = false
