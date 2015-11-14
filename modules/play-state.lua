@@ -19,7 +19,6 @@
 local play = {}
 local states = nil
 
--- TODO Require these in load()
 local pinball = require ("nova-pinball-engine")
 local targetManager = require("modules.targets")
 local bumperManager = require("modules.bumpers")
@@ -32,17 +31,6 @@ local sounds = {}
 -- Stores a collection of all the targets on the table.
 local targets = {}
 
-function play.loadTableFile()
-    local mydata, size = love.filesystem.read("nova.pinball", nil)
-    local pickle = require("modules.pickle")
-    local tableDefinition = pickle.unpickle(mydata)
-    pinball:loadTable(tableDefinition)
-end
-
-function play:gameInProgress()
-    return states:on("play") or states:on("paused")
-end
-
 -- The main resource loading point for this pinball game
 function play:load()
 
@@ -54,7 +42,7 @@ function play:load()
     love.graphics.setBackgroundColor(0, 0, 0)
 
     -- Load the table layout into the pinball engine
-    play.loadTableFile()
+    play.loadTableLayout()
     play.setupStartingValues()
 
     play.setupBackgroundImage()
@@ -69,169 +57,6 @@ function play:load()
     led:add("Hit space to launch the ball", "sticky")
 
     play:flashAllTargets()
-end
-
-function play:loadSprites()
-    sprites.background = loadSprite ("images/background.png")
-    sprites.launchCover = loadSprite("images/launcher-cover.png")
-    sprites.ball = loadSprite ("images/ball.png")
-    sprites.leftflipper = loadSprite ("images/leftflip.png")
-    sprites.blackhole = loadSprite("images/black-hole.png")
-    sprites.wheel1 = loadSprite("images/nova-wheel.png")
-    sprites.wheel2 = loadSprite("images/nova-wheel.png")
-    sprites.rays = loadSprite("images/nova-rays.png")
-    sprites.redStar = loadSprite("images/red-star.png")
-    sprites.wormholeRays = loadSprite("images/wormhole-rays.png")
-    sprites.wormhole = loadSprite("images/wormhole-background.png")
-    sprites.wormholeClouds = loadSprite("images/wormhole-clouds.png")
-    sprites.starFlare = loadSprite("images/star-flare.png")
-    sprites.star = loadSprite("images/stable-star.png")
-end
-
-function play:setupMission()
-    -- Define the mission goals
-    mission:clear()
-    mission:define("red giant"):on("nova word")
-    mission:define("hydrogen release"):on("left ramp"):on("right ramp")
-    mission:define("fusion stage 1"):on("left targets"):on("left ramp"):on("left bumper")
-    mission:define("fusion stage 2"):on("right targets"):on("right ramp"):on("right bumper")
-    mission:define("fusion burn"):wait(30):on("left ramp"):on("right ramp"):on("nova word")
-    mission:define("fusion unstable"):wait(30):on("left ramp"):on("right ramp"):on("nova word")
-    mission:define("collapse star"):on("left ramp"):on("right ramp"):on("nova word")
-    mission:define("wormhole"):on("black hole"):on("black hole"):on("black hole")
-    mission:define("reset"):wait(7)
-    mission:start()
-end
-
--- Load and position the words target, the left and right spot targets.
-function play:loadTargets()
-
-    -- "NOVA" word target
-    targets.wordTarget = targetManager:new()
-    targets.wordTarget.onComplete = play.onWordTargetComplete
-    targets.wordTarget.onSwitch = play.onWordTargetSwitch
-    -- N
-    local x, y = pinball:getObjectXY("n")
-    local target = targets.wordTarget:add("n")
-    target.x = x
-    target.y = y
-    target:setOffImage("images/word-target-off.png")
-    target:setOnImage("images/word-target-n.png")
-    target:setFlashImage("images/word-target-flash.png")
-    target:addToGroup("nova word")
-    -- O
-    local x, y = pinball:getObjectXY("o")
-    local target = targets.wordTarget:add("o")
-    target.x = x
-    target.y = y
-    target:setOffImage("images/word-target-off.png")
-    target:setOnImage("images/word-target-o.png")
-    target:setFlashImage("images/word-target-flash.png")
-    target:addToGroup("nova word")
-    -- V
-    local x, y = pinball:getObjectXY("v")
-    local target = targets.wordTarget:add("v")
-    target.x = x
-    target.y = y
-    target:setOffImage("images/word-target-off.png")
-    target:setOnImage("images/word-target-v.png")
-    target:setFlashImage("images/word-target-flash.png")
-    target:addToGroup("nova word")
-    -- A
-    local x, y = pinball:getObjectXY("a")
-    local target = targets.wordTarget:add("a")
-    target.x = x
-    target.y = y
-    target:setOffImage("images/word-target-off.png")
-    target:setOnImage("images/word-target-a.png")
-    target:setFlashImage("images/word-target-flash.png")
-    target:addToGroup("nova word")
-
-    -- Set up the left targets
-    targets.leftTargets = targetManager:new()
-    targets.leftTargets.onComplete = play.onLeftTargetsComplete
-    targets.leftTargets.onSwitch = play.onLeftTargetSwitch
-    -- left 1
-    local x, y = pinball:getObjectXY("dot4")
-    local target = targets.leftTargets:add("dot4")
-    target.x = x
-    target.y = y
-    target:setOffImage("images/circle-target-off.png")
-    target:setOnImage("images/circle-target-on.png")
-    target:setFlashImage("images/circle-target-flash.png")
-    target:addToGroup("left targets")
-    -- left 2
-    local x, y = pinball:getObjectXY("dot5")
-    local target = targets.leftTargets:add("dot5")
-    target.x = x
-    target.y = y
-    target:setOffImage("images/circle-target-off.png")
-    target:setOnImage("images/circle-target-on.png")
-    target:setFlashImage("images/circle-target-flash.png")
-    target:addToGroup("left targets")
-
-    -- Set up the right targets
-    targets.rightTargets = targetManager:new()
-    targets.rightTargets.onComplete = play.onRightTargetsComplete
-    targets.rightTargets.onSwitch = play.onRightTargetsSwitch
-    -- Right 1
-    local x, y = pinball:getObjectXY("dot1")
-    local target = targets.rightTargets:add("dot1")
-    target.x = x
-    target.y = y
-    target:setOffImage("images/circle-target-off.png")
-    target:setOnImage("images/circle-target-on.png")
-    target:setFlashImage("images/circle-target-flash.png")
-    target:addToGroup("right targets")
-    -- Right 2
-    local x, y = pinball:getObjectXY("dot2")
-    local target = targets.rightTargets:add("dot2")
-    target.x = x
-    target.y = y
-    target:setOffImage("images/circle-target-off.png")
-    target:setOnImage("images/circle-target-on.png")
-    target:setFlashImage("images/circle-target-flash.png")
-    target:addToGroup("right targets")
-
-    -- Add ramp indicator lights as pseudo targets (no hit interaction here)
-    targets.rampLights = targetManager:new()
-    -- Left
-    local x, y = pinball:getObjectXY("left ramp slingshot")
-    local target = targets.rampLights:add("left ramp")
-    target.x = x
-    target.y = y
-    target:setOffImage("images/slingshot-off.png")
-    --target:setOnImage("images/arrow-indicator-off.png")
-    target:setFlashImage("images/slingshot-on.png")
-    -- Right
-    local x, y = pinball:getObjectXY("right ramp slingshot")
-    local target = targets.rampLights:add("right ramp")
-    target.x = x
-    target.y = y
-    target:setOffImage("images/slingshot-off.png")
-    target:setFlashImage("images/slingshot-on.png")
-
-    -- Bumper lights
-    targets.bumpers = targetManager:new()
-    -- Left
-    local x, y = pinball:getObjectXY("left bumper")
-    local target = targets.bumpers:add("left bumper")
-    target.x = x
-    target.y = y
-    target:setFlashImage("images/bumper-flash.png")
-    -- Middle
-    local x, y = pinball:getObjectXY("middle bumper")
-    local target = targets.bumpers:add("middle bumper")
-    target.x = x
-    target.y = y
-    target:setFlashImage("images/bumper-flash.png")
-    -- Right
-    local x, y = pinball:getObjectXY("right bumper")
-    local target = targets.bumpers:add("right bumper")
-    target.x = x
-    target.y = y
-    target:setFlashImage("images/bumper-flash.png")
-
 end
 
 function play:update (dt)
@@ -391,6 +216,11 @@ end
 function play:resize (w, h)
     play.positionDrawingElements()
     pinball:resize (w, h)
+end
+
+-- Returns if a game is in progress
+function play:gameInProgress()
+    return states:on("play") or states:on("paused")
 end
 
 -- Set the game over state and position the camera for upward scroll
@@ -942,6 +772,14 @@ end
 -- // SETUP AND LOAD FUNCTIONS
 
 
+-- Loads the table layout from file
+function play.loadTableLayout()
+    local mydata, size = love.filesystem.read("nova.pinball", nil)
+    local pickle = require("modules.pickle")
+    local tableDefinition = pickle.unpickle(mydata)
+    pinball:loadTable(tableDefinition)
+end
+
 -- Set up the states that manage play.
 function play.setupPlayStates()
     states = stateManager:new()
@@ -1093,6 +931,171 @@ function play.setupWallsCanvas()
     play.wallCanvas = love.graphics.newCanvas(scrWidth, pinball.table.size.height)
     pinball:draw()
     play.predraw = false
+end
+
+-- Load game images and sprites
+function play:loadSprites()
+    sprites.background = loadSprite ("images/background.png")
+    sprites.launchCover = loadSprite("images/launcher-cover.png")
+    sprites.ball = loadSprite ("images/ball.png")
+    sprites.leftflipper = loadSprite ("images/leftflip.png")
+    sprites.blackhole = loadSprite("images/black-hole.png")
+    sprites.wheel1 = loadSprite("images/nova-wheel.png")
+    sprites.wheel2 = loadSprite("images/nova-wheel.png")
+    sprites.rays = loadSprite("images/nova-rays.png")
+    sprites.redStar = loadSprite("images/red-star.png")
+    sprites.wormholeRays = loadSprite("images/wormhole-rays.png")
+    sprites.wormhole = loadSprite("images/wormhole-background.png")
+    sprites.wormholeClouds = loadSprite("images/wormhole-clouds.png")
+    sprites.starFlare = loadSprite("images/star-flare.png")
+    sprites.star = loadSprite("images/stable-star.png")
+end
+
+-- Set up the missions to complete
+function play:setupMission()
+    -- Define the mission goals
+    mission:clear()
+    mission:define("red giant"):on("nova word")
+    mission:define("hydrogen release"):on("left ramp"):on("right ramp")
+    mission:define("fusion stage 1"):on("left targets"):on("left ramp"):on("left bumper")
+    mission:define("fusion stage 2"):on("right targets"):on("right ramp"):on("right bumper")
+    mission:define("fusion burn"):wait(30):on("left ramp"):on("right ramp"):on("nova word")
+    mission:define("fusion unstable"):wait(30):on("left ramp"):on("right ramp"):on("nova word")
+    mission:define("collapse star"):on("left ramp"):on("right ramp"):on("nova word")
+    mission:define("wormhole"):on("black hole"):on("black hole"):on("black hole")
+    mission:define("reset"):wait(7)
+    mission:start()
+end
+
+-- Load and position the words target, the left and right spot targets.
+function play:loadTargets()
+
+    -- "NOVA" word target
+    targets.wordTarget = targetManager:new()
+    targets.wordTarget.onComplete = play.onWordTargetComplete
+    targets.wordTarget.onSwitch = play.onWordTargetSwitch
+    -- N
+    local x, y = pinball:getObjectXY("n")
+    local target = targets.wordTarget:add("n")
+    target.x = x
+    target.y = y
+    target:setOffImage("images/word-target-off.png")
+    target:setOnImage("images/word-target-n.png")
+    target:setFlashImage("images/word-target-flash.png")
+    target:addToGroup("nova word")
+    -- O
+    local x, y = pinball:getObjectXY("o")
+    local target = targets.wordTarget:add("o")
+    target.x = x
+    target.y = y
+    target:setOffImage("images/word-target-off.png")
+    target:setOnImage("images/word-target-o.png")
+    target:setFlashImage("images/word-target-flash.png")
+    target:addToGroup("nova word")
+    -- V
+    local x, y = pinball:getObjectXY("v")
+    local target = targets.wordTarget:add("v")
+    target.x = x
+    target.y = y
+    target:setOffImage("images/word-target-off.png")
+    target:setOnImage("images/word-target-v.png")
+    target:setFlashImage("images/word-target-flash.png")
+    target:addToGroup("nova word")
+    -- A
+    local x, y = pinball:getObjectXY("a")
+    local target = targets.wordTarget:add("a")
+    target.x = x
+    target.y = y
+    target:setOffImage("images/word-target-off.png")
+    target:setOnImage("images/word-target-a.png")
+    target:setFlashImage("images/word-target-flash.png")
+    target:addToGroup("nova word")
+
+    -- Set up the left targets
+    targets.leftTargets = targetManager:new()
+    targets.leftTargets.onComplete = play.onLeftTargetsComplete
+    targets.leftTargets.onSwitch = play.onLeftTargetSwitch
+    -- left 1
+    local x, y = pinball:getObjectXY("dot4")
+    local target = targets.leftTargets:add("dot4")
+    target.x = x
+    target.y = y
+    target:setOffImage("images/circle-target-off.png")
+    target:setOnImage("images/circle-target-on.png")
+    target:setFlashImage("images/circle-target-flash.png")
+    target:addToGroup("left targets")
+    -- left 2
+    local x, y = pinball:getObjectXY("dot5")
+    local target = targets.leftTargets:add("dot5")
+    target.x = x
+    target.y = y
+    target:setOffImage("images/circle-target-off.png")
+    target:setOnImage("images/circle-target-on.png")
+    target:setFlashImage("images/circle-target-flash.png")
+    target:addToGroup("left targets")
+
+    -- Set up the right targets
+    targets.rightTargets = targetManager:new()
+    targets.rightTargets.onComplete = play.onRightTargetsComplete
+    targets.rightTargets.onSwitch = play.onRightTargetsSwitch
+    -- Right 1
+    local x, y = pinball:getObjectXY("dot1")
+    local target = targets.rightTargets:add("dot1")
+    target.x = x
+    target.y = y
+    target:setOffImage("images/circle-target-off.png")
+    target:setOnImage("images/circle-target-on.png")
+    target:setFlashImage("images/circle-target-flash.png")
+    target:addToGroup("right targets")
+    -- Right 2
+    local x, y = pinball:getObjectXY("dot2")
+    local target = targets.rightTargets:add("dot2")
+    target.x = x
+    target.y = y
+    target:setOffImage("images/circle-target-off.png")
+    target:setOnImage("images/circle-target-on.png")
+    target:setFlashImage("images/circle-target-flash.png")
+    target:addToGroup("right targets")
+
+    -- Add ramp indicator lights as pseudo targets (no hit interaction here)
+    targets.rampLights = targetManager:new()
+    -- Left
+    local x, y = pinball:getObjectXY("left ramp slingshot")
+    local target = targets.rampLights:add("left ramp")
+    target.x = x
+    target.y = y
+    target:setOffImage("images/slingshot-off.png")
+    --target:setOnImage("images/arrow-indicator-off.png")
+    target:setFlashImage("images/slingshot-on.png")
+    -- Right
+    local x, y = pinball:getObjectXY("right ramp slingshot")
+    local target = targets.rampLights:add("right ramp")
+    target.x = x
+    target.y = y
+    target:setOffImage("images/slingshot-off.png")
+    target:setFlashImage("images/slingshot-on.png")
+
+    -- Bumper lights
+    targets.bumpers = targetManager:new()
+    -- Left
+    local x, y = pinball:getObjectXY("left bumper")
+    local target = targets.bumpers:add("left bumper")
+    target.x = x
+    target.y = y
+    target:setFlashImage("images/bumper-flash.png")
+    -- Middle
+    local x, y = pinball:getObjectXY("middle bumper")
+    local target = targets.bumpers:add("middle bumper")
+    target.x = x
+    target.y = y
+    target:setFlashImage("images/bumper-flash.png")
+    -- Right
+    local x, y = pinball:getObjectXY("right bumper")
+    local target = targets.bumpers:add("right bumper")
+    target.x = x
+    target.y = y
+    target:setFlashImage("images/bumper-flash.png")
+
 end
 
 return play
