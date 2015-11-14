@@ -127,18 +127,17 @@ function play:keypressed (key)
     end
 
     -- DEBUG Functions
-    -- advance the mission goal
-    if (DEBUG and key == "f2") then
-        mission:skipWait()
-        mission:check(mission:nextTarget())
-    end
-    -- end the game
-    if (DEBUG and key == "e") then
-        play.endGame()
-    end
-    -- extra ball
-    if (DEBUG and key == "b") then
-        pinball:newBall()        
+    if DEBUG then
+        if key == "f2" then
+            mission:skipWait()
+            mission:check(mission:nextTarget())
+        elseif key == "f10" then
+            play.endGame()
+        elseif key == "f1" then
+            pinball:newBall()
+        elseif key == "f3" then
+            play.activateBallSaver()
+        end
     end
 end
 
@@ -243,16 +242,30 @@ end
 
 function play.drawStatusBar()
     local height = 20
-    love.graphics.setColor(0, 0, 0, 255)
+    
+    if play.isSafe() then
+        local g = play.safeMode*(255/play.safeModePeriod)
+        love.graphics.setColor(0, g, 0, 155)
+    else
+        love.graphics.setColor(0, 0, 0, 255)
+    end
+    
     love.graphics.rectangle("fill", 0, 0, scrWidth, height)
     love.graphics.setFont(smallFont)
 
     love.graphics.setColor(255, 255, 255, 255)
     love.graphics.print("Balls:" .. play.balls, play.ballStatXPosition, 2)
     love.graphics.print("Score:" .. play.scoreFormatted, 10, 2)
+    
+    if play.isSafe() then
+        local g = play.safeMode*(255/play.safeModePeriod)
+        love.graphics.setColor(g, g, 0, 255)
+        love.graphics.print("BALL SAVER", play.ballStatXPosition-200, 2)
+    end
+    
     if (DEBUG) then
         love.graphics.setColor(255, 100, 100, 255)
-        love.graphics.print("DEBUG", play.ballStatXPosition-200, 2)
+        love.graphics.print("DEBUG", 340, 30)
     end
 end
 
@@ -433,7 +446,7 @@ end
 -- The number of balls still in play are passed.
 function pinball.ballDrained (ballsInPlay)
     aplay(sounds.drained)
-    if (play.safeMode > 0) then
+    if play.isSafe() then
         play.launchBall(false)
         led:add("Ball Saved", "priority")
     elseif (ballsInPlay == 0) then
@@ -670,12 +683,16 @@ function play.releaseBonusBall()
 end
 
 function play.updateSafemode(dt)
-    if (play.safeMode > 0) then
+    if play.isSafe() then
         play.safeMode = play.safeMode - dt
-        if (play.safeMode < 0) then
+        if not play.isSafe() then
             play.deactivateBallSaver()
         end
     end
+end
+
+function play.isSafe()
+    return play.safeMode > 0
 end
 
 function play.activateBallSaver()
@@ -904,7 +921,7 @@ function play.setupStartingValues()
     -- Safe-mode fires a new ball if any ball drains
     play.safeMode = 0
     -- How long safe-mode lasts (seconds)
-    play.safeModePeriod = 60
+    play.safeModePeriod = 30
     -- Position to draw the balls remaining stat line (gets updated on resize)
     play.ballStatXPosition = 0
     -- Store the current player score
