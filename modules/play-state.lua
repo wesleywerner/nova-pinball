@@ -35,7 +35,7 @@ local targets = {}
 function play:load()
 
     play.setupPlayStates()
-    play:loadSprites()
+    play.loadSprites()
     play.loadSounds()
 
     -- Set graphics
@@ -49,14 +49,14 @@ function play:load()
     play.setupSpritePositions()
     play.setupBumpers()
     self:loadTargets()
-    play:setupMission()
+    play.setupMission()
     play.setupWallsCanvas()
 
     -- Pre-game welcome
     led:add("Welcome to Nova Pinball!", "long")
     led:add("Hit space to launch the ball", "sticky")
 
-    play:flashAllTargets()
+    play.flashAllTargets()
 end
 
 function play:update (dt)
@@ -72,18 +72,18 @@ function play:update (dt)
     
     if (states:on("preview")) then
         led:update(dt)
-        if (self.previewPosition > -(pinball.table.size.height-scrHeight)) then
-            self.previewPosition = self.previewPosition - (dt*50)
-            pinball.cfg.translateOffset.y = self.previewPosition
+        if (play.previewPosition > -(pinball.table.size.height-scrHeight)) then
+            play.previewPosition = play.previewPosition - (dt*50)
+            pinball.cfg.translateOffset.y = play.previewPosition
         end
     elseif (states:on("game over")) then
         led:update(dt)
         -- Scroll the camera up until the table is out of view
-        if (self.previewPosition < pinball.table.size.height) then
-            self.previewPosition = self.previewPosition + (dt*150)
-            pinball.cfg.translateOffset.y = self.previewPosition
+        if (play.previewPosition < pinball.table.size.height) then
+            play.previewPosition = play.previewPosition + (dt*150)
+            pinball.cfg.translateOffset.y = play.previewPosition
         else
-            play:quitToScores()
+            play.quitToScores()
         end
     elseif (states:on("play")) then
         led:update(dt)
@@ -92,7 +92,7 @@ function play:update (dt)
         bumperManager:update(dt)
         spriteStates:update(dt)
         mission:update(dt)
-        play:updateNudgeCounters(dt)
+        play.updateNudgeCounters(dt)
         play.updateSafemode(dt)
     end
 
@@ -100,7 +100,7 @@ end
 
 function play:keypressed (key)
     if (states:on("preview")) then
-        if (key == " ") then play:launchBall(true) end
+        if (key == " ") then play.launchBall(true) end
         if (key == "escape") then mainstate:set("menu") end
     elseif (states:on("play")) then
         if (key == "escape") then states:set("paused") end
@@ -112,14 +112,14 @@ function play:keypressed (key)
             aplay(sounds.rightFlipper)
             pinball:moveRightFlippers()
         end
-        if (key == " ") then play:launchBall() end
+        if (key == " ") then play.launchBall() end
     elseif (states:on("paused")) then
         if (key == " ") then states:set("play") end
         if (key == "escape") then mainstate:set("menu") end
     elseif (states:on("game over")) then
         -- Quick escape to the high score list on game over
         if (key == "escape" or key == " ") then
-            play:quitToScores()
+            play.quitToScores()
         end
     end
 
@@ -131,7 +131,7 @@ function play:keypressed (key)
     end
     -- end the game
     if (DEBUG and key == "e") then
-        play:endGame()
+        play.endGame()
     end
     -- extra ball
     if (DEBUG and key == "b") then
@@ -195,7 +195,7 @@ function play:draw ( )
 
     -- Draw the status box
     love.graphics.origin()
-    play:drawStats()
+    play.drawStats()
 
     -- Draw the LED display
     love.graphics.setColor(0, 0, 0, 255)
@@ -219,26 +219,26 @@ function play:resize (w, h)
 end
 
 -- Returns if a game is in progress
-function play:gameInProgress()
+function play.gameInProgress()
     return states:on("play") or states:on("paused")
 end
 
 -- Set the game over state and position the camera for upward scroll
-function play:endGame()
+function play.endGame()
     pinball:resetCamera()
     states:set("game over")
-    self.previewPosition = -(pinball.table.size.height-scrHeight)
+    play.previewPosition = -(pinball.table.size.height-scrHeight)
 end
 
 -- Register the current score and quit to the scores list
-function play:quitToScores()
+function play.quitToScores()
     scores:register(play.score)
     self:resetGame()
     mainstate:set("menu")
     menu.state:set("scores")
 end
 
-function play:drawStats()
+function play.drawStats()
     local height = 20
     love.graphics.setColor(0, 0, 0, 255)
     love.graphics.rectangle("fill", 0, 0, scrWidth, height)
@@ -261,7 +261,7 @@ function play.updateShakeAnimation(dt)
 end
 
 -- Set flashing on all targets
-function play:flashAllTargets()
+function play.flashAllTargets()
     for _, targetGroup in pairs(targets) do
         targetGroup:reset()
         targetGroup:flash(nil)
@@ -269,7 +269,7 @@ function play:flashAllTargets()
 end
 
 -- Reset flashing and status on all targets
-function play:resetAllTargets()
+function play.resetAllTargets()
     for _, targetGroup in pairs(targets) do
         targetGroup:reset()
     end
@@ -431,12 +431,12 @@ end
 function pinball.ballDrained (ballsInPlay)
     aplay(sounds.drained)
     if (play.safeMode > 0) then
-        play:launchBall(false)
+        play.launchBall(false)
         led:add("Ball Saved", "priority")
     elseif (ballsInPlay == 0) then
         led:add("Ball drained", "priority")
         play.balls = play.balls - 1
-        if (play.balls == 0) then play:endGame() end
+        if (play.balls == 0) then play.endGame() end
     end
 end
 
@@ -698,7 +698,7 @@ function play.addScore(amount)
     end
 end
 
-function play:launchBall(firstLaunch)
+function play.launchBall(firstLaunch)
     if (firstLaunch) then
         led:clear()
         -- Stop the pre-launch scroll effect
@@ -708,7 +708,7 @@ function play:launchBall(firstLaunch)
         -- Display the LED message
         led:add("Make the star go Nova", "priority")
         -- Light up the first target (the mission check callback won't fire at this point as no goals are met yet)
-        play:resetAllTargets()
+        play.resetAllTargets()
         targets.wordTarget:flash("nova word")
         -- First ball gets a safe period
         play.activateBallSaver()
@@ -738,7 +738,7 @@ function play:launchBall(firstLaunch)
     end
 end
 
-function play:updateNudgeCounters(dt)
+function play.updateNudgeCounters(dt)
     if (play.nudgeCount > 0) then
         play.nudgeTimer = play.nudgeTimer - dt
         if (play.nudgeTimer < 0) then
@@ -749,11 +749,11 @@ function play:updateNudgeCounters(dt)
     end
 end
 
-function play:resetGame()
+function play.resetGame()
     -- Reposition the camera to default
-    self.previewPosition = 0
+    play.previewPosition = 0
     -- Reset mission progress and sprites
-    play:setupMission()
+    play.setupMission()
     play.resetMissionSprites()
     -- Clear score and ball count
     play.score = 0
@@ -764,7 +764,7 @@ function play:resetGame()
     led:clear()
     led:add("Welcome to Nova Pinball!", "long")
     led:add("Hit space to launch the ball", "sticky")
-    play:flashAllTargets()
+    play.flashAllTargets()
     states:set("preview")
 end
 
@@ -934,7 +934,7 @@ function play.setupWallsCanvas()
 end
 
 -- Load game images and sprites
-function play:loadSprites()
+function play.loadSprites()
     sprites.background = loadSprite ("images/background.png")
     sprites.launchCover = loadSprite("images/launcher-cover.png")
     sprites.ball = loadSprite ("images/ball.png")
@@ -952,7 +952,7 @@ function play:loadSprites()
 end
 
 -- Set up the missions to complete
-function play:setupMission()
+function play.setupMission()
     -- Define the mission goals
     mission:clear()
     mission:define("red giant"):on("nova word")
@@ -968,7 +968,7 @@ function play:setupMission()
 end
 
 -- Load and position the words target, the left and right spot targets.
-function play:loadTargets()
+function play.loadTargets()
 
     -- "NOVA" word target
     targets.wordTarget = targetManager:new()
