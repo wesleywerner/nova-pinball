@@ -18,6 +18,8 @@
 
 local play = {}
 local states = nil
+
+-- TODO Require these in load()
 local pinball = require ("nova-pinball-engine")
 local targetManager = require("modules.targets")
 local bumperManager = require("modules.bumpers")
@@ -29,40 +31,6 @@ local sounds = {}
 
 -- Stores a collection of all the targets on the table.
 local targets = {}
-
--- Calculated to center the table in the screen
-play.leftAlign = 0
-play.topAlign = 0
--- Show hints of the next target in the LED display
-play.ledHints = true
--- Pre-game scroll effect drawing offset
-play.previewPosition = 0
--- Table nudge shake offset
-play.nudgeOffset = 0
--- Tracks when to display the current mission goal on the LED display
-play.missionStatusUpdateTime = 0
--- Safe-mode fires a new ball if any ball drains
-play.safeMode = 0
--- How long safe-mode lasts (seconds)
-play.safeModePeriod = 60
--- Position to draw the balls remaining stat line (gets updated on resize)
-play.ballStatXPosition = 0
--- Store the current player score
-play.score = 0
-play.scoreFormatted = "0"
-play.balls = 6
--- Tracks how many nudges the player did
-play.nudgeCount = 0
--- Nudges before we tilt
-play.nudgeThreshhold = 3
--- Cooldown before decreasing the nudge count
-play.nudgeCooldown = 5
-play.nudgeTimer = play.nudgeCooldown
--- Too many nudges in a short time tilts the game (flippers turn off)
-play.tilt = false
--- Pre-draw walls onto a canvas (performance optimization)
-play.predraw = true
-play.wallCanvas = nil
 
 -- A lookup of mission targets and their human readable texts
 local missionDescriptions = {
@@ -92,112 +60,23 @@ end
 -- The main resource loading point for this pinball game
 function play:load()
 
-    -- Set up play states
-    states = stateManager:new()
-    states:add("preview")
-    states:add("play")
-    states:add("paused")
-    states:add("game over")
-
+    play.setupPlayStates()
     play:loadSprites()
+    play.loadSounds()
 
     -- Set graphics
     love.graphics.setBackgroundColor(0, 0, 0)
 
-    -- Set initial game state
-    pinball:newBall()
-    states:set("preview")
-
-    -- Load audio
-    sounds.leftFlipper = love.audio.newSource("audio/flipper.wav")
-    sounds.rightFlipper = love.audio.newSource("audio/flipper.wav")
-    sounds.wall = love.audio.newSource("audio/wall.wav")
-    sounds.leftBumper = love.audio.newSource("audio/bumper.wav")
-    sounds.middleBumper = love.audio.newSource("audio/bumper.wav")
-    sounds.rightBumper = love.audio.newSource("audio/bumper.wav")
-    sounds.wordBonus = love.audio.newSource("audio/wordbonus.wav")
-    sounds.target = love.audio.newSource("audio/target.wav")
-    sounds.ramp = love.audio.newSource("audio/ramp.wav")
-    sounds.launch = love.audio.newSource("audio/launch.wav")
-    sounds.wormhole = love.audio.newSource("audio/wormhole.wav")
-    sounds.wormhole:setLooping(true)
-    sounds.wormholeClose = love.audio.newSource("audio/wormhole-close.wav")
-    sounds.timewarp = love.audio.newSource("audio/timewarp.wav")
-    sounds.blackHole = love.audio.newSource("audio/blackhole.wav")
-    sounds.blackHoleRelease = love.audio.newSource("audio/blackhole-release.wav")
-    sounds.blackHoleLock = love.audio.newSource("audio/blackhole-lock.wav")
-    sounds.nudge = love.audio.newSource("audio/nudge.wav")
-    sounds.hydrogenReleased = love.audio.newSource("audio/hydrogen-released.wav")
-    sounds.fusion1 = sounds.hydrogenReleased
-    sounds.fusion2 = sounds.hydrogenReleased
-    sounds.drained = love.audio.newSource("audio/ball-drained.wav")
-    sounds.supergravityBonus = love.audio.newSource("audio/supergravity-bonus.wav")
-
     -- Load the table layout into the pinball engine
     play.loadTableFile()
+    play.setupStartingValues()
 
-    -- Position the background image
-    local border = 20
-    sprites.background.x = pinball.table.size.x1-border
-    sprites.background.y = pinball.table.size.y1-border
-    sprites.background.ox = 0   -- Position relative to top-left corner
-    sprites.background.oy = 0   -- and not the center of the image
-
-    -- Position the launch cover over the ball
-    sprites.launchCover.x = pinball.table.ball.x
-    sprites.launchCover.y = pinball.table.ball.y
-    
-    -- Center all these sprites around the black hole's position
-    local x, y = pinball:getObjectXY("black hole")
-    sprites.blackhole.x = x
-    sprites.blackhole.y = y
-    sprites.wormholeRays.x = x
-    sprites.wormholeRays.y = y
-    sprites.wormhole.x = x
-    sprites.wormhole.y = y
-    sprites.wormholeClouds.x = x
-    sprites.wormholeClouds.y = y
-    sprites.rays.x = x
-    sprites.rays.y = y
-    sprites.star.x = x
-    sprites.star.y = y
-    sprites.starFlare.x = x
-    sprites.starFlare.y = y
-    sprites.redStar.x = x
-    sprites.redStar.y = y
-    sprites.wheel1.x = x
-    sprites.wheel1.y = y
-    sprites.wheel2.x = x
-    sprites.wheel2.y = y
-    sprites.wheel2.scale = -1
-
-    -- Set up the sprite state manager
-    spriteStates:add("star", sprites.star)
-    spriteStates:add("wheel 1", sprites.wheel1):setRotation(0.01):setScale(0)
-    spriteStates:add("wheel 2", sprites.wheel2):setRotation(0.02):setScale(0)
-    spriteStates:add("rays", sprites.rays):setRotation(-0.1):setScale(0)
-    spriteStates:add("red star", sprites.redStar):setScale(0)
-    spriteStates:add("star flare", sprites.starFlare):setRotation(-0.01):setScale(0)
-    spriteStates:add("worm hole rays", sprites.wormholeRays):setRotation(0.1):setScale(0)
-    spriteStates:add("worm hole", sprites.wormhole):setRotation(0.1):setScale(0)
-    spriteStates:add("worm hole clouds", sprites.wormholeClouds):setRotation(0.6):setScale(0):setBlendmode("additive")
-    spriteStates:add("black hole", sprites.blackhole):setScale(0)
-
-    -- Set up the bumper manager
-    bumperManager:add("left bumper", "images/bumper.png")
-    bumperManager:add("middle bumper", "images/bumper.png")
-    bumperManager:add("right bumper", "images/bumper.png")
-    bumperManager:add("left kicker", "images/kicker.png")
-    bumperManager:add("right kicker", "images/kicker.png", -1)
-
+    play.setupBackgroundImage()
+    play.setupSpritePositions()
+    play.setupBumpers()
     self:loadTargets()
     play:setupMission()
-    play.positionDrawingElements()
-
-    -- Pre-draw walls now
-    play.wallCanvas = love.graphics.newCanvas(scrWidth, pinball.table.size.height)
-    pinball:draw()
-    play.predraw = false
+    play.setupWallsCanvas()
 
     -- Pre-game welcome
     led:add("Welcome to Nova Pinball!", "long")
@@ -994,6 +873,7 @@ function play:launchBall(firstLaunch)
         play.activateBallSaver()
         -- Play the launch sound
         aplay(sounds.launch)
+        pinball:newBall()
     else
         -- Launch another ball, or shake the table
         if (#pinball.bodies.balls == 0) then
@@ -1045,6 +925,163 @@ function play:resetGame()
     led:add("Hit space to launch the ball", "sticky")
     play:flashAllTargets()
     states:set("preview")
+end
+
+
+-- // SETUP AND LOAD FUNCTIONS
+
+
+-- Set up the states that manage play.
+function play.setupPlayStates()
+    states = stateManager:new()
+    -- Preview scrolls the screen from top-to-bottom before play starts.
+    states:add("preview")
+    states:add("play")
+    states:add("paused")
+    states:add("game over")
+    -- Set initial game state
+    states:set("preview")
+end
+
+-- Load game sounds into the sounds table.
+function play.loadSounds()
+    sounds.leftFlipper = love.audio.newSource("audio/flipper.wav")
+    sounds.rightFlipper = love.audio.newSource("audio/flipper.wav")
+    sounds.wall = love.audio.newSource("audio/wall.wav")
+    sounds.leftBumper = love.audio.newSource("audio/bumper.wav")
+    sounds.middleBumper = love.audio.newSource("audio/bumper.wav")
+    sounds.rightBumper = love.audio.newSource("audio/bumper.wav")
+    sounds.wordBonus = love.audio.newSource("audio/wordbonus.wav")
+    sounds.target = love.audio.newSource("audio/target.wav")
+    sounds.ramp = love.audio.newSource("audio/ramp.wav")
+    sounds.launch = love.audio.newSource("audio/launch.wav")
+    sounds.wormhole = love.audio.newSource("audio/wormhole.wav")
+    sounds.wormhole:setLooping(true)
+    sounds.wormholeClose = love.audio.newSource("audio/wormhole-close.wav")
+    sounds.timewarp = love.audio.newSource("audio/timewarp.wav")
+    sounds.blackHole = love.audio.newSource("audio/blackhole.wav")
+    sounds.blackHoleRelease = love.audio.newSource("audio/blackhole-release.wav")
+    sounds.blackHoleLock = love.audio.newSource("audio/blackhole-lock.wav")
+    sounds.nudge = love.audio.newSource("audio/nudge.wav")
+    sounds.hydrogenReleased = love.audio.newSource("audio/hydrogen-released.wav")
+    sounds.fusion1 = sounds.hydrogenReleased
+    sounds.fusion2 = sounds.hydrogenReleased
+    sounds.drained = love.audio.newSource("audio/ball-drained.wav")
+    sounds.supergravityBonus = love.audio.newSource("audio/supergravity-bonus.wav")
+end
+
+-- Position the background image.
+-- It is offset against the table top-left position (which may not be 0,0)
+-- depending on how the table was designed.
+function play.setupBackgroundImage()
+    -- Position the background image
+    local border = 20
+    sprites.background.x = pinball.table.size.x1-border
+    sprites.background.y = pinball.table.size.y1-border
+    sprites.background.ox = 0   -- Position relative to top-left corner
+    sprites.background.oy = 0   -- and not the center of the image
+    -- Position the launch cover over the ball
+    sprites.launchCover.x = pinball.table.ball.x
+    sprites.launchCover.y = pinball.table.ball.y
+end
+
+-- Position all the animated sprites on the table.
+-- The star, the flares, light rays, black hole and worm hole.
+function play.setupSpritePositions()
+      -- All these center around the black hole's position.
+    local x, y = pinball:getObjectXY("black hole")
+    sprites.blackhole.x = x
+    sprites.blackhole.y = y
+    sprites.wormholeRays.x = x
+    sprites.wormholeRays.y = y
+    sprites.wormhole.x = x
+    sprites.wormhole.y = y
+    sprites.wormholeClouds.x = x
+    sprites.wormholeClouds.y = y
+    sprites.rays.x = x
+    sprites.rays.y = y
+    sprites.star.x = x
+    sprites.star.y = y
+    sprites.starFlare.x = x
+    sprites.starFlare.y = y
+    sprites.redStar.x = x
+    sprites.redStar.y = y
+    sprites.wheel1.x = x
+    sprites.wheel1.y = y
+    sprites.wheel2.x = x
+    sprites.wheel2.y = y
+    sprites.wheel2.scale = -1
+
+    -- Set up the sprite state manager.
+    -- It handles scaling and rotation of these sprites.
+    spriteStates:add("star", sprites.star)
+    spriteStates:add("wheel 1", sprites.wheel1):setRotation(0.01):setScale(0)
+    spriteStates:add("wheel 2", sprites.wheel2):setRotation(0.02):setScale(0)
+    spriteStates:add("rays", sprites.rays):setRotation(-0.1):setScale(0)
+    spriteStates:add("red star", sprites.redStar):setScale(0)
+    spriteStates:add("star flare", sprites.starFlare):setRotation(-0.01):setScale(0)
+    spriteStates:add("worm hole rays", sprites.wormholeRays):setRotation(0.1):setScale(0)
+    spriteStates:add("worm hole", sprites.wormhole):setRotation(0.1):setScale(0)
+    spriteStates:add("worm hole clouds", sprites.wormholeClouds):setRotation(0.6):setScale(0):setBlendmode("additive")
+    spriteStates:add("black hole", sprites.blackhole):setScale(0)
+end
+
+-- Set up the bumper manager.
+-- It tracks bumpers by their tag names in the table.
+function play.setupBumpers()
+    bumperManager:add("left bumper", "images/bumper.png")
+    bumperManager:add("middle bumper", "images/bumper.png")
+    bumperManager:add("right bumper", "images/bumper.png")
+    bumperManager:add("left kicker", "images/kicker.png")
+    bumperManager:add("right kicker", "images/kicker.png", -1)
+end
+
+-- Set the starting values of all play variables.
+function play.setupStartingValues()
+      -- Calculated to center the table in the screen
+    play.leftAlign = 0
+    play.topAlign = 0
+    -- Show hints of the next target in the LED display
+    play.ledHints = true
+    -- Pre-game scroll effect drawing offset
+    play.previewPosition = 0
+    -- Table nudge shake offset
+    play.nudgeOffset = 0
+    -- Tracks when to display the current mission goal on the LED display
+    play.missionStatusUpdateTime = 0
+    -- Safe-mode fires a new ball if any ball drains
+    play.safeMode = 0
+    -- How long safe-mode lasts (seconds)
+    play.safeModePeriod = 60
+    -- Position to draw the balls remaining stat line (gets updated on resize)
+    play.ballStatXPosition = 0
+    -- Store the current player score
+    play.score = 0
+    play.scoreFormatted = "0"
+    play.balls = 6
+    -- Tracks how many nudges the player did
+    play.nudgeCount = 0
+    -- Nudges before we tilt
+    play.nudgeThreshhold = 3
+    -- Cooldown before decreasing the nudge count
+    play.nudgeCooldown = 5
+    play.nudgeTimer = play.nudgeCooldown
+    -- Too many nudges in a short time tilts the game (flippers turn off)
+    play.tilt = false
+    -- Pre-draw walls onto a canvas (performance optimization)
+    play.predraw = true
+    play.wallCanvas = nil
+    -- Calculate positions of elements
+    play.positionDrawingElements()
+end
+
+-- Draw the table walls on to a canvas 
+-- We draw this canvas during play, instead of drawing each wall every loop.
+-- This gives a good performance boost.
+function play.setupWallsCanvas()
+    play.wallCanvas = love.graphics.newCanvas(scrWidth, pinball.table.size.height)
+    pinball:draw()
+    play.predraw = false
 end
 
 return play
