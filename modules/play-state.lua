@@ -25,6 +25,7 @@ local bumperManager = require("modules.bumpers")
 local mission = require("modules.mission")
 local spriteStates = spriteManager:new()
 local led = require("modules.led-display")
+local pausedScreen = require("modules.paused-screen")
 local sprites = { }
 local sounds = {}
 
@@ -94,6 +95,8 @@ function play:update (dt)
         mission:update(dt)
         play.updateNudgeCounters(dt)
         play.updateSafemode(dt)
+    elseif (states:on("paused")) then
+        pausedScreen:update(dt)
     end
 
 end
@@ -206,7 +209,7 @@ function play:draw ( )
 
     -- Simple text overlays
     if (states:on("paused")) then
-        printShadowText("PAUSED", 200, {255, 128, 255, 200})
+        pausedScreen:draw()
     elseif (states:on("game over")) then
         printShadowText("GAME OVER", 200, {255, 128, 255, 200})
     end
@@ -276,6 +279,7 @@ function play.resetAllTargets()
 end
 
 function play.positionDrawingElements()
+    pausedScreen.reposition()
     led.size.w = scrWidth
     led.size.h = 36
     led.position.y = scrHeight - led.size.h
