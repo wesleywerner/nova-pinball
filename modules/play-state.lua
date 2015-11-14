@@ -279,7 +279,6 @@ function play.resetAllTargets()
 end
 
 function play.positionDrawingElements()
-    pausedScreen.reposition()
     led.size.w = scrWidth
     led.size.h = 36
     led.position.y = scrHeight - led.size.h

@@ -16,43 +16,53 @@
 -- Written by Wesley "keyboard monkey" Werner 2015
 -- https://github.com/wesleywerner/
 
-local pausedScreen = {}
+local screen = {}
 
-function pausedScreen:update(dt)
+function screen:load()
+   local cutter = require("modules.cutter") 
+   screen.box = cutter.cut(0.8, 0.5)
+   local W, H = love.graphics.getDimensions()
+   screen.width = W
+   screen.height = H
+end
+
+function screen:update(dt)
     
 end
 
-function pausedScreen:draw()
+function screen:draw()
+    
     -- Full screen overlay
     love.graphics.setColor(0, 0, 0, 200)
-    love.graphics.rectangle("fill", 0 , 0, 
-        pausedScreen.screenWidth, pausedScreen.screenHeight)
+    love.graphics.rectangle(
+        "fill", 0 , 0, 
+        screen.width, 
+        screen.height)
+    
     -- Box Fill
     love.graphics.setColor(0, 0, 0, 200)
-    love.graphics.rectangle("fill",
-        pausedScreen.x, pausedScreen.y, 
-        pausedScreen.width, pausedScreen.height)
+    love.graphics.rectangle(
+        "fill",
+        screen.box.x, 
+        screen.box.y, 
+        screen.box.width, 
+        screen.box.height)
+    
     -- Box Outline
     love.graphics.setColor(200, 255, 200, 200)
-    love.graphics.rectangle("line",
-        pausedScreen.x, pausedScreen.y, 
-        pausedScreen.width, pausedScreen.height)
+    love.graphics.rectangle(
+        "line",
+        screen.box.x, 
+        screen.box.y, 
+        screen.box.width, 
+        screen.box.height)
+    
     -- Box Title
-    --love.graphics.setColor(200, 255, 200, 255)
     printShadowText("PAUSED", 
-        pausedScreen.center, 
+        screen.box.center.y, 
         {200, 255, 200, 255})
 end
 
-function pausedScreen.reposition()
-   local width, height = love.graphics.getDimensions()
-   pausedScreen.screenWidth = width
-   pausedScreen.screenHeight = height
-   pausedScreen.width = width * 0.8
-   pausedScreen.height = height * 0.5
-   pausedScreen.x = (width - pausedScreen.width) / 2
-   pausedScreen.y = (height - pausedScreen.height) / 2
-   pausedScreen.center = pausedScreen.y + (pausedScreen.height / 2)
-end
+screen:load()
 
-return pausedScreen
+return screen
