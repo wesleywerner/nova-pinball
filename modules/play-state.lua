@@ -198,7 +198,7 @@ function play:draw ( )
 
     -- Draw the status box
     love.graphics.origin()
-    play.drawStats()
+    play.drawStatusBar()
 
     -- Draw the LED display
     love.graphics.setColor(0, 0, 0, 255)
@@ -241,7 +241,7 @@ function play.quitToScores()
     menu.state:set("scores")
 end
 
-function play.drawStats()
+function play.drawStatusBar()
     local height = 20
     love.graphics.setColor(0, 0, 0, 255)
     love.graphics.rectangle("fill", 0, 0, scrWidth, height)
