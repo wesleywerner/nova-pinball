@@ -32,20 +32,6 @@ local sounds = {}
 -- Stores a collection of all the targets on the table.
 local targets = {}
 
--- A lookup of mission targets and their human readable texts
-local missionDescriptions = {
-    ["nova word"]="Complete the NOVA word bonus",
-    }
-
--- A set of encouraging words while the mission state is waiting
-local waitingWords = {
-    "Keep it up",
-    "Looking good",
-    "Don't drop that ball",
-    "Hope you're enjoying Nova Pinball",
-    "You are in the Zone"
-    }
-
 function play.loadTableFile()
     local mydata, size = love.filesystem.read("nova.pinball", nil)
     local pickle = require("modules.pickle")
@@ -482,13 +468,38 @@ function play.positionDrawingElements()
     end
 end
 
+-- Update the LED display every game loop
 function play.updateLedDisplayMessages(dt)
+  
+    -- Count down until the next LED refresh
     play.missionStatusUpdateTime = play.missionStatusUpdateTime - dt
+    
+    -- Time to refresh the LED display with a new message
     if (play.missionStatusUpdateTime < 0 or dt == 0) then
+        
+        -- Reset the time until the next update (in seconds)
         play.missionStatusUpdateTime = 20
+        
+        -- A lookup of mission targets and their human readable texts
+        local missionDescriptions = {
+          ["nova word"]="Complete the NOVA word bonus",
+          }
+        
+        -- A set of encouraging words while the mission state is waiting
+        local waitingWords = {
+            "Keep it up",
+            "Looking good",
+            "Don't drop that ball",
+            "Hope you're enjoying Nova Pinball",
+            "You are in the Zone"
+          }
+          
+        -- Only when busy playing
         if (states:on("play")) then
+          
             -- Display a hint of the next goal
             local title = mission:nextTarget()
+          
             -- Show encouraging words while waiting on a goal
             if (title == "wait") then
                 title = waitingWords[math.random(1, #waitingWords)]
