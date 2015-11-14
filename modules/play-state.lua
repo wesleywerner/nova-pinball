@@ -49,7 +49,7 @@ function play:load()
     play.setupBackgroundImage()
     play.setupSpritePositions()
     play.setupBumpers()
-    self:loadTargets()
+    play.loadTargets()
     play.setupMission()
     play.setupWallsCanvas()
 
@@ -236,7 +236,7 @@ end
 -- Register the current score and quit to the scores list
 function play.quitToScores()
     scores:register(play.score)
-    self:resetGame()
+    play.resetGame()
     mainstate:set("menu")
     menu.state:set("scores")
 end
