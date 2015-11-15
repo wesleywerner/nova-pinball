@@ -30,8 +30,9 @@ largeFont = love.graphics.newFont("fonts/advanced_led_board-7.ttf", 37)
 smallFont = love.graphics.newFont("fonts/erbos_draco_1st_open_nbp.ttf", 20)
 local splash = nil
 
-function love.load()
+function love.load(arg)
 
+    if arg[#arg] == "-debug" then require("mobdebug").start() end
     math.randomseed(os.time())
     love.mouse.setVisible(false)
     scrWidth, scrHeight = love.window.getDimensions()
