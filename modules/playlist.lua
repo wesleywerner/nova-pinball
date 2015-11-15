@@ -28,46 +28,64 @@ playlist.source = nil
 
 playlist.playedCount = 0
 
-playlist.tracks = {
-    {
-        file="music/nexus_x.it",
-        credit="Nexus, by Xaser",
-        url="http://modarchive.org/index.php?request=view_by_moduleid&query=50384",
-        loop=2,
-        volume=0.6,
-    },
-    {
-        file="music/nosotr_x.it",
-        credit="Nosotros, by Xaser",
-        url="http://modarchive.org/index.php?request=view_by_moduleid&query=51677",
-        loop=2,
-        volume=0.6,
-    },
-    {
-        file="music/tarvoi_x.it",
-        credit="Void of Space, by Xaser",
-        url="http://modarchive.org/index.php?request=view_by_moduleid&query=160395",
-        loop=4,
-        volume=0.6,
-    },
-    {
-        file="music/voxel_x.it",
-        credit="voxelbuffer, by Xaser",
-        url="http://modarchive.org/index.php?request=view_by_moduleid&query=162116",
-        loop=2,
-        volume=0.6,
-    },
-    {
-        file="music/zeroph_x.it",
-        credit="Zerophine, by Xaser",
-        url="http://modarchive.org/index.php?request=view_by_moduleid&query=160368",
-        loop=2,
-        volume=0.6,
-    },
-}
+playlist.tracks = {}
 
 function playlist:load()
+    self:refreshTracks()
+end
 
+function playlist:refreshTracks()
+    playlist.tracks = {}
+    local files = love.filesystem.getDirectoryItems("music")
+    for i, file in pairs(files) do
+        -- skip nfo files at this time
+        if not string.find(file, ".nfo$") then
+            self:addTrack("music", file)
+        end
+    end
+end
+
+-- Add a track and read an optional nfo file.
+-- nfo format:
+--      first line is the title
+--      extra lines go into the track.nfo value
+--      optional "loop=n" line is applied to track.loop
+--      optional "volume=n" line is applied to track.volume
+function playlist:addTrack(path, filename)
+    local track = {file=path .. "/" .. filename, volume=1, nfo=filename, loop=1}
+    local nfopath = path .. "/" .. filename .. ".nfo"
+    local infoExists = love.filesystem.exists(nfopath)
+    
+    if infoExists then
+        
+        -- read the nfo file.
+        -- first line is track title
+        local hasTitle = false
+        
+        for line in love.filesystem.lines(nfopath) do
+            
+            -- check for loop setting lines
+            local loopI, loopJ = string.find(line, "^loop=")
+            local volumeI, volumeJ = string.find(line, "^volume=")
+            
+            if loopI then
+                track.loop = tonumber( line:sub(loopJ+1, string.len(line)) )
+            elseif volumeI then
+                track.volume = tonumber( line:sub(volumeJ+1, string.len(line)) )
+            else
+                
+                if hasTitle then
+                    track.nfo = track.nfo .. line .. "\n"
+                else
+                    track.title = line
+                    track.nfo = ""
+                    hasTitle = true
+                end
+                
+            end     -- else loopI
+        end
+    end
+    table.insert(playlist.tracks, track)
 end
 
 function playlist:play()
