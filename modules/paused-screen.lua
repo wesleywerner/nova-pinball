@@ -26,7 +26,7 @@ function screen:load()
 --  +                       |
 --  |      [trackBox]       |
 --  +                       |
---  |      [hintBoX]        |
+--  |      [hintBoX]   [vol]|
 --  +-----------------------+
     
     local cutter = require("modules.cutter") 
@@ -34,6 +34,9 @@ function screen:load()
     screen.titleBox = cutter.cut(1, 0.1, "top", screen.pauseBox)
     screen.trackBox = cutter.cut(0.9, 0.5, "center", screen.pauseBox)
     screen.hintBox = cutter.cut(1, 0.1, "bottom", screen.pauseBox)
+    screen.volumeBox = cutter.cut(0.05, 0.1, "bottom right", screen.pauseBox)
+    -- adjusted a little up
+    screen.volumeBox.y = screen.volumeBox.y - 10
     local W, H = love.graphics.getDimensions()
     screen.width = W
     screen.height = H
@@ -77,6 +80,54 @@ function screen:draw()
         screen.titleBox.center.y,
         {200, 255, 200, 255})
     
+    if screen:drawNowPlayingTrack() then
+        screen:drawVolumeBar()
+    end
+    
+end
+
+function screen:keypressed(key)
+    if key == "left" then
+        playlist:prevTrack()
+    elseif key == "right" then
+        playlist:nextTrack()
+    elseif key == "up" then
+        playlist:volumeUp()
+    elseif key == "down" then
+        playlist:volumeDown()
+    end
+end
+
+function screen:drawVolumeBar()
+    -- Volume Bar
+    love.graphics.setLineWidth(2)
+    -- (fill)
+    love.graphics.setColor(0, 200, 0, 200)
+    love.graphics.rectangle(
+        "fill",
+        screen.volumeBox.x, 
+        screen.volumeBox.y, 
+        20, 
+        screen.volumeBox.height)
+    -- (outline)
+    love.graphics.setColor(0, 0, 0, 100)
+    love.graphics.rectangle(
+        "line",
+        screen.volumeBox.x, 
+        screen.volumeBox.y,
+        20, 
+        screen.volumeBox.height)
+    -- (green bar)
+    love.graphics.setColor(0, 0, 0, 200)
+    love.graphics.rectangle(
+        "fill",
+        screen.volumeBox.x,
+        screen.volumeBox.y,
+        20,
+        screen.volumeBox.height - (screen.volumeBox.height * playlist:volumeDecimal()))
+end
+
+function screen:drawNowPlayingTrack()
     -- Now Playing
     local track = playlist:nowplaying()
     
@@ -125,20 +176,9 @@ function screen:draw()
             screen.hintBox.y,
             screen.hintBox.width,
             "center")
-
-    end
-    
-end
-
-function screen:keypressed(key)
-    if key == "left" then
-        playlist:prevTrack()
-    elseif key == "right" then
-        playlist:nextTrack()
-    elseif key == "up" then
-        playlist:volumeUp()
-    elseif key == "down" then
-        playlist:volumeDown()
+        
+        -- Signal there is a track playing
+        return true
     end
 end
 
