@@ -212,4 +212,13 @@ function playlist:volumeDown()
     end
 end
 
+-- Returns the music volume
+function playlist:volumePercentage()
+    return (1 + playlist.volumeAdjust) * 100
+end
+
+function playlist:volumeDecimal()
+   return (1 + playlist.volumeAdjust) 
+end
+
 return playlist
