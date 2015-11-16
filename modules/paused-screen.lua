@@ -135,6 +135,10 @@ function screen:keypressed(key)
         playlist:prevTrack()
     elseif key == "right" then
         playlist:nextTrack()
+    elseif key == "up" then
+        playlist:volumeUp()
+    elseif key == "down" then
+        playlist:volumeDown()
     end
 end
 

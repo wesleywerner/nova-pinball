@@ -34,6 +34,9 @@ playlist.random = false
 
 playlist.isFadingOut = false
 
+-- Adjust all tracks by this volume amount
+playlist.volumeAdjust = 0
+
 function playlist:load()
     self:refreshTracks()
     if playlist.random then
@@ -161,7 +164,7 @@ function playlist:update(dt)
             -- Play the track
             local track = playlist.tracks[playlist.trackIndex]
             playlist.source = love.audio.newSource(track.file, "stream")
-            playlist.source:setVolume(track.volume)
+            playlist.source:setVolume(track.volume + playlist.volumeAdjust)
             love.audio.play(playlist.source)
         else
             -- Track is finished playing
@@ -191,6 +194,22 @@ function playlist:nextTrack()
     playlist.isFadingOut = true
     -- Skip the loop count too
     playlist.playedCount = playlist.tracks[playlist.trackIndex].loop
+end
+
+function playlist:volumeUp()
+    if playlist.source then
+        playlist.volumeAdjust = math.max(-1, math.min(0, playlist.volumeAdjust + 0.1))
+        local track = self:nowplaying()
+        playlist.source:setVolume(track.volume + playlist.volumeAdjust)
+    end
+end
+
+function playlist:volumeDown()
+    if playlist.source then
+        playlist.volumeAdjust = math.max(-1, math.min(0, playlist.volumeAdjust - 0.1))
+        local track = self:nowplaying()
+        playlist.source:setVolume(track.volume + playlist.volumeAdjust)
+    end
 end
 
 return playlist
