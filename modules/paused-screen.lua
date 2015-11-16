@@ -67,8 +67,8 @@ function screen:draw()
     -- Now Playing
     local track = playlist:nowplaying()
     if track then
-        local title = string.format("%q by %s\n\n%s", 
-                        track.title, track.artist, track.nfo)
+        local title = string.format("Now Playing:\n\n#%s. %q by %s\n\n%s", 
+                        playlist.trackIndex, track.title, track.artist, track.nfo)
         love.graphics.setFont(smallFont)
         love.graphics.setColor(255, 255, 200, 255)
         love.graphics.printf (title, 
@@ -87,7 +87,9 @@ function screen:draw()
 end
 
 function screen:keypressed(key)
-    if key == "left" or key == "right" then
+    if key == "left" then
+        playlist:prevTrack()
+    elseif key == "right" then
         playlist:nextTrack()
     end
 end
