@@ -116,7 +116,7 @@ function playlist:update(dt)
     -- Fade out
     if (playlist.source and playlist.isFadingOut) then
         local v = playlist.source:getVolume()
-        v = v - dt
+        v = v - dt*2
         if v < 0 then
             love.audio.stop(playlist.source)
             playlist.source = nil
