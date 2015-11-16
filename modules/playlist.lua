@@ -174,7 +174,7 @@ end
 
 -- Gets the track playing
 function playlist:nowplaying()
-    if playlist.turnedOn then
+    if (not playlist.isFadingOut and playlist.turnedOn) then
         return playlist.tracks[playlist.trackIndex]
     end
 end
