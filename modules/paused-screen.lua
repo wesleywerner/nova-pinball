@@ -19,13 +19,24 @@
 local screen = {}
 
 function screen:load()
-   local cutter = require("modules.cutter") 
-   screen.pauseBox = cutter.cut(0.9, 0.5)
-   screen.titleBox = cutter.cut(1, 0.1, "top", screen.pauseBox)
-   screen.trackBox = cutter.cut(0.9, 0.5, "center", screen.pauseBox)
-   local W, H = love.graphics.getDimensions()
-   screen.width = W
-   screen.height = H
+
+--  [pauseBox]
+--  +-----------------------+
+--  |      [titleBox]       |
+--  +                       |
+--  |      [trackBox]       |
+--  +                       |
+--  |      [hintBoX]        |
+--  +-----------------------+
+    
+    local cutter = require("modules.cutter") 
+    screen.pauseBox = cutter.cut(0.9, 0.5)
+    screen.titleBox = cutter.cut(1, 0.1, "top", screen.pauseBox)
+    screen.trackBox = cutter.cut(0.9, 0.5, "center", screen.pauseBox)
+    screen.hintBox = cutter.cut(1, 0.1, "bottom", screen.pauseBox)
+    local W, H = love.graphics.getDimensions()
+    screen.width = W
+    screen.height = H
 end
 
 function screen:update(dt)
@@ -33,6 +44,8 @@ function screen:update(dt)
 end
 
 function screen:draw()
+    
+    love.graphics.setLineWidth(6)
     
     -- Full screen overlay
     love.graphics.setColor(0, 0, 0, 200)
@@ -42,7 +55,7 @@ function screen:draw()
         screen.height)
     
     -- Box Fill
-    love.graphics.setColor(0, 0, 0, 200)
+    love.graphics.setColor(0, 128, 128, 200)
     love.graphics.rectangle(
         "fill",
         screen.pauseBox.x, 
@@ -66,21 +79,52 @@ function screen:draw()
     
     -- Now Playing
     local track = playlist:nowplaying()
+    
+    -- There is a track playing
     if track then
-        local title = string.format("Now Playing:\n\n#%s. %q by %s\n\n%s", 
+        
+        -- Format the track artist & title
+        local title = string.format("Now Playing Track %s\n\n%q by %s\n\n%s", 
                         playlist.trackIndex, track.title, track.artist, track.nfo)
+        
+        -- Calculate the width and line count of the track title
         love.graphics.setFont(smallFont)
-        love.graphics.setColor(255, 255, 200, 255)
-        love.graphics.printf (title, 
+        local titleWidth, titleLines = smallFont:getWrap(
+            title, screen.trackBox.width)
+        local titleHeight = smallFont:getHeight()
+        
+        love.graphics.setLineWidth(1)
+        
+        -- Draw an insert box for the title
+        -- (Fill)
+        love.graphics.setColor(0, 0, 0, 64)
+        love.graphics.rectangle("fill", 
             screen.trackBox.x, 
-            screen.trackBox.y, 
-            screen.trackBox.width, 
+            screen.trackBox.y,
+            screen.trackBox.width,
+            screen.trackBox.height)
+        -- (Lines)
+        love.graphics.setColor(255, 255, 255, 100)
+        love.graphics.rectangle("line", 
+            screen.trackBox.x - 0,
+            screen.trackBox.y - 0,
+            screen.trackBox.width - 2,
+            screen.trackBox.height - 2)
+        
+        -- Print the track title (inside the inset box)
+        love.graphics.setColor(255, 255, 200, 255)
+        love.graphics.printf(title, 
+            screen.trackBox.x + 6,
+            screen.trackBox.y + 6,
+            screen.trackBox.width,
             "left")
 
-        love.graphics.setColor(255, 255, 255, 100)
-        love.graphics.print("Arrows - Skip + Volume",
-            screen.trackBox.x,
-            screen.trackBox.y + screen.trackBox.height)
+        love.graphics.setColor(255, 255, 255, 64)
+        love.graphics.printf("Arrows - Skip + Volume",
+            screen.hintBox.x,
+            screen.hintBox.y,
+            screen.hintBox.width,
+            "center")
 
     end
     
