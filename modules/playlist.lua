@@ -70,6 +70,8 @@ function playlist:addTrack(path, filename)
     track.volume = 1
     track.nfo=""
     track.loop = 1
+    track.title = filename
+    track.artist = ""
     
     -- Extract the track nfo file
     if infoExists then
