@@ -30,7 +30,7 @@ playlist.playedCount = 0
 
 playlist.tracks = {}
 
-playlist.random = true
+playlist.random = false
 
 playlist.isFadingOut = false
 
@@ -146,12 +146,15 @@ function playlist:update(dt)
                 if playlist.random then
                     playlist.trackIndex = math.random(1, #playlist.tracks)
                 else
-                    playlist.trackIndex = playlist.trackIndex + 1
+                    playlist.trackIndex = playlist.trackIndex + (playlist.skipOffset or 1)
+                    playlist.skipOffset = nil
                 end
                 
                 -- Cycle back to the beginning of the playlist
                 if (playlist.trackIndex > #playlist.tracks) then
                     playlist.trackIndex = 1
+                elseif (playlist.trackIndex < 1) then
+                    playlist.trackIndex = #playlist.tracks
                 end
             end
             
@@ -176,8 +179,18 @@ function playlist:nowplaying()
     end
 end
 
+function playlist:prevTrack()
+    playlist.isFadingOut = true
+    -- Skip the loop count too
+    playlist.playedCount = playlist.tracks[playlist.trackIndex].loop
+    -- Cycle around
+    playlist.skipOffset = -1
+end
+
 function playlist:nextTrack()
     playlist.isFadingOut = true
+    -- Skip the loop count too
+    playlist.playedCount = playlist.tracks[playlist.trackIndex].loop
 end
 
 return playlist
