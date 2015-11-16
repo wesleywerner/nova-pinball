@@ -20,7 +20,9 @@ local screen = {}
 
 function screen:load()
    local cutter = require("modules.cutter") 
-   screen.box = cutter.cut(0.8, 0.5)
+   screen.pauseBox = cutter.cut(0.9, 0.5)
+   screen.titleBox = cutter.cut(1, 0.1, "top", screen.pauseBox)
+   screen.trackBox = cutter.cut(0.9, 0.5, "center", screen.pauseBox)
    local W, H = love.graphics.getDimensions()
    screen.width = W
    screen.height = H
@@ -43,24 +45,51 @@ function screen:draw()
     love.graphics.setColor(0, 0, 0, 200)
     love.graphics.rectangle(
         "fill",
-        screen.box.x, 
-        screen.box.y, 
-        screen.box.width, 
-        screen.box.height)
+        screen.pauseBox.x, 
+        screen.pauseBox.y, 
+        screen.pauseBox.width, 
+        screen.pauseBox.height)
     
     -- Box Outline
     love.graphics.setColor(200, 255, 200, 200)
     love.graphics.rectangle(
         "line",
-        screen.box.x, 
-        screen.box.y, 
-        screen.box.width, 
-        screen.box.height)
+        screen.pauseBox.x, 
+        screen.pauseBox.y, 
+        screen.pauseBox.width, 
+        screen.pauseBox.height)
     
     -- Box Title
     printShadowText("PAUSED", 
-        screen.box.center.y, 
+        screen.titleBox.center.y,
         {200, 255, 200, 255})
+    
+    -- Now Playing
+    local track = playlist:nowplaying()
+    if track then
+        local title = string.format("%q by %s\n\n%s", 
+                        track.title, track.artist, track.nfo)
+        love.graphics.setFont(smallFont)
+        love.graphics.setColor(255, 255, 200, 255)
+        love.graphics.printf (title, 
+            screen.trackBox.x, 
+            screen.trackBox.y, 
+            screen.trackBox.width, 
+            "left")
+
+        love.graphics.setColor(255, 255, 255, 100)
+        love.graphics.print("Arrows - Skip + Volume",
+            screen.trackBox.x,
+            screen.trackBox.y + screen.trackBox.height)
+
+    end
+    
+end
+
+function screen:keypressed(key)
+    if key == "left" or key == "right" then
+        playlist:nextTrack()
+    end
 end
 
 screen:load()

@@ -119,6 +119,7 @@ function play:keypressed (key)
     elseif (states:on("paused")) then
         if (key == " ") then states:set("play") end
         if (key == "escape") then mainstate:set("menu") end
+        pausedScreen:keypressed(key)
     elseif (states:on("game over")) then
         -- Quick escape to the high score list on game over
         if (key == "escape" or key == " ") then
