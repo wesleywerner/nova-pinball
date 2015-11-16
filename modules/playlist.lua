@@ -32,6 +32,8 @@ playlist.tracks = {}
 
 playlist.random = true
 
+playlist.isFadingOut = false
+
 function playlist:load()
     self:refreshTracks()
     if playlist.random then
@@ -106,14 +108,24 @@ end
 
 function playlist:stop()
     playlist.turnedOn = false
-    if (playlist.source) then
-        love.audio.stop(playlist.source)
-        playlist.source = nil
-    end
+    playlist.isFadingOut = true
 end
 
 function playlist:update(dt)
     
+    -- Fade out
+    if (playlist.source and playlist.isFadingOut) then
+        local v = playlist.source:getVolume()
+        v = v - dt
+        if v < 0 then
+            love.audio.stop(playlist.source)
+            playlist.source = nil
+            playlist.isFadingOut = false
+        else
+            playlist.source:setVolume(v)
+        end
+    end
+
     -- The playlist is on
     if (playlist.turnedOn) then
         
@@ -152,7 +164,7 @@ function playlist:update(dt)
             -- Track is finished playing
             if (playlist.source:isStopped()) then
                 playlist.source = nil
-            end
+            end        
         end
     end
 end
