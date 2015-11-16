@@ -30,8 +30,13 @@ playlist.playedCount = 0
 
 playlist.tracks = {}
 
+playlist.random = true
+
 function playlist:load()
     self:refreshTracks()
+    if playlist.random then
+        playlist.trackIndex = math.random(1, #playlist.tracks)
+    end
 end
 
 function playlist:refreshTracks()
@@ -47,42 +52,39 @@ end
 
 -- Add a track and read an optional nfo file.
 -- nfo format:
---      first line is the title
---      extra lines go into the track.nfo value
---      optional "loop=n" line is applied to track.loop
---      optional "volume=n" line is applied to track.volume
+-- Lines with the format key=value are stored on the track object
+-- as track[key] = value.
+-- All other lines are stored on the track.nfo value.
+-- Possible keys:
+--      title, loop, volume
 function playlist:addTrack(path, filename)
-    local track = {file=path .. "/" .. filename, volume=1, nfo=filename, loop=1}
     local nfopath = path .. "/" .. filename .. ".nfo"
     local infoExists = love.filesystem.exists(nfopath)
+    local track = {}
+    track.file = path .. "/" .. filename
+    track.volume = 1
+    track.nfo=""
+    track.loop = 1
     
+    -- Extract the track nfo file
     if infoExists then
-        
-        -- read the nfo file.
-        -- first line is track title
-        local hasTitle = false
         
         for line in love.filesystem.lines(nfopath) do
             
             -- check for loop setting lines
-            local loopI, loopJ = string.find(line, "^loop=")
-            local volumeI, volumeJ = string.find(line, "^volume=")
+            local i, j = string.find(line, "=")
             
-            if loopI then
-                track.loop = tonumber( line:sub(loopJ+1, string.len(line)) )
-            elseif volumeI then
-                track.volume = tonumber( line:sub(volumeJ+1, string.len(line)) )
+            if i and j then
+                -- map the key-value pair to the track table
+                local k = line:sub(1, i-1)
+                local v = line:sub(j+1, line:len())
+                -- attempt cast to number
+                local vi = tonumber(v)
+                track[k] = vi or v
+                --track.loop = tonumber( line:sub(loopJ+1, string.len(line)) )
             else
-                
-                if hasTitle then
-                    track.nfo = track.nfo .. line .. "\n"
-                else
-                    track.title = line
-                    track.nfo = ""
-                    hasTitle = true
-                end
-                
-            end     -- else loopI
+                track.nfo = track.nfo .. line .. "\n"
+            end
         end
     end
     table.insert(playlist.tracks, track)
@@ -111,23 +113,43 @@ function playlist:stop()
 end
 
 function playlist:update(dt)
+    
+    -- The playlist is on
     if (playlist.turnedOn) then
-        -- next track
+        
+        -- There is nothing playing
         if (not playlist.source) then
+            
+            -- Find the last track played
             local track = playlist.tracks[playlist.trackIndex]
-            -- Loop the same track or skip to the next track
+            
+            -- Up the track play count
             playlist.playedCount = playlist.playedCount + 1
+            
+            -- This track is done looping
             if (playlist.playedCount > track.loop) then
                 playlist.playedCount = 1
-                playlist.trackIndex = playlist.trackIndex + 1
-                if (playlist.trackIndex > #playlist.tracks) then playlist.trackIndex = 1 end
+                
+                -- Next track or randomize
+                if playlist.random then
+                    playlist.trackIndex = math.random(1, #playlist.tracks)
+                else
+                    playlist.trackIndex = playlist.trackIndex + 1
+                end
+                
+                -- Cycle back to the beginning of the playlist
+                if (playlist.trackIndex > #playlist.tracks) then
+                    playlist.trackIndex = 1
+                end
             end
+            
+            -- Play the track
             local track = playlist.tracks[playlist.trackIndex]
             playlist.source = love.audio.newSource(track.file, "stream")
             playlist.source:setVolume(track.volume)
             love.audio.play(playlist.source)
         else
-        -- Track is finished playing
+            -- Track is finished playing
             if (playlist.source:isStopped()) then
                 playlist.source = nil
             end
