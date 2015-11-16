@@ -169,4 +169,15 @@ function playlist:update(dt)
     end
 end
 
+-- Gets the track playing
+function playlist:nowplaying()
+    if playlist.turnedOn then
+        return playlist.tracks[playlist.trackIndex]
+    end
+end
+
+function playlist:nextTrack()
+    playlist.isFadingOut = true
+end
+
 return playlist
