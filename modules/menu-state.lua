@@ -50,7 +50,9 @@ function thisState:load()
     spr.sprite.y = scrHeight / 2
     -- Menu sounds
     menuSound = love.audio.newSource("audio/menu.wav", "static")
-    if (cfg:get("music") == 1) then playlist:play() end
+    
+    -- Play the Nova theme song
+    if (cfg:get("music") == 1) then playlist:play("Supernova Explosion") end
 end
 
 function thisState:update (dt)
