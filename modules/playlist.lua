@@ -37,6 +37,12 @@ playlist.isFadingOut = false
 -- Adjust all tracks by this volume amount
 playlist.volumeAdjust = 0
 
+-- The time current track has been playing
+playlist.playedTime = 0
+
+-- The maximum number of seconds a track can play for (looped)
+playlist.maxPlayTime = 180
+
 function playlist:load()
     self:refreshTracks()
     if playlist.random then
@@ -137,6 +143,9 @@ function playlist:update(dt)
         -- There is nothing playing
         if (not playlist.source) then
             
+            -- Reset play time
+            playlist.playedTime = 0
+            
             -- Find the last track played
             local track = playlist.tracks[playlist.trackIndex]
             
@@ -166,12 +175,17 @@ function playlist:update(dt)
             -- Play the track
             local track = playlist.tracks[playlist.trackIndex]
             playlist.source = love.audio.newSource(track.file, "stream")
+            playlist.source:setLooping(true)
             playlist.source:setVolume(track.volume + playlist.volumeAdjust)
             love.audio.play(playlist.source)
         else
             -- Track is finished playing
             if (playlist.source:isStopped()) then
                 playlist.source = nil
+            elseif (playlist.playedTime > playlist.maxPlayTime) then
+                playlist.isFadingOut = true
+            else
+                playlist.playedTime = playlist.playedTime + dt
             end        
         end
     end
