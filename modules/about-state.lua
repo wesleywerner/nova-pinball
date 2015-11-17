@@ -24,17 +24,18 @@ local aboutDetail = scrollManager:new()
 local aboutLineIndex = 1
 local aboutLines = {
     {"NOVA PINBALL", "VERSION " .. VERSION},
+    {"CREATED BY", "Wesley \"Keyboard Monkey\" Werner"},
     {"MADE WITH LÖVE", "love2d.org"},
     {"COPYLEFT", "GNU General Public License"},
     {"YOU ARE FREE TO", "Copy, Study, Modify the game"},
 
-    {"CREDITS", "", 0},
+    {"THANKS", "TO", 0},
+    {"Music", "Beyond"},
     {"LED Board-7 Font", "Sizenko Alexander"},
     {"Erbos Draco NBP Font", "Nate Halley"},
-    {"SFXR SOUND GENERATOR", "Tomas Pettersson - www.drpetter.se"},
+    {"SFXR SOUND GENERATOR", "Tomas Pettersson"},
 
-    {"SPECIAL THANKS", "", 0},
-    {":)", "JADIE"},
+    {"SPECIAL THANKS", "JADE :]"},
     
     {"POWERED BY", "Kittens", 0},
     {"WWW", "wesleywerner.github.io/nova-pinball", 10},
