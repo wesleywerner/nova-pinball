@@ -16,18 +16,22 @@ _Copyleft 2015 Wesley Werner_
 
 Thanks goes to these people for letting me use their work:
 
-**Advanced LED Board-7 Font** by Sizenko Alexander  
+**Music** created by Beyond
+http://modarchive.org/member.php?82730  
+https://soundcloud.com/beyond-26  
+
+**Advanced LED Board-7 Font** created by Sizenko Alexander  
 http://www.styleseven.com  
 http://www.fontspace.com/style-7/advanced-led-board-7
 
-**Erbos Draco Open NBP Font** by Nate Halley  
+**Erbos Draco Open NBP Font** created by Nate Halley  
 Licensed under Creative Commons (by-sa)  
 http://www.fontspace.com/total-fontgeek-dtf-ltd/erbos-draco-monospaced-nbp
 
-**File Pickler** by Steve Dekorte  
+**Lua File Pickler** created by Steve Dekorte  
 http://www.dekorte.com, Apr 2000
 
-**SFXR sound effect generator** by Tomas Pettersson
+**SFXR sound effect generator** created by Tomas Pettersson
 http://www.drpetter.se/project_sfxr.html
 
 # ENGINE
