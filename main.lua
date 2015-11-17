@@ -108,10 +108,10 @@ function loadAllModules()
         cfg = require("modules.game-config")
         playlist = require("modules.playlist")
         cfg:load()
+        playlist:load()
         menu:load()
         playstate:load()
         scores:load()
-        playlist:load()
     end
 end
 
