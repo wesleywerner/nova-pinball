@@ -94,7 +94,6 @@ function playlist:addTrack(path, filename)
                 -- attempt cast to number
                 local vi = tonumber(v)
                 track[k] = vi or v
-                --track.loop = tonumber( line:sub(loopJ+1, string.len(line)) )
             else
                 track.nfo = track.nfo .. line .. "\n"
             end
@@ -103,8 +102,27 @@ function playlist:addTrack(path, filename)
     table.insert(playlist.tracks, track)
 end
 
-function playlist:play()
+-- Plays the track set in trackIndex
+function playlist:_play()
+    local track = playlist.tracks[playlist.trackIndex]
+    playlist.source = love.audio.newSource(track.file, "stream")
+    playlist.source:setLooping(true)
+    playlist.source:setVolume(track.volume + playlist.volumeAdjust)
+    love.audio.play(playlist.source)
+end
+        
+-- Start playing music. The optional title of a track can be given to play.
+function playlist:play(title)
     playlist.turnedOn = true
+    if title then
+        for i, track in pairs(playlist.tracks) do
+            if track.title == title then
+                playlist.trackIndex = i
+                playlist:_play()
+                break
+            end
+        end
+    end
 end
 
 function playlist:pauseUnpause()
@@ -172,12 +190,9 @@ function playlist:update(dt)
                 end
             end
             
-            -- Play the track
-            local track = playlist.tracks[playlist.trackIndex]
-            playlist.source = love.audio.newSource(track.file, "stream")
-            playlist.source:setLooping(true)
-            playlist.source:setVolume(track.volume + playlist.volumeAdjust)
-            love.audio.play(playlist.source)
+            -- Start playing
+            self:_play()
+            
         else
             -- Track is finished playing
             if (playlist.source:isStopped()) then
