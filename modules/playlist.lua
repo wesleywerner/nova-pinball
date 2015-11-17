@@ -104,6 +104,10 @@ end
 
 -- Plays the track set in trackIndex
 function playlist:_play()
+    -- Reset played count
+    playlist.playedCount = 1
+    -- Reset play time
+    playlist.playedTime = 0
     local track = playlist.tracks[playlist.trackIndex]
     playlist.source = love.audio.newSource(track.file, "stream")
     playlist.source:setLooping(true)
@@ -160,10 +164,7 @@ function playlist:update(dt)
         
         -- There is nothing playing
         if (not playlist.source) then
-            
-            -- Reset play time
-            playlist.playedTime = 0
-            
+                        
             -- Find the last track played
             local track = playlist.tracks[playlist.trackIndex]
             
@@ -172,7 +173,6 @@ function playlist:update(dt)
             
             -- This track is done looping
             if (playlist.playedCount > track.loop) then
-                playlist.playedCount = 1
                 
                 -- Next track or randomize
                 if playlist.random then
