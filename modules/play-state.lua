@@ -31,18 +31,18 @@ local sounds = {}
 
 -- Define the score points
 local points = {}
-points.gravityLock = 2500
-points.kicker = 750
-points.bumper = 500
-points.wordBonus = 1250
-points.dotTargets = 100
-points.missionGoal1 = 1000  -- evolve red giant
-points.missionGoal2 = 1250  -- hydrogen released
-points.missionGoal3 = 1500  -- fusion stage 1
-points.missionGoal4 = 1750  -- fusion stage 2
-points.missionGoal5 = 2250  -- collapse star
-points.missionGoal6 = 10000 -- super gravity bonus (reset)
-points.missionGoal7 = 15000 -- multi-ball bonus (extra mission)
+points.gravityLock = 250000
+points.kicker = 7500
+points.bumper = 5000
+points.wordBonus = 12500
+points.dotTargets = 1000
+points.missionGoal1 = 10000  -- evolve red giant
+points.missionGoal2 = 12500  -- hydrogen released
+points.missionGoal3 = 15000  -- fusion stage 1
+points.missionGoal4 = 17500  -- fusion stage 2
+points.missionGoal5 = 22500  -- collapse star
+points.missionGoal6 = 500000 -- super gravity bonus (reset)
+points.missionGoal7 = 150000 -- multi-ball bonus (extra mission)
 
 -- Stores a collection of all the targets on the table.
 local targets = {}
@@ -663,7 +663,7 @@ function play.showBlackHole()
 end
 
 function play.showWormhole()
-    pinball:setGravity(0)
+    pinball:setGravity(-0.2)
     pinball:setBallDampening(1)
     spriteStates:item("worm hole rays"):setVisible(true):scale(0.1)
     spriteStates:item("worm hole"):setVisible(true):scale(0.3)
