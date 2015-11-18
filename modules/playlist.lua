@@ -41,7 +41,7 @@ playlist.volumeAdjust = 0
 playlist.playedTime = 0
 
 -- The maximum number of seconds a track can play for (looped)
-playlist.maxPlayTime = 180
+playlist.maxPlayTime = 20 --180
 
 function playlist:load()
     self:refreshTracks()
@@ -142,6 +142,8 @@ end
 function playlist:stop()
     playlist.turnedOn = false
     playlist.isFadingOut = true
+    -- Fade faster than default
+    playlist.fadeSpeed = 2
 end
 
 function playlist:update(dt)
@@ -149,11 +151,12 @@ function playlist:update(dt)
     -- Fade out
     if (playlist.source and playlist.isFadingOut) then
         local v = playlist.source:getVolume()
-        v = v - dt*2
+        v = v - dt*(playlist.fadeSpeed or 0.05)
         if v < 0 then
             love.audio.stop(playlist.source)
             playlist.source = nil
             playlist.isFadingOut = false
+            playlist.fadeSpeed = nil
         else
             playlist.source:setVolume(v)
         end
@@ -219,12 +222,16 @@ function playlist:prevTrack()
     playlist.playedCount = playlist.tracks[playlist.trackIndex].loop
     -- Cycle around
     playlist.skipOffset = -1
+    -- Fade faster than default
+    playlist.fadeSpeed = 2
 end
 
 function playlist:nextTrack()
     playlist.isFadingOut = true
     -- Skip the loop count too
     playlist.playedCount = playlist.tracks[playlist.trackIndex].loop
+    -- Fade faster than default
+    playlist.fadeSpeed = 2
 end
 
 function playlist:volumeUp()
