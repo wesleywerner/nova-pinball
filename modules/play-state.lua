@@ -721,6 +721,7 @@ end
 
 function play.launchBall(firstLaunch)
     if (firstLaunch) then
+        play.tilt = false
         led:clear()
         -- Stop the pre-launch scroll effect
         pinball.cfg.translateOffset.y = 0
