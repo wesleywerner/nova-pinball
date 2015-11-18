@@ -732,7 +732,7 @@ function play.launchBall(firstLaunch)
         play.resetAllTargets()
         targets.wordTarget:flash("nova word")
         -- First ball gets a safe period
-        play.activateBallSaver()
+        --play.activateBallSaver()
         -- Play the launch sound
         aplay(sounds.launch)
         pinball:newBall()
