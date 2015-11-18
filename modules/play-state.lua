@@ -657,6 +657,10 @@ function play.showStarFlare()
     pinball:setBallDampening(0)
 end
 
+function play.hideStarFlare()
+    spriteStates:item("star flare"):scale(-0.5)
+end
+
 function play.showBlackHole()
     spriteStates:item("black hole"):setVisible(true):scale(0.2)
     aplay(sounds.blackHole)
@@ -792,6 +796,7 @@ function play.resetGame()
     -- Reset mission progress and sprites
     play.setupMission()
     play.resetMissionSprites()
+    play.hideStarFlare()
     -- Clear score and ball count
     play.score = 0
     play.scoreFormatted = "0"
