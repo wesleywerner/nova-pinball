@@ -29,6 +29,21 @@ local pausedScreen = require("modules.paused-screen")
 local sprites = { }
 local sounds = {}
 
+-- Define the score points
+local points = {}
+points.gravityLock = 2500
+points.kicker = 750
+points.bumper = 500
+points.wordBonus = 1250
+points.dotTargets = 100
+points.missionGoal1 = 1000  -- evolve red giant
+points.missionGoal2 = 1250  -- hydrogen released
+points.missionGoal3 = 1500  -- fusion stage 1
+points.missionGoal4 = 1750  -- fusion stage 2
+points.missionGoal5 = 2250  -- collapse star
+points.missionGoal6 = 10000 -- super gravity bonus (reset)
+points.missionGoal7 = 15000 -- multi-ball bonus (extra mission)
+
 -- Stores a collection of all the targets on the table.
 local targets = {}
 
@@ -478,25 +493,25 @@ function pinball.tagContact (tag, id)
             local v1 = (300 + math.random() * 600) * sign1
             local v2 = (300 + math.random() * 600) * sign2
             pinball:lockBall (id, sprites.blackhole.x, sprites.blackhole.y, 1, v1, v2)
-            play.addScore(2500)
+            play.addScore(points.gravityLock)
             led:add("Gravity Lock Bonus")
         end
     end
 
     if (tag == "left bumper") then
         aplay(sounds.leftBumper)
-        play.addScore(500)
+        play.addScore(points.bumper)
     end
     if (tag == "middle bumper") then
         aplay(sounds.middleBumper)
-        play.addScore(500)
+        play.addScore(points.bumper)
     end
     if (tag == "right bumper") then
         aplay(sounds.rightBumper)
-        play.addScore(500)
+        play.addScore(points.bumper)
     end
     if (tag == "left kicker" or tag == "right kicker") then
-        play.addScore(750)
+        play.addScore(points.kicker)
         aplay(sounds.leftBumper)
     end
     if (tag == "left ramp" or tag == "right ramp") then
@@ -522,7 +537,7 @@ function play.onWordTargetSwitch(letter)
 end
 
 function play.onWordTargetComplete()
-    play.addScore(1250)
+    play.addScore(points.wordBonus)
     aplay(sounds.wordBonus)
     led:add("Word Bonus")
     mission:check("nova word")
@@ -533,7 +548,7 @@ function play.onLeftTargetSwitch(letter)
 end
 
 function play.onLeftTargetsComplete()
-    play.addScore(100)
+    play.addScore(points.dotTargets)
     mission:check("left targets")
 end
 
@@ -542,7 +557,7 @@ function play.onRightTargetsSwitch(letter)
 end
 
 function play.onRightTargetsComplete()
-    play.addScore(100)
+    play.addScore(points.dotTargets)
     mission:check("right targets")
 end
 
@@ -568,20 +583,20 @@ end
 function mission.onMissionAdvanced(title)
 
     if (title == "red giant") then
-        play.addScore(1000)
+        play.addScore(points.missionGoal1)
         led:add("Star evolved into a Red Giant", "priority")
         spriteStates:item("red star"):setVisible(true):scale(0.1)
     elseif (title == "hydrogen release") then
-        play.addScore(1250)
+        play.addScore(points.missionGoal2)
         led:add("Hydrogen released", "priority")
         aplay(sounds.hydrogenReleased)
     elseif (title == "fusion stage 1") then
-        play.addScore(1500)
+        play.addScore(points.missionGoal3)
         led:add("Fusion first stage complete", "priority")
         spriteStates:item("wheel 1"):setVisible(true):scale(0.02)
         aplay(sounds.fusion1)
     elseif (title == "fusion stage 2") then
-        play.addScore(1750)
+        play.addScore(points.missionGoal4)
         led:add("Fusion second stage complete", "priority")
         spriteStates:item("wheel 2"):setVisible(true):scale(0.02)
         aplay(sounds.fusion2)
@@ -591,7 +606,7 @@ function mission.onMissionAdvanced(title)
         led:add("Fusion unstable", "priority")
         spriteStates:item("rays"):setVisible(true):scale(0.03)
     elseif (title == "collapse star") then
-        play.addScore(2250)
+        play.addScore(points.missionGoal5)
         led:add("Star collapsing", "priority")
         led:add("Black hole created", "priority")
         play.showBlackHole()
@@ -600,7 +615,7 @@ function mission.onMissionAdvanced(title)
         led:add("Wormhole Alert!", "priority,sticky")
         play.showWormhole()
     elseif (title == "reset") then
-        play.addScore(10000)
+        play.addScore(points.missionGoal6)
         led:add("Supergravity Bonus", "priority")
         aplay(sounds.supergravityBonus)
         play.resetMissionSprites()
@@ -610,7 +625,7 @@ function mission.onMissionAdvanced(title)
         led:add("Matter Jetisson")
         led:add("Score another ball")
     elseif (title == "bonus ball") then
-        play.addScore(15000)
+        play.addScore(points.missionGoal7)
         play.releaseBonusBall()
         play.activateBallSaver()
     end
