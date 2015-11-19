@@ -41,7 +41,7 @@ playlist.volumeAdjust = 0
 playlist.playedTime = 0
 
 -- The maximum number of seconds a track can play for (looped)
-playlist.maxPlayTime = 20 --180
+playlist.maxPlayTime = 180
 
 function playlist:load()
     self:refreshTracks()
@@ -235,17 +235,17 @@ function playlist:nextTrack()
 end
 
 function playlist:volumeUp()
-    if playlist.source then
+    local track = self:nowplaying()
+    if track and playlist.source then
         playlist.volumeAdjust = math.max(-1, math.min(0, playlist.volumeAdjust + 0.1))
-        local track = self:nowplaying()
         playlist.source:setVolume(track.volume + playlist.volumeAdjust)
     end
 end
 
 function playlist:volumeDown()
-    if playlist.source then
+    local track = self:nowplaying()
+    if track and playlist.source then
         playlist.volumeAdjust = math.max(-1, math.min(0, playlist.volumeAdjust - 0.1))
-        local track = self:nowplaying()
         playlist.source:setVolume(track.volume + playlist.volumeAdjust)
     end
 end
