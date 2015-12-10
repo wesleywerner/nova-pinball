@@ -9,7 +9,7 @@ if [ -z $VER ]; then
 fi
 
 # The love version to build against
-LOVER="0.9.1"
+LOVER="0.9.2"
 
 # Win32
 love-release -W32 -t "nova-pinball-$VER" -l $LOVER -v $VER -x image-sources\/\* -x dev\/\* -x nova-pinball-engine\/editor\/\*
