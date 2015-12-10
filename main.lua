@@ -16,7 +16,7 @@
 -- Written by Wesley "keyboard monkey" Werner 2015
 -- https://github.com/wesleywerner/
 
-VERSION = "0.2.2.1"
+VERSION = "0.2.2.2"
 DEBUG = false
 spriteManager = require("modules.sprite-state-manager")
 stateManager = require ("modules.states")
