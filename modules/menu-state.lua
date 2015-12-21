@@ -65,6 +65,18 @@ function thisState:update (dt)
     end
 end
 
+function thisState:mousepressed(x, y, button)
+    if self.state:on("scores") then
+        scores:mousepressed(x, y, button)
+    else
+        touch:pressed("menu", x, y)
+    end
+end
+
+function thisState:mousereleased(x, y, button)
+    touch:released("menu", x, y)
+end
+
 function thisState:keypressed (key)
     -- Menu navigation
     if (key == "up") then
@@ -160,9 +172,11 @@ function thisState:draw ( )
     -- Draw the menus
     if self.state:on("main") then
         self:drawOptionsMenu()
+        touch:draw("menu")
     elseif self.state:on("config") then
         self:drawOptionsMenu()
         self:drawSelectedOptionDescription()
+        touch:draw("menu")
     elseif self.state:on("about") then
         about:draw()
     elseif self.state:on("scores") then

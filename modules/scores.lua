@@ -103,12 +103,27 @@ function scores:register(score)
     end
     
     self.initials = ""
+    
     -- The new score made it on the list
-    if (self.newScoreIndex) then self.isTyping = true end
+    if (self.newScoreIndex) then
+        self.isTyping = true
+        -- Enable input on Androids
+        if love.system.getOS() == "Android" then
+            love.keyboard.setTextInput(true)
+        end
+    end
+    
 end
 
 function scores:update(dt)
 
+end
+
+function scores:mousepressed(x, y, button)
+    -- Enable input on Androids
+    if self.isTyping and love.system.getOS() == "Android" then
+        love.keyboard.setTextInput(true)
+    end
 end
 
 function scores:keypressed(key)
@@ -117,6 +132,10 @@ function scores:keypressed(key)
         if (key == "return" or key == "enter") then
             self.isTyping = false
             self:save()
+            -- Disable text input on Android
+            if love.system.getOS() == "Android" then
+                love.keyboard.setTextInput(false)
+            end
         else
             if (self.initials:len() < 3 and string.find("0123456789abcdefghijklmnopqrstuvwxyz", key)) then
                 self.initials = self.initials .. string.upper(key)

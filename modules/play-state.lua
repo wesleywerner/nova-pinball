@@ -174,6 +174,14 @@ function play:keyreleased(key)
     end
 end
 
+function play:mousepressed(x, y, button)
+    touch:pressed("play", x, y)
+end
+
+function play:mousereleased(x, y, button)
+    touch:released("play", x, y)
+end
+
 function play:draw ( )
 
     -- Reset drawing color
@@ -228,6 +236,8 @@ function play:draw ( )
     elseif (states:on("game over")) then
         printShadowText("GAME OVER", 200, {255, 128, 255, 200})
     end
+    
+    touch:draw("play")
 
 end
 

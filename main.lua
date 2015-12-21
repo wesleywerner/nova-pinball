@@ -16,10 +16,11 @@
 -- Written by Wesley "keyboard monkey" Werner 2015
 -- https://github.com/wesleywerner/
 
-VERSION = "0.2.2.2"
+VERSION = "0.2.3"
 DEBUG = false
 spriteManager = require("modules.sprite-state-manager")
 stateManager = require ("modules.states")
+touch = require("modules.android-touch")
 playstate = nil
 mainstate = nil
 menu = nil
@@ -50,6 +51,29 @@ function love.load(arg)
     splash:load()
 
     love.graphics.setFont(largeFont)
+    
+    -- Set up touch device buttons
+    if touch.active then
+       
+       touch:add("menu", "up", "UP", {left=0, top=60, bottom=80, right=15},
+           love.graphics.newImage("images/android-arrow-up.png"))
+       
+       touch:add("menu", "down", "DN", {left=0, top=80, bottom=100, right=15},
+           love.graphics.newImage("images/android-arrow-down.png"))
+       
+       touch:add("menu", " ", "SELECT", {left=0, top=40, bottom=60, right=15},
+           love.graphics.newImage("images/android-enter.png"))
+       
+       touch:add("play", "lshift", "", {left=0, top=80, bottom=100, right=15},
+           love.graphics.newImage("images/android-enter.png"))
+       
+       touch:add("play", "rshift", "", {left=85, top=80, bottom=100, right=100},
+           love.graphics.newImage("images/android-enter.png"))
+       
+       touch:add("play", " ", "Launch", {left=85, top=60, bottom=80, right=100},
+           love.graphics.newImage("images/android-arrow-up.png"))
+       
+    end
 
 end
 
@@ -85,6 +109,28 @@ function love.keyreleased(key)
     end
 end
 
+function love.textinput(t)
+    if mainstate:on("menu") and menu.state:on("scores") then
+       scores:keypressed(t) 
+    end
+end
+
+function love.mousepressed(x, y, button)
+    if (mainstate:on("play")) then
+        playstate:mousepressed(x, y, button)
+    elseif (mainstate:on("menu")) then
+        menu:mousepressed(x, y, button)
+    end
+end
+
+function love.mousereleased(x, y, button)
+    if (mainstate:on("play")) then
+        playstate:mousereleased(x, y, button)
+    elseif (mainstate:on("menu")) then
+        menu:mousereleased(x, y, button)
+    end
+end
+
 function love.draw ( )
     if (mainstate:on("play")) then
         playstate:draw()
@@ -92,7 +138,7 @@ function love.draw ( )
         splash:draw()
     elseif (mainstate:on("menu")) then
         menu:draw()
-    end
+    end    
 end
 
 function love.resize (w, h)
