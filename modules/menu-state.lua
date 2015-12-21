@@ -164,11 +164,13 @@ end
 function thisState:draw ( )
     love.graphics.setColor(255, 255, 255, 255)
     -- Draw background
-    love.graphics.draw(sprites.background.image, 0, 0)
+    love.graphics.draw(sprites.background.image,
+        (scrWidth - sprites.background.image:getWidth())/2, 0)
     -- Draw rotating overlay
     spriteStates:draw()
     -- Draw spikes
-    love.graphics.draw(sprites.spikes.image, 0, 0)
+    love.graphics.draw(sprites.spikes.image,
+        (scrWidth - sprites.spikes.image:getWidth())/2, 0)
     -- Draw the menus
     if self.state:on("main") then
         self:drawOptionsMenu()
