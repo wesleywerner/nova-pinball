@@ -69,13 +69,11 @@ end
 function thisState:mousepressed(x, y, button)
     if self.state:on("scores") then
         scores:mousepressed(x, y, button)
-    else
-        touch:pressed("menu", x, y)
     end
 end
 
 function thisState:mousereleased(x, y, button)
-    touch:released("menu", x, y)
+    -- touch handled in touch:update()
 end
 
 function thisState:keypressed (key)

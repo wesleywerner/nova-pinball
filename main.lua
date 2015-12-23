@@ -115,6 +115,18 @@ function love.textinput(t)
     end
 end
 
+function love.mousepressed(x, y, button)
+    if (mainstate:on("menu")) then
+        menu:mousepressed(x, y, button)
+    end
+end
+
+function love.mousereleased(x, y, button)
+    if (mainstate:on("menu")) then
+        menu:mousereleased(x, y, button)
+    end
+end
+
 function love.draw ( )
     if (mainstate:on("play")) then
         playstate:draw()
