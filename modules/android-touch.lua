@@ -5,6 +5,14 @@ touch.colors = {}
 touch.colors.fill = {0, 200, 100, 200}
 touch.colors.border = {200, 255, 255, 200}
 touch.colors.font = {255, 255, 255, 200}
+touch.colors.tint = {200, 255, 200, 128}
+
+-- Remember the last key down
+touch.lastkey = nil
+
+-- Limit touch rate
+--touch.cooldown = 0.1
+--touch.cooldownvalue = touch.cooldown
 
 -- A zone is a state when to show a button.
 touch.zones = {}
@@ -21,11 +29,6 @@ function touch.add(self, zone, key, title, position, image)
         -- Set up a new zone collection
         self.zones[zone] = {}
     end
-    
---    if image then
---        position.bottom = position.top + image:getWidth()
---        position.right = position.left + image:getHeight()
---    end
     
     local touchData = {
         title=title,
@@ -83,11 +86,13 @@ function touch.draw(self, zone)
         -- Image
         if button.image then
             
-           love.graphics.draw(button.image,
-               x+w/2, y+h/2,
-               0, 1, 1,
-               button.image:getWidth()/2,
-               button.image:getHeight()/2)
+            love.graphics.setColor(touch.colors.tint)
+            
+            love.graphics.draw(button.image,
+                x+w/2, y+h/2,
+                0, 1, 1,
+                button.image:getWidth()/2,
+                button.image:getHeight()/2)
             
             if DEBUG then
                 love.graphics.rectangle("line", x, y, w, h)
@@ -133,46 +138,39 @@ function touch.released(self, zone, x, y)
     
 end
 
-function touch.addKeyboard(self)
+function touch.update(self, dt, zone)
     
-    local numbers = "0123456789"
-    local alpha1 = "abcdefghijklm"
-    local alpha2 = "nopqrstuvwxyz"
-    local special = {"backspace", "return"}
+    if not self.active then return end
     
-    for col = 1, #numbers  do
-        local key = numbers:sub(col, col)
-        local width = 7.6
-        local x= (col-1)*width
-        self:add("kb", key, key, {left=x, top=60, bottom=70, right=x+width})
+    --touch.cooldownvalue = touch.cooldownvalue - dt
+    
+    --if touch.cooldownvalue > 0 then return end
+    
+    --touch.cooldownvalue = touch.cooldown
+    
+    if love.mouse.isDown('l') then
+    
+        local x, y = love.mouse.getPosition() 
+        
+        local key = self:determine_zone(zone, x, y)
+        
+        if key and self.lastkey ~= key then
+            love.keypressed(key)
+            self.lastkey = key
+        end
+            
+    else
+        if self.lastkey then
+            love.keyreleased(self.lastkey)
+            self.lastkey = nil
+        end
     end
-
-    for col = 1, #alpha1  do
-        local key = alpha1:sub(col, col)
-        local width = 7.6
-        local x= (col-1)*width
-        self:add("kb", key, key, {left=x, top=70, bottom=80, right=x+width})
-    end
-
-    for col = 1, #alpha2  do
-        local key = alpha2:sub(col, col)
-        local width = 7.6
-        local x= (col-1)*width
-        self:add("kb", key, key, {left=x, top=80, bottom=90, right=x+width})
-    end
-
-    for col, n in ipairs(special) do
-        local width = 30
-        local x= (col-1)*width
-        self:add("kb", n, n, {left=x, top=90, bottom=100, right=x+width})
-    end
-
+    
 end
 
 -- Hook the touch regions for android devices
 if DEBUG or love.system.getOS() == "Android" then
     touch.active = true
-    touch:addKeyboard()
 end
 
 return touch

@@ -87,12 +87,14 @@ function play:update (dt)
     targets.bumpers:update(dt)
     
     if (states:on("preview")) then
+        touch:update(dt, "play")
         led:update(dt)
         if (play.previewPosition > -(pinball.table.size.height-scrHeight)) then
             play.previewPosition = play.previewPosition - (dt*50)
             pinball.cfg.translateOffset.y = play.previewPosition
         end
     elseif (states:on("game over")) then
+        touch:update(dt, "play")
         led:update(dt)
         -- Scroll the camera up until the table is out of view
         if (play.previewPosition < pinball.table.size.height) then
@@ -102,6 +104,7 @@ function play:update (dt)
             play.quitToScores()
         end
     elseif (states:on("play")) then
+        touch:update(dt, "play")
         led:update(dt)
         play.updateShakeAnimation(dt)
         pinball:update(dt)
@@ -111,6 +114,7 @@ function play:update (dt)
         play.updateNudgeCounters(dt)
         play.updateSafemode(dt)
     elseif (states:on("paused")) then
+        touch:update(dt, "paused")
         pausedScreen:update(dt)
     end
 
@@ -233,12 +237,13 @@ function play:draw ( )
     -- Simple text overlays
     if (states:on("paused")) then
         pausedScreen:draw()
+        touch:draw("paused")
     elseif (states:on("game over")) then
         printShadowText("GAME OVER", 200, {255, 128, 255, 200})
+    else
+        touch:draw("play")
     end
     
-    touch:draw("play")
-
 end
 
 function play:resize (w, h)

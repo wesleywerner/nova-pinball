@@ -56,6 +56,7 @@ function thisState:load()
 end
 
 function thisState:update (dt)
+    touch:update(dt, "menu")
     self.state:update(dt)
     spriteStates:update(dt)
     if self.state:on("about") then
