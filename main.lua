@@ -55,22 +55,22 @@ function love.load(arg)
     -- Set up touch device buttons
     if touch.active then
        
-       touch:add("menu", "up", "UP", {left=0, top=60, bottom=80, right=15},
+       touch:add("menu", "up", "UP", {left=0, top=10, bottom=50, right=30},
            love.graphics.newImage("images/android-arrow-up.png"))
        
-       touch:add("menu", "down", "DN", {left=0, top=80, bottom=100, right=15},
+       touch:add("menu", "down", "DN", {left=0, top=50, bottom=90, right=30},
            love.graphics.newImage("images/android-arrow-down.png"))
        
-       touch:add("menu", " ", "SELECT", {left=0, top=40, bottom=60, right=15},
+       touch:add("menu", " ", "SELECT", {left=70, top=20, bottom=70, right=100},
            love.graphics.newImage("images/android-enter.png"))
        
-       touch:add("play", "lshift", "", {left=0, top=80, bottom=100, right=15},
+       touch:add("play", "lshift", "", {left=0, top=20, bottom=70, right=30},
            love.graphics.newImage("images/android-enter.png"))
        
-       touch:add("play", "rshift", "", {left=85, top=80, bottom=100, right=100},
+       touch:add("play", "rshift", "", {left=70, top=20, bottom=70, right=100},
            love.graphics.newImage("images/android-enter.png"))
        
-       touch:add("play", " ", "Launch", {left=85, top=60, bottom=80, right=100},
+       touch:add("play", " ", "Launch", {left=70, top=70, bottom=100, right=100},
            love.graphics.newImage("images/android-arrow-up.png"))
        
     end
@@ -112,22 +112,6 @@ end
 function love.textinput(t)
     if mainstate:on("menu") and menu.state:on("scores") then
        scores:keypressed(t) 
-    end
-end
-
-function love.mousepressed(x, y, button)
-    if (mainstate:on("play")) then
-        playstate:mousepressed(x, y, button)
-    elseif (mainstate:on("menu")) then
-        menu:mousepressed(x, y, button)
-    end
-end
-
-function love.mousereleased(x, y, button)
-    if (mainstate:on("play")) then
-        playstate:mousereleased(x, y, button)
-    elseif (mainstate:on("menu")) then
-        menu:mousereleased(x, y, button)
     end
 end
 
