@@ -173,6 +173,12 @@ function touch.update(self, dt, zone)
     
 end
 
+function touch.vibe(self, duration)
+    if self.active and love.system.vibrate then
+        love.system.vibrate(duration)
+    end
+end
+
 -- Hook the touch regions for android devices
 if DEBUG or love.system.getOS() == "Android" then
     touch.active = true

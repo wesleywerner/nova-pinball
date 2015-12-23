@@ -179,11 +179,11 @@ function play:keyreleased(key)
 end
 
 function play:mousepressed(x, y, button)
-    touch:pressed("play", x, y)
+    -- touch handled in touch:update()
 end
 
 function play:mousereleased(x, y, button)
-    touch:released("play", x, y)
+    -- touch handled in touch:update()
 end
 
 function play:draw ( )
@@ -481,6 +481,7 @@ function pinball.ballDrained (ballsInPlay)
         play.launchBall(false)
         led:add("Ball Saved", "priority")
     elseif (ballsInPlay == 0) then
+        touch:vibe(0.3)
         led:add("Ball drained", "priority")
         play.balls = play.balls - 1
         if (play.balls == 0) then play.endGame() end
@@ -510,31 +511,41 @@ function pinball.tagContact (tag, id)
             pinball:lockBall (id, sprites.blackhole.x, sprites.blackhole.y, 1, v1, v2)
             play.addScore(points.gravityLock)
             led:add("Gravity Lock Bonus")
+            touch:vibe(0.2)
         end
     end
 
     if (tag == "left bumper") then
         aplay(sounds.leftBumper)
         play.addScore(points.bumper)
+        touch:vibe(0.05)
     end
     if (tag == "middle bumper") then
         aplay(sounds.middleBumper)
         play.addScore(points.bumper)
+        touch:vibe(0.05)
     end
     if (tag == "right bumper") then
         aplay(sounds.rightBumper)
         play.addScore(points.bumper)
+        touch:vibe(0.05)
     end
     if (tag == "left kicker" or tag == "right kicker") then
         play.addScore(points.kicker)
         aplay(sounds.leftBumper)
+        touch:vibe(0.05)
     end
     if (tag == "left ramp" or tag == "right ramp") then
         aplay(sounds.ramp)
+        touch:vibe(0.2)
     end
 
     if (tag == "wall") then
         aplay(sounds.wall)
+    end
+    
+    if (tag == "flipper") then
+        touch:vibe(0.05)
     end
 
     -- Switch targets on when their tag is hit
@@ -771,6 +782,7 @@ function play.launchBall(firstLaunch)
         -- Play the launch sound
         aplay(sounds.launch)
         pinball:newBall()
+        touch:vibe(0.2)
     else
         -- Launch another ball, or shake the table
         if (#pinball.bodies.balls == 0) then
@@ -779,6 +791,7 @@ function play.launchBall(firstLaunch)
             play.tilt = false
             play.nudgeCount = 0
             aplay(sounds.launch)
+            touch:vibe(0.2)
         else
             if (not play.tilt) then
                 pinball:nudge(0, 0, -100, 0)
@@ -787,6 +800,7 @@ function play.launchBall(firstLaunch)
                 if (play.nudgeCount == play.nudgeThreshhold) then
                     play.tilt = true
                     led:add("TILT!", "priority,sticky")
+                    touch:vibe(0.3)
                 end
                 aplay(sounds.nudge)
             end
