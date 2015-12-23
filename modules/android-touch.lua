@@ -155,6 +155,11 @@ function touch.update(self, dt, zone)
         local key = self:determine_zone(zone, x, y)
         
         if key and self.lastkey ~= key then
+            -- Release last key first
+            if self.lastkey then
+                love.keyreleased(self.lastkey)
+            end
+            -- Press new key
             love.keypressed(key)
             self.lastkey = key
         end
