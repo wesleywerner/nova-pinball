@@ -17,7 +17,7 @@
 -- https://github.com/wesleywerner/
 
 VERSION = "0.2.3"
-DEBUG = false
+DEBUG = true
 spriteManager = require("modules.sprite-state-manager")
 stateManager = require ("modules.states")
 touch = require("modules.android-touch")
@@ -35,7 +35,7 @@ function love.load(arg)
 
     if arg[#arg] == "-debug" then require("mobdebug").start() end
     math.randomseed(os.time())
-    love.mouse.setVisible(false)
+    if not DEBUG then love.mouse.setVisible(false) end
     scrWidth, scrHeight = love.window.getDimensions()
 
     -- Set up main states
@@ -55,26 +55,25 @@ function love.load(arg)
     -- Set up touch device buttons
     if touch.active then
        
-       touch:add("menu", "up", "UP", {left=0, top=10, bottom=50, right=30},
-           love.graphics.newImage("images/android-arrow-up.png"))
+--       touch:add("menu", "up", "UP", {left=0, top=10, bottom=50, right=30},
+--           love.graphics.newImage("images/android-arrow-up.png"))
        
-       touch:add("menu", "down", "DN", {left=0, top=50, bottom=90, right=30},
-           love.graphics.newImage("images/android-arrow-down.png"))
+--       touch:add("menu", "down", "DN", {left=0, top=50, bottom=90, right=30},
+--           love.graphics.newImage("images/android-arrow-down.png"))
        
-       touch:add("menu", " ", "SELECT", {left=70, top=20, bottom=70, right=100},
-           love.graphics.newImage("images/android-enter.png"))
+--       touch:add("menu", " ", "SELECT", {left=70, top=20, bottom=70, right=100},
+--           love.graphics.newImage("images/android-enter.png"))
        
        touch:add("play", "lshift", "", {left=0, top=20, bottom=70, right=30},
-           love.graphics.newImage("images/android-enter.png"))
+           love.graphics.newImage("images/android-left-shift.png"))
        
        touch:add("play", "rshift", "", {left=70, top=20, bottom=70, right=100},
-           love.graphics.newImage("images/android-enter.png"))
+           love.graphics.newImage("images/android-right-shift.png"))
        
        touch:add("play", " ", "Launch", {left=70, top=70, bottom=100, right=100},
            love.graphics.newImage("images/android-arrow-up.png"))
        
-       touch:add("paused", " ", "Launch", {left=70, top=70, bottom=100, right=100},
-           love.graphics.newImage("images/android-arrow-up.png"))
+       touch:add("paused", " ", "Launch", {left=0, top=0, bottom=100, right=100})
        
     end
 

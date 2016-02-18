@@ -48,6 +48,10 @@ function thisState:load()
     spr:setBlendmode("subtractive")
     spr.sprite.x = scrWidth / 2
     spr.sprite.y = scrHeight / 2
+    
+    -- Initial setup for touch menus
+    self:drawOptionsMenu(true)
+    
     -- Menu sounds
     menuSound = love.audio.newSource("audio/menu.wav", "static")
     
@@ -136,11 +140,11 @@ function thisState:keyreleased(key)
     end
 end
 
-function thisState:drawOptionsMenu()
+function thisState:drawOptionsMenu(measureTouchPositions)
     love.graphics.setFont(largeFont)
     local y = 100
     local color
-    for _, m in ipairs(currentOptions) do
+    for i, m in ipairs(currentOptions) do
         if (currentOptions[selectedItem] == m) then
             color = {255, 255, 255, 255}
             love.graphics.draw(sprites.ball.image, 160, y)
@@ -148,6 +152,14 @@ function thisState:drawOptionsMenu()
             color = {200, 200, 255, 255}
         end
         printShadowText(m, y, color)
+        
+        if measureTouchPositions and touch.active then
+            touch:add("menu", "", tostring(i), 
+                    {x=0, y=y-40, w=scrWidth, h=80},
+                    nil,
+                    thisState.touchMenuAction, i)
+        end
+        
         y = y + 80
     end
 end
@@ -191,6 +203,11 @@ end
 
 function thisState:resetSelection()
     selectedItem = 1
+end
+
+function thisState.touchMenuAction(index)
+    selectedItem = index
+    thisState:menuAction()
 end
 
 function thisState:menuAction()

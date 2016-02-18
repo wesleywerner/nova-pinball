@@ -766,12 +766,13 @@ end
 
 function play.launchBall(firstLaunch)
     if (firstLaunch) then
+        -- Switch to the play game state
+        states:set("play")
+        -- Turn off tilt mode
         play.tilt = false
         led:clear()
         -- Stop the pre-launch scroll effect
         pinball.cfg.translateOffset.y = 0
-        -- Switch to the play game state
-        states:set("play")
         -- Display the LED message
         led:add("Make the star go Nova", "priority")
         -- Light up the first target (the mission check callback won't fire at this point as no goals are met yet)

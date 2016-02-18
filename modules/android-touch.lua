@@ -11,8 +11,8 @@ touch.colors.tint = {200, 255, 200, 128}
 touch.lastkey = nil
 
 -- Limit touch rate
---touch.cooldown = 0.1
---touch.cooldownvalue = touch.cooldown
+touch.cooldown = 0.15
+touch.cooldownvalue = touch.cooldown
 
 -- A zone is a state when to show a button.
 touch.zones = {}
@@ -23,7 +23,7 @@ touch.zones = {}
 -- as top, left, bottom, right values:
 --      { top=10, left=10, bottom=15, right=15 }
 --  (A button 10% top-left and 15% bottom-right of the device size)
-function touch.add(self, zone, key, title, position, image)
+function touch.add(self, zone, key, title, position, image, func, params)
     
     if not self.zones[zone] then
         -- Set up a new zone collection
@@ -34,7 +34,9 @@ function touch.add(self, zone, key, title, position, image)
         title=title,
         position=position,
         key=key,
-        image=image
+        image=image,
+        func=func,
+        params=params
     }
     
     table.insert(self.zones[zone], touchData)
@@ -51,13 +53,33 @@ function touch.determine_zone(self, zone, x, y)
     
     for _, button in pairs(self.zones[zone]) do
         
-        local bx = button.position.left / 100 * W
-        local by = button.position.top / 100 * H
-        local bh = button.position.bottom / 100 * H
-        local bw = button.position.right / 100 * W
+        local bx = button.position.x
+        local by = button.position.y
+        local bh = button.position.h
+        local bw = button.position.w
+        
+        if by and bh then bh = bh + by end
+        
+        if button.position.left then
+            bx = button.position.left / 100 * W
+        end
+        if button.position.top then
+            by = button.position.top / 100 * H
+        end
+        if button.position.bottom then
+            bh = button.position.bottom / 100 * H
+        end
+        if button.position.right then
+            bw = button.position.right / 100 * W 
+        end
         
         if x > bx and x < bw and y > by and y < bh then
-            return button.key
+            if button.func then
+                touch.cooldownvalue = touch.cooldown
+                button.func(button.params)
+            else
+                return button.key
+            end
         end
         
     end
@@ -78,11 +100,24 @@ function touch.draw(self, zone)
     
     for _, button in pairs(self.zones[zone]) do
         
-        local x = button.position.left / 100 * W
-        local y = button.position.top / 100 * H
-        local h = button.position.bottom / 100 * H - y
-        local w = button.position.right / 100 * W - x
-            
+        local x = button.position.x
+        local y = button.position.y
+        local h = button.position.h
+        local w = button.position.w
+        
+        if button.position.left then
+            x = button.position.left / 100 * W
+        end
+        if button.position.top then
+            y = button.position.top / 100 * H
+        end
+        if button.position.bottom then
+            h = button.position.bottom / 100 * H - y
+        end
+        if button.position.right then
+            w = button.position.right / 100 * W - x 
+        end
+        
         -- Image
         if button.image then
             
@@ -100,17 +135,17 @@ function touch.draw(self, zone)
 
         else
             
-            -- Fill
-            love.graphics.setColor(touch.colors.fill)
-            love.graphics.rectangle("fill", x, y, w, h)
+--            -- Fill
+--            love.graphics.setColor(touch.colors.fill)
+--            love.graphics.rectangle("fill", x, y, w, h)
             
-            -- Border
-            love.graphics.setColor(touch.colors.border)
-            love.graphics.rectangle("line", x, y, w, h)
+--            -- Border
+--            love.graphics.setColor(touch.colors.border)
+--            love.graphics.rectangle("line", x, y, w, h)
             
-            -- Title
-            love.graphics.setColor(touch.colors.font)
-            love.graphics.printf(button.title, x, y+h/2, w, "center")
+--            -- Title
+--            love.graphics.setColor(touch.colors.font)
+--            love.graphics.printf(button.title, x, y+h/2, w, "center")
             
         end
         
@@ -118,35 +153,33 @@ function touch.draw(self, zone)
     
 end
 
-function touch.pressed(self, zone, x, y)
+--function touch.pressed(self, zone, x, y)
     
-    if not self.active then return end
+--    if not self.active then return end
     
-    local key = self:determine_zone(zone, x, y)
+--    local key = self:determine_zone(zone, x, y)
     
-    if key then love.keypressed(key) end
+--    if key then love.keypressed(key) end
     
-end
+--end
 
-function touch.released(self, zone, x, y)
+--function touch.released(self, zone, x, y)
     
-    if not self.active then return end
+--    if not self.active then return end
     
-    local key = self:determine_zone(zone, x, y)
+--    local key = self:determine_zone(zone, x, y)
     
-    if key then love.keyreleased(key) end
+--    if key then love.keyreleased(key) end
     
-end
+--end
 
 function touch.update(self, dt, zone)
     
     if not self.active then return end
     
-    --touch.cooldownvalue = touch.cooldownvalue - dt
+    touch.cooldownvalue = touch.cooldownvalue - dt
     
-    --if touch.cooldownvalue > 0 then return end
-    
-    --touch.cooldownvalue = touch.cooldown
+    if touch.cooldownvalue > 0 then return end
     
     if love.mouse.isDown('l') then
     
