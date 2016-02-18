@@ -99,6 +99,7 @@ function screen:keypressed(key)
 end
 
 function screen:drawVolumeBar()
+    if touch.active then return end
     -- Volume Bar
     love.graphics.setLineWidth(2)
     -- (fill)
@@ -170,12 +171,14 @@ function screen:drawNowPlayingTrack()
             screen.trackBox.width,
             "left")
 
-        love.graphics.setColor(255, 255, 255, 64)
-        love.graphics.printf("Arrows - Skip + Volume",
-            screen.hintBox.x,
-            screen.hintBox.y,
-            screen.hintBox.width,
-            "center")
+        if not touch.active then
+            love.graphics.setColor(255, 255, 255, 64)
+            love.graphics.printf("Arrows - Skip + Volume",
+                screen.hintBox.x,
+                screen.hintBox.y,
+                screen.hintBox.width,
+                "center")
+        end
         
         -- Signal there is a track playing
         return true
