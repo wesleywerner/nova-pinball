@@ -118,7 +118,7 @@ end
 
 function play:keypressed (key)
     if (states:on("preview")) then
-        if (key == " ") then play.launchBall(true) end
+        if (key == "space") then play.launchBall(true) end
         if (key == "escape") then mainstate:set("menu") end
     elseif (states:on("play")) then
         if (key == "escape") then states:set("paused") end
@@ -130,14 +130,14 @@ function play:keypressed (key)
             aplay(sounds.rightFlipper)
             pinball:moveRightFlippers()
         end
-        if (key == " ") then play.launchBall() end
+        if (key == "space") then play.launchBall() end
     elseif (states:on("paused")) then
-        if (key == " ") then states:set("play") end
+        if (key == "space") then states:set("play") end
         if (key == "escape") then mainstate:set("menu") end
         pausedScreen:keypressed(key)
     elseif (states:on("game over")) then
         -- Quick escape to the high score list on game over
-        if (key == "escape" or key == " ") then
+        if (key == "escape" or key == "space") then
             play.quitToScores()
         end
     end
@@ -162,7 +162,7 @@ function play:keyreleased(key)
     if (key == "rshift" or key == "right") then pinball:releaseRightFlippers() end
 
     -- Apply any config settings
-    if (key == "enter" or key == "return" or key == " ") then
+    if (key == "enter" or key == "return" or key == "space") then
         -- Pinball engine camera view
         play.positionDrawingElements()
         -- LED and Lights (1 is LED, 2 is lights, 3 is both
