@@ -45,7 +45,7 @@ function thisState:load()
     sprites.spikes = loadSprite("images/about-screen-spikes.png")
     -- Rotating checkerboard
     local spr = spriteStates:add("checkers", sprites.background):setRotation(0.05)
-    spr:setBlendmode("subtractive")
+    spr:setBlendmode("subtract")
     spr.sprite.x = scrWidth / 2
     spr.sprite.y = scrHeight / 2
     -- Menu sounds
@@ -81,7 +81,7 @@ function thisState:keypressed (key)
         if (key == "escape") then
             -- Focus the last main menu item
             selectedItem = #currentOptions
-        elseif (key == "return" or key == "enter" or key == " ") then
+        elseif (key == "return" or key == "enter" or key == "space") then
             self:menuAction()
         end
     elseif (self.state:on("config")) then
@@ -100,11 +100,11 @@ function thisState:keypressed (key)
             self.state:set("main")
             currentOptions = mainOptions
             self:resetSelection()
-        elseif (key == "return" or key == "enter" or key == " ") then
+        elseif (key == "return" or key == "enter" or key == "space") then
             self:menuAction()
         end
     elseif (self.state:on("about")) then
-        if (key == " ") then
+        if (key == "space") then
             about:forward()
         elseif (key == "escape") then
             self.state:set("main")

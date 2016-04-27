@@ -35,7 +35,7 @@ function love.load(arg)
     if arg[#arg] == "-debug" then require("mobdebug").start() end
     math.randomseed(os.time())
     love.mouse.setVisible(false)
-    scrWidth, scrHeight = love.window.getDimensions()
+    scrWidth, scrHeight = love.graphics.getDimensions()
 
     -- Set up main states
     mainstate = stateManager:new()
