@@ -913,7 +913,7 @@ function play.setupSpritePositions()
     spriteStates:add("star flare", sprites.starFlare):setRotation(-0.01):setScale(0)
     spriteStates:add("worm hole rays", sprites.wormholeRays):setRotation(0.1):setScale(0)
     spriteStates:add("worm hole", sprites.wormhole):setRotation(0.1):setScale(0)
-    spriteStates:add("worm hole clouds", sprites.wormholeClouds):setRotation(0.6):setScale(0):setBlendmode("additive")
+    spriteStates:add("worm hole clouds", sprites.wormholeClouds):setRotation(0.6):setScale(0):setBlendmode("add")
     spriteStates:add("black hole", sprites.blackhole):setScale(0)
 end
 
