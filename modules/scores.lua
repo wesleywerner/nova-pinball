@@ -47,7 +47,7 @@ function scores:load()
         {score=2000, initials="HHH", date="03/11/2015"},
         }
     -- Load scores from file
-    local info = love.filesystem.getinfo("scores")
+    local info = love.filesystem.getInfo("scores")
     if info then
         local pickle = require("modules.pickle")
         local rawData, size = love.filesystem.read("scores")

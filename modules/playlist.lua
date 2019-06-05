@@ -70,7 +70,7 @@ end
 --      title, loop, volume
 function playlist:addTrack(path, filename)
     local nfopath = path .. "/" .. filename .. ".nfo"
-    local infoExists = love.filesystem.getinfo(nfopath)
+    local infoExists = love.filesystem.getInfo(nfopath)
     local track = {}
     track.file = path .. "/" .. filename
     track.volume = 1
