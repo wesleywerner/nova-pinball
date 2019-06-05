@@ -52,7 +52,7 @@ config.settings = {
 
 -- Load config from file
 function config:load()
-    local exists = love.filesystem.exists("config")
+    local exists = love.filesystem.getinfo("config")
     if (exists) then
         local data, size = love.filesystem.read("config", nil)
         local pickle = require("modules.pickle")
