@@ -75,7 +75,7 @@ function play:load()
     play.flashAllTargets()
 end
 
-function play:update (dt)
+function play:update(dt)
     states:update(dt)
     play.updateLedDisplayMessages(dt)
 
@@ -116,7 +116,7 @@ function play:update (dt)
 
 end
 
-function play:keypressed (key)
+function play:keypressed(key)
     if (states:on("preview")) then
         if (key == "space") then play.launchBall(true) end
         if (key == "escape") then mainstate:set("menu") end
@@ -174,7 +174,7 @@ function play:keyreleased(key)
     end
 end
 
-function play:draw ( )
+function play:draw()
 
     -- Reset drawing color
     love.graphics.setBackgroundColor(0, 0, 0)
@@ -231,7 +231,7 @@ function play:draw ( )
 
 end
 
-function play:resize (w, h)
+function play:resize(w, h)
     play.positionDrawingElements()
     pinball:resize (w, h)
 end
@@ -382,7 +382,7 @@ function play.updateLedDisplayMessages(dt)
     end
 end
 
-function pinball.drawWall (points)
+function pinball.drawWall(points)
     -- Draw the table walls onto a canvas
     if (play.predraw) then
         -- Accommodate points that go into the negative Y-axiz
@@ -400,18 +400,18 @@ function pinball.drawWall (points)
     end
 end
 
-function pinball.drawBumper (tag, x, y, r)
+function pinball.drawBumper(tag, x, y, r)
     bumperManager:draw(tag, x, y)
 end
 
-function pinball.drawKicker (tag, x, y, points)
+function pinball.drawKicker(tag, x, y, points)
     bumperManager:draw(tag, x, y)
 end
 
-function pinball.drawTrigger (tag, points)
+function pinball.drawTrigger(tag, points)
 end
 
-function pinball.drawFlipper (orientation, position, angle, origin, points)
+function pinball.drawFlipper(orientation, position, angle, origin, points)
     -- orientation is "left" or "right"
     -- position {x,y}
     -- angle is in radians
@@ -426,14 +426,14 @@ function pinball.drawFlipper (orientation, position, angle, origin, points)
     love.graphics.draw(sprites.leftflipper.image, position.x, position.y, angle, scaleX, 1, origin.x, origin.y)
 end
 
-function pinball.drawBall (x, y, radius)
+function pinball.drawBall(x, y, radius)
     love.graphics.setColor(1, 1, 1, 1)
     love.graphics.draw(sprites.ball.image, x, y, 0, 1, 1, sprites.ball.ox, sprites.ball.oy)
 end
 
 -- Called when a ball has drained out of play.
 -- The number of balls still in play are passed.
-function pinball.ballDrained (ballsInPlay)
+function pinball.ballDrained(ballsInPlay)
     aplay(sounds.drained)
     if play.isSafe() then
         play.launchBall(false)
@@ -456,7 +456,7 @@ function pinball.ballUnlocked(id)
 end
 
 -- The ball made contact with a tagged component
-function pinball.tagContact (tag, id)
+function pinball.tagContact(tag, id)
 
     if (tag == "black hole" and not play.tilt) then
         local blackHoleVisible = spriteStates:item("black hole").visible

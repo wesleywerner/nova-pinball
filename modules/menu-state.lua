@@ -55,7 +55,7 @@ function thisState:load()
     if (cfg:get("music") == 1) then playlist:play("Supernova Explosion") end
 end
 
-function thisState:update (dt)
+function thisState:update(dt)
     self.state:update(dt)
     spriteStates:update(dt)
     if self.state:on("about") then
@@ -65,7 +65,7 @@ function thisState:update (dt)
     end
 end
 
-function thisState:keypressed (key)
+function thisState:keypressed(key)
     -- Menu navigation
     if (key == "up") then
         aplay(menuSound)
@@ -149,7 +149,7 @@ function thisState:drawSelectedOptionDescription()
     printShadowText(detail, scrHeight - 60, {200/256, 1, 200/256, 1})
 end
 
-function thisState:draw ( )
+function thisState:draw()
     love.graphics.setColor(1, 1, 1, 1)
     -- Draw background
     love.graphics.draw(sprites.background.image, 0, 0)
@@ -170,7 +170,7 @@ function thisState:draw ( )
     end
 end
 
-function thisState:resize (w, h)
+function thisState:resize(w, h)
 
 end
 
