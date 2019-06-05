@@ -178,7 +178,7 @@ function play:draw ( )
 
     -- Reset drawing color
     love.graphics.setBackgroundColor(0, 0, 0)
-    love.graphics.setColor (255, 255, 255, 255)
+    love.graphics.setColor (1, 1, 1, 1)
 
     -- Center in the screen
     love.graphics.translate(play.leftAlign, play.topAlign)
@@ -187,7 +187,7 @@ function play:draw ( )
     pinball:setCamera()
 
     -- Draw the background image. It has a 20px border we account for.
-    love.graphics.setColor(255, 255, 255, 255)
+    love.graphics.setColor(1, 1, 1, 1)
     sprites.background:draw()
 
     -- Draw targets and sprites
@@ -208,7 +208,7 @@ function play:draw ( )
 
     -- Draw the launch cover over the pinball components
     -- (reposition the camera as the pinball module resets it after it draws)
-    love.graphics.setColor (255, 255, 255, 255)
+    love.graphics.setColor (1, 1, 1, 1)
     sprites.launchCover:draw()
 
     -- Draw the status box
@@ -216,17 +216,17 @@ function play:draw ( )
     play.drawStatusBar()
 
     -- Draw the LED display
-    love.graphics.setColor(0, 0, 0, 255)
+    love.graphics.setColor(0, 0, 0, 1)
     love.graphics.rectangle("fill", 0, scrHeight - led.size.h, scrWidth, led.size.h)
     love.graphics.setFont(largeFont)
-    love.graphics.setColor(50, 255, 50, 255)
+    love.graphics.setColor(50/256, 1, 50/256, 1)
     led:draw()
 
     -- Simple text overlays
     if (states:on("paused")) then
         pausedScreen:draw()
     elseif (states:on("game over")) then
-        printShadowText("GAME OVER", 200, {255, 128, 255, 200})
+        printShadowText("GAME OVER", 200, {1, 0.5, 1, 200/256})
     end
 
 end
@@ -260,27 +260,27 @@ function play.drawStatusBar()
     local height = 20
     
     if play.isSafe() then
-        local g = play.safeMode*(255/play.safeModePeriod)
-        love.graphics.setColor(0, g, 0, 155)
+        local g = play.safeMode*(1/play.safeModePeriod)
+        love.graphics.setColor(0, g, 0, 155/256)
     else
-        love.graphics.setColor(0, 0, 0, 255)
+        love.graphics.setColor(0, 0, 0, 1)
     end
     
     love.graphics.rectangle("fill", 0, 0, scrWidth, height)
     love.graphics.setFont(smallFont)
 
-    love.graphics.setColor(255, 255, 255, 255)
+    love.graphics.setColor(1, 1, 1, 1)
     love.graphics.print("Balls:" .. play.balls, play.ballStatXPosition, 2)
     love.graphics.print("Score:" .. play.scoreFormatted, 10, 2)
     
     if play.isSafe() then
-        local g = play.safeMode*(255/play.safeModePeriod)
-        love.graphics.setColor(g, g, 0, 255)
+        local g = play.safeMode*(1/play.safeModePeriod)
+        love.graphics.setColor(g, g, 0, 1)
         love.graphics.print("BALL SAVER", play.ballStatXPosition-200, 2)
     end
     
     if (DEBUG) then
-        love.graphics.setColor(255, 100, 100, 255)
+        love.graphics.setColor(1, 100/256, 100/256, 1)
         love.graphics.print("DEBUG", 340, 30)
     end
 end
@@ -393,7 +393,7 @@ function pinball.drawWall (points)
         end
         play.wallCanvas:renderTo( function()
             love.graphics.setLineWidth(6)
-            love.graphics.setColor(55, 53, 140, 255)
+            love.graphics.setColor(55/256, 53/256, 140/256, 1)
             love.graphics.line(points)
             end
         )
@@ -401,30 +401,14 @@ function pinball.drawWall (points)
 end
 
 function pinball.drawBumper (tag, x, y, r)
-    --love.graphics.setLineWidth (2)
-    --love.graphics.setColor(42, 161, 152)
-    --love.graphics.circle("fill", x, y, r * 0.8)
-    --love.graphics.setColor(108, 113, 196)
-    --love.graphics.circle("line", x, y, r)
-
-    ---- draw bumper image
-    --love.graphics.setColor(255, 255, 255, 255)
-    --love.graphics.draw(sprites.bumper.image, x, y, 0, 1, 1, sprites.bumper.ox, sprites.bumper.oy)
-    
     bumperManager:draw(tag, x, y)
 end
 
 function pinball.drawKicker (tag, x, y, points)
-    --love.graphics.setLineWidth (1)
-    --love.graphics.setColor(108, 196, 113)
-    --love.graphics.polygon("fill", points)
     bumperManager:draw(tag, x, y)
 end
 
 function pinball.drawTrigger (tag, points)
-    --love.graphics.setLineWidth (1)
-    --love.graphics.setColor(255, 255, 255, 32)
-    --love.graphics.polygon("fill", points)
 end
 
 function pinball.drawFlipper (orientation, position, angle, origin, points)
@@ -434,27 +418,16 @@ function pinball.drawFlipper (orientation, position, angle, origin, points)
     -- origin {x,y} is offset from the physics body center
     -- points {} are polygon vertices
 
-    --love.graphics.setColor(108, 113, 196)
-    --love.graphics.polygon("fill", points)
-    --love.graphics.setLineWidth (4)
-    --love.graphics.setColor(68, 73, 156)
-    --love.graphics.polygon("line", points)
-
     ---- The flipper body is positioned relative to it's center, given
     ---- as the origin parameter. When we draw the image we offset by the
     ---- origin to line the top-left corner of our image with the body.
-    love.graphics.setColor(255, 255, 255, 255)
+    love.graphics.setColor(1, 1, 1, 1)
     local scaleX = (orientation == "left") and 1 or -1  -- a negative scale flips the image horizontally
     love.graphics.draw(sprites.leftflipper.image, position.x, position.y, angle, scaleX, 1, origin.x, origin.y)
 end
 
 function pinball.drawBall (x, y, radius)
-    --love.graphics.setLineWidth (4)
-    --love.graphics.setColor(238, 232, 213, alpha)
-    --love.graphics.circle("fill", x, y, radius)
-    --love.graphics.setColor(147, 161, 161, alpha)
-    --love.graphics.circle("line", x, y, radius)
-    love.graphics.setColor(255, 255, 255, 255)
+    love.graphics.setColor(1, 1, 1, 1)
     love.graphics.draw(sprites.ball.image, x, y, 0, 1, 1, sprites.ball.ox, sprites.ball.oy)
 end
 

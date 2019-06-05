@@ -65,9 +65,9 @@ end
 
 function about:draw()
     -- texts
-    love.graphics.setColor(128, 255, 255, 255)
+    love.graphics.setColor(0.5, 1, 1, 1)
     aboutHeading:draw()
-    love.graphics.setColor(255, 255, 128, 255)
+    love.graphics.setColor(1, 1, 0.5, 1)
     aboutDetail:draw()
 end
 

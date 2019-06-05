@@ -2,7 +2,7 @@ local splash = {}
 
 function splash:load()
     love.graphics.setFont(smallFont)
-    love.graphics.setBackgroundColor(0, 0, 0, 255)
+    love.graphics.setBackgroundColor(0, 0, 0, 1)
     -- center of screen
     self.center = {}
     self.center.x = scrWidth / 2
@@ -69,9 +69,9 @@ function splash:update(dt)
 
         -- Fade the splash screen out
         if (self.fading) then
-            self.fadeAlpha = self.fadeAlpha + (127*dt)
-            if self.fadeAlpha >= 255 then
-                self.fadeAlpha = 255
+            self.fadeAlpha = self.fadeAlpha + (0.5*dt)
+            if self.fadeAlpha >= 1 then
+                self.fadeAlpha = 1
                 self:unload()
                 mainstate:set("menu")
                 love.graphics.setFont(largeFont)
@@ -86,11 +86,11 @@ end
 
 function splash:draw(dt)
     if self.splashLoaded then
-        love.graphics.setColor(0, 255, 0)
+        love.graphics.setColor(0, 1, 0)
         love.graphics.circle("fill", self.center.x, self.center.y, self.r)
-        love.graphics.setColor(255, 255, 255)
+        love.graphics.setColor(1, 1, 1)
         self.sprites:draw()
-        printShadowText(self.loadingMessage, scrHeight - 40, {200, 200, 100})
+        printShadowText(self.loadingMessage, scrHeight - 40, {200/256, 200/256, 100/256})
         if self.fading then
             love.graphics.setColor(0, 0, 0, self.fadeAlpha)
             love.graphics.rectangle("fill", 0, 0, scrWidth, scrHeight)

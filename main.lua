@@ -16,7 +16,7 @@
 -- Written by Wesley "keyboard monkey" Werner 2015
 -- https://github.com/wesleywerner/
 
-VERSION = "0.2.3"
+VERSION = "11.2"
 DEBUG = false
 spriteManager = require("modules.sprite-state-manager")
 stateManager = require ("modules.states")
@@ -118,7 +118,7 @@ end
 -- A global function to draw better readable words
 function printShadowText(text, y, color)
     -- Shadow
-    love.graphics.setColor(0, 0, 0, 200)
+    love.graphics.setColor(0, 0, 0, 200/256)
     love.graphics.printf (text, 2, y+2, scrWidth, "center")
     -- Text
     love.graphics.setColor(unpack(color))

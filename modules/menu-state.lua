@@ -131,10 +131,10 @@ function thisState:drawOptionsMenu()
     local color
     for _, m in ipairs(currentOptions) do
         if (currentOptions[selectedItem] == m) then
-            color = {255, 255, 255, 255}
+            color = {1, 1, 1, 1}
             love.graphics.draw(sprites.ball.image, 160, y)
         else
-            color = {200, 200, 255, 255}
+            color = {200/256, 200/256, 1, 1}
         end
         printShadowText(m, y, color)
         y = y + 80
@@ -146,11 +146,11 @@ function thisState:drawSelectedOptionDescription()
     local value = cfg.values[setting.meta]
     local detail = setting.details[value]
     love.graphics.setFont(smallFont)
-    printShadowText(detail, scrHeight - 60, {200, 255, 200, 255})
+    printShadowText(detail, scrHeight - 60, {200/256, 1, 200/256, 1})
 end
 
 function thisState:draw ( )
-    love.graphics.setColor(255, 255, 255, 255)
+    love.graphics.setColor(1, 1, 1, 1)
     -- Draw background
     love.graphics.draw(sprites.background.image, 0, 0)
     -- Draw rotating overlay
