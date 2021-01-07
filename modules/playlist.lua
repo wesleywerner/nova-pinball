@@ -70,7 +70,7 @@ end
 --      title, loop, volume
 function playlist:addTrack(path, filename)
     local nfopath = path .. "/" .. filename .. ".nfo"
-    local infoExists = love.filesystem.exists(nfopath)
+    local infoExists = love.filesystem.getInfo(nfopath)
     local track = {}
     track.file = path .. "/" .. filename
     track.volume = 1
@@ -131,8 +131,8 @@ end
 
 function playlist:pauseUnpause()
     if (playlist.turnedOn and playlist.source) then
-        if (playlist.source:isPaused()) then
-            playlist.source:resume()
+        if (not playlist.source:isPlaying()) then
+            playlist.source:play()
         else
             playlist.source:pause()
         end
@@ -198,7 +198,7 @@ function playlist:update(dt)
             
         else
             -- Track is finished playing
-            if (playlist.source:isStopped()) then
+            if (not playlist.source:isPlaying()) then
                 playlist.source = nil
             elseif (playlist.playedTime > playlist.maxPlayTime) then
                 playlist.isFadingOut = true

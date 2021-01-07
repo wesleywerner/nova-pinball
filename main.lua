@@ -16,7 +16,7 @@
 -- Written by Wesley "keyboard monkey" Werner 2015
 -- https://github.com/wesleywerner/
 
-VERSION = "0.2.3"
+VERSION = "11.2"
 DEBUG = false
 spriteManager = require("modules.sprite-state-manager")
 stateManager = require ("modules.states")
@@ -53,7 +53,7 @@ function love.load(arg)
 
 end
 
-function love.update (dt)
+function love.update(dt)
     dt = math.min(1/60, dt)
     mainstate:update(dt)
     if (mainstate:on("play")) then
@@ -67,7 +67,7 @@ function love.update (dt)
     end
 end
 
-function love.keypressed (key, isrepeat)
+function love.keypressed(key, isrepeat)
     if (mainstate:on("play")) then
         playstate:keypressed(key)
     elseif (mainstate:on("splash")) then
@@ -85,7 +85,7 @@ function love.keyreleased(key)
     end
 end
 
-function love.draw ( )
+function love.draw()
     if (mainstate:on("play")) then
         playstate:draw()
     elseif (mainstate:on("splash")) then
@@ -95,7 +95,7 @@ function love.draw ( )
     end
 end
 
-function love.resize (w, h)
+function love.resize(w, h)
     scrWidth, scrHeight = w, h
     playstate:resize(w, h)
 end
@@ -118,7 +118,7 @@ end
 -- A global function to draw better readable words
 function printShadowText(text, y, color)
     -- Shadow
-    love.graphics.setColor(0, 0, 0, 200)
+    love.graphics.setColor(0, 0, 0, 200/256)
     love.graphics.printf (text, 2, y+2, scrWidth, "center")
     -- Text
     love.graphics.setColor(unpack(color))
@@ -126,7 +126,7 @@ function printShadowText(text, y, color)
 end
 
 -- A global function to load a sprite and calculate the center point.
-function loadSprite (path)
+function loadSprite(path)
     -- Store sprites as
     --      sprite.image
     --      sprite.size     (width, height)

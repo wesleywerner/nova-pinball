@@ -75,7 +75,7 @@ function play:load()
     play.flashAllTargets()
 end
 
-function play:update (dt)
+function play:update(dt)
     states:update(dt)
     play.updateLedDisplayMessages(dt)
 
@@ -116,7 +116,7 @@ function play:update (dt)
 
 end
 
-function play:keypressed (key)
+function play:keypressed(key)
     if (states:on("preview")) then
         if (key == "space") then play.launchBall(true) end
         if (key == "escape") then mainstate:set("menu") end
@@ -174,11 +174,11 @@ function play:keyreleased(key)
     end
 end
 
-function play:draw ( )
+function play:draw()
 
     -- Reset drawing color
     love.graphics.setBackgroundColor(0, 0, 0)
-    love.graphics.setColor (255, 255, 255, 255)
+    love.graphics.setColor (1, 1, 1, 1)
 
     -- Center in the screen
     love.graphics.translate(play.leftAlign, play.topAlign)
@@ -187,7 +187,7 @@ function play:draw ( )
     pinball:setCamera()
 
     -- Draw the background image. It has a 20px border we account for.
-    love.graphics.setColor(255, 255, 255, 255)
+    love.graphics.setColor(1, 1, 1, 1)
     sprites.background:draw()
 
     -- Draw targets and sprites
@@ -208,7 +208,7 @@ function play:draw ( )
 
     -- Draw the launch cover over the pinball components
     -- (reposition the camera as the pinball module resets it after it draws)
-    love.graphics.setColor (255, 255, 255, 255)
+    love.graphics.setColor (1, 1, 1, 1)
     sprites.launchCover:draw()
 
     -- Draw the status box
@@ -216,22 +216,22 @@ function play:draw ( )
     play.drawStatusBar()
 
     -- Draw the LED display
-    love.graphics.setColor(0, 0, 0, 255)
+    love.graphics.setColor(0, 0, 0, 1)
     love.graphics.rectangle("fill", 0, scrHeight - led.size.h, scrWidth, led.size.h)
     love.graphics.setFont(largeFont)
-    love.graphics.setColor(50, 255, 50, 255)
+    love.graphics.setColor(50/256, 1, 50/256, 1)
     led:draw()
 
     -- Simple text overlays
     if (states:on("paused")) then
         pausedScreen:draw()
     elseif (states:on("game over")) then
-        printShadowText("GAME OVER", 200, {255, 128, 255, 200})
+        printShadowText("GAME OVER", 200, {1, 0.5, 1, 200/256})
     end
 
 end
 
-function play:resize (w, h)
+function play:resize(w, h)
     play.positionDrawingElements()
     pinball:resize (w, h)
 end
@@ -260,27 +260,27 @@ function play.drawStatusBar()
     local height = 20
     
     if play.isSafe() then
-        local g = play.safeMode*(255/play.safeModePeriod)
-        love.graphics.setColor(0, g, 0, 155)
+        local g = play.safeMode*(1/play.safeModePeriod)
+        love.graphics.setColor(0, g, 0, 155/256)
     else
-        love.graphics.setColor(0, 0, 0, 255)
+        love.graphics.setColor(0, 0, 0, 1)
     end
     
     love.graphics.rectangle("fill", 0, 0, scrWidth, height)
     love.graphics.setFont(smallFont)
 
-    love.graphics.setColor(255, 255, 255, 255)
+    love.graphics.setColor(1, 1, 1, 1)
     love.graphics.print("Balls:" .. play.balls, play.ballStatXPosition, 2)
     love.graphics.print("Score:" .. play.scoreFormatted, 10, 2)
     
     if play.isSafe() then
-        local g = play.safeMode*(255/play.safeModePeriod)
-        love.graphics.setColor(g, g, 0, 255)
+        local g = play.safeMode*(1/play.safeModePeriod)
+        love.graphics.setColor(g, g, 0, 1)
         love.graphics.print("BALL SAVER", play.ballStatXPosition-200, 2)
     end
     
     if (DEBUG) then
-        love.graphics.setColor(255, 100, 100, 255)
+        love.graphics.setColor(1, 100/256, 100/256, 1)
         love.graphics.print("DEBUG", 340, 30)
     end
 end
@@ -382,7 +382,7 @@ function play.updateLedDisplayMessages(dt)
     end
 end
 
-function pinball.drawWall (points)
+function pinball.drawWall(points)
     -- Draw the table walls onto a canvas
     if (play.predraw) then
         -- Accommodate points that go into the negative Y-axiz
@@ -393,74 +393,47 @@ function pinball.drawWall (points)
         end
         play.wallCanvas:renderTo( function()
             love.graphics.setLineWidth(6)
-            love.graphics.setColor(55, 53, 140, 255)
+            love.graphics.setColor(55/256, 53/256, 140/256, 1)
             love.graphics.line(points)
             end
         )
     end
 end
 
-function pinball.drawBumper (tag, x, y, r)
-    --love.graphics.setLineWidth (2)
-    --love.graphics.setColor(42, 161, 152)
-    --love.graphics.circle("fill", x, y, r * 0.8)
-    --love.graphics.setColor(108, 113, 196)
-    --love.graphics.circle("line", x, y, r)
-
-    ---- draw bumper image
-    --love.graphics.setColor(255, 255, 255, 255)
-    --love.graphics.draw(sprites.bumper.image, x, y, 0, 1, 1, sprites.bumper.ox, sprites.bumper.oy)
-    
+function pinball.drawBumper(tag, x, y, r)
     bumperManager:draw(tag, x, y)
 end
 
-function pinball.drawKicker (tag, x, y, points)
-    --love.graphics.setLineWidth (1)
-    --love.graphics.setColor(108, 196, 113)
-    --love.graphics.polygon("fill", points)
+function pinball.drawKicker(tag, x, y, points)
     bumperManager:draw(tag, x, y)
 end
 
-function pinball.drawTrigger (tag, points)
-    --love.graphics.setLineWidth (1)
-    --love.graphics.setColor(255, 255, 255, 32)
-    --love.graphics.polygon("fill", points)
+function pinball.drawTrigger(tag, points)
 end
 
-function pinball.drawFlipper (orientation, position, angle, origin, points)
+function pinball.drawFlipper(orientation, position, angle, origin, points)
     -- orientation is "left" or "right"
     -- position {x,y}
     -- angle is in radians
     -- origin {x,y} is offset from the physics body center
     -- points {} are polygon vertices
 
-    --love.graphics.setColor(108, 113, 196)
-    --love.graphics.polygon("fill", points)
-    --love.graphics.setLineWidth (4)
-    --love.graphics.setColor(68, 73, 156)
-    --love.graphics.polygon("line", points)
-
     ---- The flipper body is positioned relative to it's center, given
     ---- as the origin parameter. When we draw the image we offset by the
     ---- origin to line the top-left corner of our image with the body.
-    love.graphics.setColor(255, 255, 255, 255)
+    love.graphics.setColor(1, 1, 1, 1)
     local scaleX = (orientation == "left") and 1 or -1  -- a negative scale flips the image horizontally
     love.graphics.draw(sprites.leftflipper.image, position.x, position.y, angle, scaleX, 1, origin.x, origin.y)
 end
 
-function pinball.drawBall (x, y, radius)
-    --love.graphics.setLineWidth (4)
-    --love.graphics.setColor(238, 232, 213, alpha)
-    --love.graphics.circle("fill", x, y, radius)
-    --love.graphics.setColor(147, 161, 161, alpha)
-    --love.graphics.circle("line", x, y, radius)
-    love.graphics.setColor(255, 255, 255, 255)
+function pinball.drawBall(x, y, radius)
+    love.graphics.setColor(1, 1, 1, 1)
     love.graphics.draw(sprites.ball.image, x, y, 0, 1, 1, sprites.ball.ox, sprites.ball.oy)
 end
 
 -- Called when a ball has drained out of play.
 -- The number of balls still in play are passed.
-function pinball.ballDrained (ballsInPlay)
+function pinball.ballDrained(ballsInPlay)
     aplay(sounds.drained)
     if play.isSafe() then
         play.launchBall(false)
@@ -483,7 +456,7 @@ function pinball.ballUnlocked(id)
 end
 
 -- The ball made contact with a tagged component
-function pinball.tagContact (tag, id)
+function pinball.tagContact(tag, id)
 
     if (tag == "black hole" and not play.tilt) then
         local blackHoleVisible = spriteStates:item("black hole").visible
@@ -836,29 +809,29 @@ end
 
 -- Load game sounds into the sounds table.
 function play.loadSounds()
-    sounds.leftFlipper = love.audio.newSource("audio/flipper.wav")
-    sounds.rightFlipper = love.audio.newSource("audio/flipper.wav")
-    sounds.wall = love.audio.newSource("audio/wall.wav")
-    sounds.leftBumper = love.audio.newSource("audio/bumper.wav")
-    sounds.middleBumper = love.audio.newSource("audio/bumper.wav")
-    sounds.rightBumper = love.audio.newSource("audio/bumper.wav")
-    sounds.wordBonus = love.audio.newSource("audio/wordbonus.wav")
-    sounds.target = love.audio.newSource("audio/target.wav")
-    sounds.ramp = love.audio.newSource("audio/ramp.wav")
-    sounds.launch = love.audio.newSource("audio/launch.wav")
-    sounds.wormhole = love.audio.newSource("audio/wormhole.wav")
+    sounds.leftFlipper = love.audio.newSource("audio/flipper.wav", "static")
+    sounds.rightFlipper = love.audio.newSource("audio/flipper.wav", "static")
+    sounds.wall = love.audio.newSource("audio/wall.wav", "static")
+    sounds.leftBumper = love.audio.newSource("audio/bumper.wav", "static")
+    sounds.middleBumper = love.audio.newSource("audio/bumper.wav", "static")
+    sounds.rightBumper = love.audio.newSource("audio/bumper.wav", "static")
+    sounds.wordBonus = love.audio.newSource("audio/wordbonus.wav", "static")
+    sounds.target = love.audio.newSource("audio/target.wav", "static")
+    sounds.ramp = love.audio.newSource("audio/ramp.wav", "static")
+    sounds.launch = love.audio.newSource("audio/launch.wav", "static")
+    sounds.wormhole = love.audio.newSource("audio/wormhole.wav", "static")
     sounds.wormhole:setLooping(true)
-    sounds.wormholeClose = love.audio.newSource("audio/wormhole-close.wav")
-    sounds.timewarp = love.audio.newSource("audio/timewarp.wav")
-    sounds.blackHole = love.audio.newSource("audio/blackhole.wav")
-    sounds.blackHoleRelease = love.audio.newSource("audio/blackhole-release.wav")
-    sounds.blackHoleLock = love.audio.newSource("audio/blackhole-lock.wav")
-    sounds.nudge = love.audio.newSource("audio/nudge.wav")
-    sounds.hydrogenReleased = love.audio.newSource("audio/hydrogen-released.wav")
+    sounds.wormholeClose = love.audio.newSource("audio/wormhole-close.wav", "static")
+    sounds.timewarp = love.audio.newSource("audio/timewarp.wav", "static")
+    sounds.blackHole = love.audio.newSource("audio/blackhole.wav", "static")
+    sounds.blackHoleRelease = love.audio.newSource("audio/blackhole-release.wav", "static")
+    sounds.blackHoleLock = love.audio.newSource("audio/blackhole-lock.wav", "static")
+    sounds.nudge = love.audio.newSource("audio/nudge.wav", "static")
+    sounds.hydrogenReleased = love.audio.newSource("audio/hydrogen-released.wav", "static")
     sounds.fusion1 = sounds.hydrogenReleased
     sounds.fusion2 = sounds.hydrogenReleased
-    sounds.drained = love.audio.newSource("audio/ball-drained.wav")
-    sounds.supergravityBonus = love.audio.newSource("audio/supergravity-bonus.wav")
+    sounds.drained = love.audio.newSource("audio/ball-drained.wav", "static")
+    sounds.supergravityBonus = love.audio.newSource("audio/supergravity-bonus.wav", "static")
 end
 
 -- Position the background image.

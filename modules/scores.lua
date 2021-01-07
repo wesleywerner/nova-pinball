@@ -47,8 +47,8 @@ function scores:load()
         {score=2000, initials="HHH", date="03/11/2015"},
         }
     -- Load scores from file
-    local exists = love.filesystem.exists("scores")
-    if exists then
+    local info = love.filesystem.getInfo("scores")
+    if info then
         local pickle = require("modules.pickle")
         local rawData, size = love.filesystem.read("scores")
         local data = pickle.unpickle(rawData)
@@ -141,14 +141,14 @@ function scores:draw()
         if (i == scores.newScoreIndex) then
             if (self.isTyping) then
                 -- Highligh initial being entered
-                love.graphics.setColor (0, 255, 255, 255)
+                love.graphics.setColor (0, 1, 1, 1)
             else
                 -- Highlight latest score
-                love.graphics.setColor (100, 255, 100, 255)
+                love.graphics.setColor (100/256, 1, 100/256, 1)
             end
         else
             -- Normal score
-            love.graphics.setColor (255, 255, 255, 255)
+            love.graphics.setColor (1, 1, 1, 1)
         end
         love.graphics.print(entry.initials, 80, y)
         love.graphics.print(scores.formatNumber(entry.score), 200, y)
@@ -157,7 +157,7 @@ function scores:draw()
     end
     -- Draw culled scores
     y = y + 50
-    love.graphics.setColor (255, 100, 100, 255)
+    love.graphics.setColor (1, 100/256, 100/256, 1)
     for i, entry in ipairs(self.culled) do
         love.graphics.print(entry.initials, 80, y)
         love.graphics.print(scores.formatNumber(entry.score), 200, y)
