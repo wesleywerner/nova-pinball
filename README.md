@@ -6,6 +6,8 @@ _Updated for LOVE2D 11.2, 2019 Eric Ahnell_
 
 **Your mission**: Make the star go nova. There are in-game hints that point out the next target to achieve your goal.
 
+![screenshot](images/screenshot1.jpg)
+
 # HOW TO PLAY
 
 * The `UP`, `DOWN` and `SPACE` keys navigate the menus.
