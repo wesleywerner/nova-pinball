@@ -181,7 +181,7 @@ function touch.update(self, dt, zone)
     
     if touch.cooldownvalue > 0 then return end
     
-    if love.mouse.isDown('l') then
+    if love.mouse.isDown(1) then
     
         local x, y = love.mouse.getPosition() 
         

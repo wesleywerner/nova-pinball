@@ -70,7 +70,7 @@ function love.load(arg)
        touch:add("play", "rshift", "", {left=70, top=20, bottom=70, right=100},
            love.graphics.newImage("images/android-right-shift.png"))
        
-       touch:add("play", " ", "Launch", {left=70, top=70, bottom=100, right=100},
+       touch:add("play", "space", "Launch", {left=70, top=70, bottom=100, right=100},
            love.graphics.newImage("images/android-arrow-up.png"))
        
        touch:add("paused", " ", "Launch", {left=0, top=0, bottom=100, right=100})
