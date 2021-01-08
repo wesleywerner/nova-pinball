@@ -2,30 +2,52 @@
 
 _Copyleft 2015 Wesley Werner_
 
+_Updated for LOVE2D 11.2, 2019 Eric Ahnell_
+
 **Your mission**: Make the star go nova. There are in-game hints that point out the next target to achieve your goal.
 
-# GOOD TO KNOW
+![screenshot](images/screenshot1.jpg)
 
-* The `SHIFT` keys control the flippers
-* The `SPACE` key launches the ball, and nudges the table
-* Written in LUA with [LOVE, a 2D game framework](http://love2d.org/)
-* Powered by kittens
+# HOW TO PLAY
+
+* The `UP`, `DOWN` and `SPACE` keys navigate the menus.
+* The `LEFT` + `RIGHT SHIFT` keys control the flippers
+* The `SPACE` key launches the ball.
+* `SPACE` also nudges the table if a ball is in play.
+* If you nudge too much the table will tilt.
+
+# TABLE FEATURES
+
+* Missions: Target goal hints are given during play, in the LED display and as flashing table lights (configurable in settings).
+* Safe Mode: A 30 second grace period where a free ball is launched on a drain.
+* Multi-ball: Complete the "Matter Jettison" mission to release the second bonus ball.
+* Tilt: You don't score points and the flippers won't move until a ball is drained.
 
 # CREDITS
 
 Thanks goes to these people for letting me use their work:
 
-**Advanced LED Board-7 Font** by Sizenko Alexander  
+**Music** created by Beyond
+http://modarchive.org/member.php?82730  
+https://soundcloud.com/beyond-26  
+
+**Advanced LED Board-7 Font** created by Sizenko Alexander  
 http://www.styleseven.com  
 http://www.fontspace.com/style-7/advanced-led-board-7
 
-**Erbos Draco Open NBP Font** by made by Nate Halley  
+**Erbos Draco Open NBP Font** created by Nate Halley  
 Licensed under Creative Commons (by-sa)  
 http://www.fontspace.com/total-fontgeek-dtf-ltd/erbos-draco-monospaced-nbp
 
+**Lua File Pickler** created by Steve Dekorte  
+http://www.dekorte.com, Apr 2000
+
+**SFXR sound effect generator** created by Tomas Pettersson
+http://www.drpetter.se/project_sfxr.html
+
 # ENGINE
 
-The game is created on top of the Nova Pinball Engine, also available under the same license, [here](https://github.com/wesleywerner/nova-pinball-engine).
+The game is created on top of the Nova Pinball Engine, also available under the same license, [here](https://github.com/wrldwzrd89/nova-pinball-engine).
 
 # LICENSE
 
