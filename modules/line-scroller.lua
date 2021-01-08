@@ -32,8 +32,8 @@ function scroll:new()
     T.goalX = 0
     T.x = scrWidth
     T.y = scrHeight / 2
-    T.alpha = 255
-    T.color = {255, 255, 255, 255}
+    T.alpha = 1
+    T.color = {1, 1, 1, 1}
     T.text = ""
     T.pauseTimer = scroll.pauseTime
     -- Modes can be: IN, PAUSE, OUT, NONE

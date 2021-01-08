@@ -31,7 +31,7 @@ function manager:add(tag, image, flipX, flipY)
 end
 
 function manager:draw(tag, x, y)
-    love.graphics.setColor(255, 255, 255, 255)
+    love.graphics.setColor(1, 1, 1, 1)
     local bumper = self.bumpers[tag]
     if (bumper) then
         local scaleX = bumper.flipX

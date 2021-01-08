@@ -45,7 +45,7 @@ function thisState:load()
     sprites.spikes = loadSprite("images/about-screen-spikes.png")
     -- Rotating checkerboard
     local spr = spriteStates:add("checkers", sprites.background):setRotation(0.05)
-    spr:setBlendmode("subtractive")
+    spr:setBlendmode("subtract")
     spr.sprite.x = scrWidth / 2
     spr.sprite.y = scrHeight / 2
     
@@ -59,7 +59,7 @@ function thisState:load()
     if (cfg:get("music") == 1) then playlist:play("Supernova Explosion") end
 end
 
-function thisState:update (dt)
+function thisState:update(dt)
     touch:update(dt, "menu")
     self.state:update(dt)
     spriteStates:update(dt)
@@ -80,7 +80,7 @@ function thisState:mousereleased(x, y, button)
     -- touch handled in touch:update()
 end
 
-function thisState:keypressed (key)
+function thisState:keypressed(key)
     -- Menu navigation
     if (key == "up") then
         aplay(menuSound)
@@ -96,7 +96,7 @@ function thisState:keypressed (key)
         if (key == "escape") then
             -- Focus the last main menu item
             selectedItem = #currentOptions
-        elseif (key == "return" or key == "enter" or key == " ") then
+        elseif (key == "return" or key == "enter" or key == "space") then
             self:menuAction()
         end
     elseif (self.state:on("config")) then
@@ -115,11 +115,11 @@ function thisState:keypressed (key)
             self.state:set("main")
             currentOptions = mainOptions
             self:resetSelection()
-        elseif (key == "return" or key == "enter" or key == " ") then
+        elseif (key == "return" or key == "enter" or key == "space") then
             self:menuAction()
         end
     elseif (self.state:on("about")) then
-        if (key == " ") then
+        if (key == "space") then
             about:forward()
         elseif (key == "escape") then
             self.state:set("main")
@@ -146,10 +146,10 @@ function thisState:drawOptionsMenu(measureTouchPositions)
     local color
     for i, m in ipairs(currentOptions) do
         if (currentOptions[selectedItem] == m) then
-            color = {255, 255, 255, 255}
+            color = {1, 1, 1, 1}
             love.graphics.draw(sprites.ball.image, 160, y)
         else
-            color = {200, 200, 255, 255}
+            color = {200/256, 200/256, 1, 1}
         end
         printShadowText(m, y, color)
         
@@ -169,11 +169,11 @@ function thisState:drawSelectedOptionDescription()
     local value = cfg.values[setting.meta]
     local detail = setting.details[value]
     love.graphics.setFont(smallFont)
-    printShadowText(detail, scrHeight - 60, {200, 255, 200, 255})
+    printShadowText(detail, scrHeight - 60, {200/256, 1, 200/256, 1})
 end
 
-function thisState:draw ( )
-    love.graphics.setColor(255, 255, 255, 255)
+function thisState:draw()
+    love.graphics.setColor(1, 1, 1, 1)
     -- Draw background
     love.graphics.draw(sprites.background.image,
         (scrWidth - sprites.background.image:getWidth())/2, 0)
@@ -197,7 +197,7 @@ function thisState:draw ( )
     end
 end
 
-function thisState:resize (w, h)
+function thisState:resize(w, h)
 
 end
 

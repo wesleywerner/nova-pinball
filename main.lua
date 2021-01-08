@@ -2,12 +2,12 @@
 -- it under the terms of the GNU General Public License as published by
 -- the Free Software Foundation, either version 3 of the License, or
 -- any later version.
-   
+
 -- This program is distributed in the hope that it will be useful,
 -- but WITHOUT ANY WARRANTY; without even the implied warranty of
 -- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 -- GNU General Public License for more details.
-   
+
 -- You should have received a copy of the GNU General Public License
 -- along with this program. If not, see http://www.gnu.org/licenses/.
 
@@ -16,7 +16,7 @@
 -- Written by Wesley "keyboard monkey" Werner 2015
 -- https://github.com/wesleywerner/
 
-VERSION = "0.2.3"
+VERSION = "11.2"
 DEBUG = true
 spriteManager = require("modules.sprite-state-manager")
 stateManager = require ("modules.states")
@@ -36,7 +36,7 @@ function love.load(arg)
     if arg[#arg] == "-debug" then require("mobdebug").start() end
     math.randomseed(os.time())
     if not DEBUG then love.mouse.setVisible(false) end
-    scrWidth, scrHeight = love.window.getDimensions()
+    scrWidth, scrHeight = love.graphics.getDimensions()
 
     -- Set up main states
     mainstate = stateManager:new()
@@ -79,7 +79,7 @@ function love.load(arg)
 
 end
 
-function love.update (dt)
+function love.update(dt)
     dt = math.min(1/60, dt)
     mainstate:update(dt)
     if (mainstate:on("play")) then
@@ -93,7 +93,7 @@ function love.update (dt)
     end
 end
 
-function love.keypressed (key, isrepeat)
+function love.keypressed(key, isrepeat)
     if (mainstate:on("play")) then
         playstate:keypressed(key)
     elseif (mainstate:on("splash")) then
@@ -129,7 +129,7 @@ function love.mousereleased(x, y, button)
     end
 end
 
-function love.draw ( )
+function love.draw()
     if (mainstate:on("play")) then
         playstate:draw()
     elseif (mainstate:on("splash")) then
@@ -139,7 +139,7 @@ function love.draw ( )
     end    
 end
 
-function love.resize (w, h)
+function love.resize(w, h)
     scrWidth, scrHeight = w, h
     playstate:resize(w, h)
 end
@@ -162,7 +162,7 @@ end
 -- A global function to draw better readable words
 function printShadowText(text, y, color)
     -- Shadow
-    love.graphics.setColor(0, 0, 0, 200)
+    love.graphics.setColor(0, 0, 0, 200/256)
     love.graphics.printf (text, 2, y+2, scrWidth, "center")
     -- Text
     love.graphics.setColor(unpack(color))
@@ -170,9 +170,9 @@ function printShadowText(text, y, color)
 end
 
 -- A global function to load a sprite and calculate the center point.
-function loadSprite (path)
+function loadSprite(path)
     -- Store sprites as
-    --      sprite.image    
+    --      sprite.image
     --      sprite.size     (width, height)
     --      sprite.ox       draw offset x
     --      sprite.oy       draw offset y

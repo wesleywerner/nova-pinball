@@ -51,14 +51,14 @@ function screen:draw()
     love.graphics.setLineWidth(6)
     
     -- Full screen overlay
-    love.graphics.setColor(0, 0, 0, 200)
+    love.graphics.setColor(0, 0, 0, 200/256)
     love.graphics.rectangle(
         "fill", 0 , 0, 
         screen.width, 
         screen.height)
     
     -- Box Fill
-    love.graphics.setColor(0, 128, 128, 200)
+    love.graphics.setColor(0, 0.5, 0.5, 200/256)
     love.graphics.rectangle(
         "fill",
         screen.pauseBox.x, 
@@ -67,7 +67,7 @@ function screen:draw()
         screen.pauseBox.height)
     
     -- Box Outline
-    love.graphics.setColor(200, 255, 200, 200)
+    love.graphics.setColor(200/256, 1, 200/256, 200/256)
     love.graphics.rectangle(
         "line",
         screen.pauseBox.x, 
@@ -78,7 +78,7 @@ function screen:draw()
     -- Box Title
     printShadowText("PAUSED", 
         screen.titleBox.center.y,
-        {200, 255, 200, 255})
+        {200/256, 1, 200/256, 1})
     
     if screen:drawNowPlayingTrack() then
         screen:drawVolumeBar()
@@ -103,7 +103,7 @@ function screen:drawVolumeBar()
     -- Volume Bar
     love.graphics.setLineWidth(2)
     -- (fill)
-    love.graphics.setColor(0, 200, 0, 200)
+    love.graphics.setColor(0, 200/256, 0, 200/256)
     love.graphics.rectangle(
         "fill",
         screen.volumeBox.x, 
@@ -111,7 +111,7 @@ function screen:drawVolumeBar()
         20, 
         screen.volumeBox.height)
     -- (outline)
-    love.graphics.setColor(0, 0, 0, 100)
+    love.graphics.setColor(0, 0, 0, 100/256)
     love.graphics.rectangle(
         "line",
         screen.volumeBox.x, 
@@ -119,7 +119,7 @@ function screen:drawVolumeBar()
         20, 
         screen.volumeBox.height)
     -- (green bar)
-    love.graphics.setColor(0, 0, 0, 200)
+    love.graphics.setColor(0, 0, 0, 200/256)
     love.graphics.rectangle(
         "fill",
         screen.volumeBox.x,
@@ -149,14 +149,14 @@ function screen:drawNowPlayingTrack()
         
         -- Draw an insert box for the title
         -- (Fill)
-        love.graphics.setColor(0, 0, 0, 64)
+        love.graphics.setColor(0, 0, 0, 0.25)
         love.graphics.rectangle("fill", 
             screen.trackBox.x, 
             screen.trackBox.y,
             screen.trackBox.width,
             screen.trackBox.height)
         -- (Lines)
-        love.graphics.setColor(255, 255, 255, 100)
+        love.graphics.setColor(1, 1, 1, 100/256)
         love.graphics.rectangle("line", 
             screen.trackBox.x - 0,
             screen.trackBox.y - 0,
@@ -164,7 +164,7 @@ function screen:drawNowPlayingTrack()
             screen.trackBox.height - 2)
         
         -- Print the track title (inside the inset box)
-        love.graphics.setColor(255, 255, 200, 255)
+        love.graphics.setColor(1, 1, 200/256, 1)
         love.graphics.printf(title, 
             screen.trackBox.x + 6,
             screen.trackBox.y + 6,
@@ -172,7 +172,7 @@ function screen:drawNowPlayingTrack()
             "left")
 
         if not touch.active then
-            love.graphics.setColor(255, 255, 255, 64)
+            love.graphics.setColor(1, 1, 1, 0.25)
             love.graphics.printf("Arrows - Skip + Volume",
                 screen.hintBox.x,
                 screen.hintBox.y,

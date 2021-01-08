@@ -20,12 +20,12 @@ local states = { }
 states.all = {}
 states.current = nil
 
-function states:add (name, timeout, nextstate)
+function states:add(name, timeout, nextstate)
     local s = {name=name, timeout=timeout, nextstate=nextstate, timer=0}
     table.insert(self.all, s)
 end
 
-function states:new ()
+function states:new()
     local function deepcopy(orig)
         local orig_type = type(orig)
         local copy
@@ -55,7 +55,7 @@ function states:on(value)
     return self.current == value
 end
 
-function states:update (dt)
+function states:update(dt)
     local current = self.all[self.current]
     if (current and current.timeout) then
         current.timer = current.timer + dt
