@@ -37,8 +37,6 @@ function thisState:load()
     -- Load the about display module
     about = require("modules.about-state")
     about:load()
-    -- Apply the screen setting
-    love.window.setFullscreen(cfg:get("fullscreen") == 1)
     -- Load image resources
     sprites.ball = loadSprite("images/ball.png")
     sprites.background = loadSprite("images/about-screen-background.png")
@@ -48,11 +46,19 @@ function thisState:load()
     spr:setBlendmode("subtract")
     spr.sprite.x = scrWidth / 2
     spr.sprite.y = scrHeight / 2
+    -- Apply the screen setting
+    self:setFullscreen()
     -- Menu sounds
     menuSound = love.audio.newSource("audio/menu.wav", "static")
     
     -- Play the Nova theme song
     if (cfg:get("music") == 1) then playlist:play("Supernova Explosion") end
+end
+
+function thisState:setFullscreen()
+    -- Apply the screen setting
+    love.window.setFullscreen(cfg:get("fullscreen") == 1)
+    scrWidth, scrHeight = love.graphics.getDimensions()
 end
 
 function thisState:update(dt)
@@ -86,8 +92,8 @@ function thisState:keypressed(key)
         end
     elseif (self.state:on("config")) then
         if (key == "escape") then
-            -- Apply window/fullscreen
-            love.window.setFullscreen(cfg:get("fullscreen") == 1)
+            self:setFullscreen()
+            self:draw() -- redraw menu in case of switching from/to fullscreen
             -- Play/Stop music
             if (cfg:get("music") == 1) then
                 playlist:play()
@@ -132,7 +138,8 @@ function thisState:drawOptionsMenu()
     for _, m in ipairs(currentOptions) do
         if (currentOptions[selectedItem] == m) then
             color = {1, 1, 1, 1}
-            love.graphics.draw(sprites.ball.image, 160, y)
+            love.graphics.draw(sprites.ball.image,
+                (scrWidth - largeFont:getWidth(m)) / 2 - 1.5 * sprites.ball.size[1], y)
         else
             color = {200/256, 200/256, 1, 1}
         end
