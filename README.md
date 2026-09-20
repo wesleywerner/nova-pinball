@@ -1,5 +1,7 @@
 # NOVA PINBALL
 
+> NOTICE: This repo is no longer being maintained. The new home of Nova Pinball is at [Codeberg](https://codeberg.org/wesbot/nova-pinball)
+
 _Copyleft 2015 Wesley Werner_
 
 _Updated for LOVE2D 11.2, 2019 Eric Ahnell_
@@ -47,7 +49,7 @@ http://www.drpetter.se/project_sfxr.html
 
 # ENGINE
 
-The game is created on top of the Nova Pinball Engine, also available under the same license, [here](https://github.com/wrldwzrd89/nova-pinball-engine).
+The game is created on top of the Nova Pinball Engine, also available under the same license, [here](https://github.com/wesleywerner/nova-pinball-engine).
 
 # LICENSE
 
